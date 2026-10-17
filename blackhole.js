@@ -264,7 +264,7 @@
     requestAnimationFrame(frame);
     if (now - last < FRAME_MS - 2) return;
     // Nothing to draw while a full-screen overlay (dashboard, modal, profile page) covers it
-    if (document.body.classList.contains('bg-paused') || document.body.classList.contains('bg-faded')) { last = now; return; }
+    if (document.body.classList.contains('bg-paused')) { last = now; return; }
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
     time += dt * (reduceMotion ? 0.15 : 1.0);

@@ -3002,14 +3002,6 @@
     </div>
     <p class="footer-word" aria-hidden="true">Void Links</p>
     <div class="footer-bottom">
-      <div class="lang-picker" id="lang-picker">
-        <ul class="lang-list" role="listbox" aria-label="Language"></ul>
-        <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false">
-          <img width="22" height="16" alt="">
-          <span><span class="lang-name">English</span> <span class="lang-region">(United States)</span></span>
-          <svg class="lang-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
-        </button>
-      </div>
       <p class="made-with"><span data-i18n="f.tag">Short links with long memories.</span> © 2026 Void Century · <span data-i18n="f.beta">In beta: features may still change.</span></p>
     </div>
   </div>
@@ -3476,38 +3468,6 @@ function setOverlay(on) {
   document.body.style.overflow = lock ? 'hidden' : '';
   document.body.classList.toggle('bg-paused', lock && !document.querySelector('#profile-view.active.show-void'));
 }
-
-// ===== BLACK HOLE FADE =====
-// The black hole owns the first screen. Scrolling past the hero fades it out so the
-// content reads on plain black; it fades back in for the final "Leave your mark" section.
-// While fully faded it stops drawing (saves battery and GPU).
-(function () {
-  const bg = document.getElementById('bg');
-  const hero = document.getElementById('hero');
-  const cta = document.getElementById('cta');
-  if (!bg || !hero) return;
-  const clamp = v => Math.max(0, Math.min(1, v));
-  let ticking = false;
-  function updateFade() {
-    ticking = false;
-    const y = window.scrollY, vh = window.innerHeight, heroH = hero.offsetHeight;
-    // Out: from 35% to 90% of the hero scrolled away
-    const out = clamp((y - heroH * 0.35) / (heroH * 0.55));
-    // Back in: as the final section comes into view
-    const back = cta ? clamp((y + vh - cta.offsetTop - vh * 0.15) / (vh * 0.55)) : 0;
-    // Profile pages without their own background float over the black hole: keep it visible
-    const profileVoid = document.querySelector('#profile-view.active.show-void');
-    const o = profileVoid ? 1 : Math.max(1 - out, back);
-    bg.style.opacity = o.toFixed(3);
-    document.body.classList.toggle('bg-faded', o < 0.01);
-  }
-  const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(updateFade); } };
-  window.addEventListener('scroll', request, { passive: true });
-  window.addEventListener('resize', request);
-  const pv = document.getElementById('profile-view');
-  if (pv) new MutationObserver(request).observe(pv, { attributes: true, attributeFilter: ['class'] });
-  updateFade();
-})();
 
 // ===== NAV SCROLL + PROGRESS =====
 const nav = document.getElementById('nav');

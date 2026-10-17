@@ -22,19 +22,19 @@
   root.id = 'help-bot';
   root.innerHTML = `
     <div class="hb-hint" id="hb-hint" hidden>
-      <span>Hi! Need a hand?</span>
+      <span>Vortex here. Need a hand?</span>
       <button type="button" class="hb-hint-x" aria-label="Dismiss">×</button>
     </div>
-    <button type="button" class="hb-launch" id="hb-launch" aria-haspopup="dialog" aria-expanded="false" aria-controls="hb-panel" aria-label="Open help chat" title="Click for help · drag to move me">
+    <button type="button" class="hb-launch" id="hb-launch" aria-haspopup="dialog" aria-expanded="false" aria-controls="hb-panel" aria-label="Chat with Vortex, the Void Links helper" title="Click for help · drag to move me">
       <canvas class="hb-canvas" aria-hidden="true"></canvas>
       <span class="hb-fallback">${BOT_SVG}<span class="hb-fallback-tag">HELP</span></span>
     </button>
-    <section class="hb-panel" id="hb-panel" role="dialog" aria-label="Void Links help" hidden>
+    <section class="hb-panel" id="hb-panel" role="dialog" aria-label="Vortex, Void Links help" hidden>
       <header class="hb-head">
         <span class="hb-avatar">${BOT_SVG}</span>
         <div class="hb-title">
-          <strong>Void Links Help</strong>
-          <span id="hb-sub">AI assistant · instant answers</span>
+          <strong>Vortex</strong>
+          <span id="hb-sub">Your guide through the void</span>
         </div>
         <button type="button" class="hb-close" aria-label="Close help">×</button>
       </header>
@@ -47,7 +47,7 @@
         <div class="hb-log" id="hb-ai-log" aria-live="polite"></div>
         <div class="hb-chips" id="hb-chips"></div>
         <form class="hb-compose" id="hb-ai-form" autocomplete="off">
-          <input id="hb-ai-input" type="text" maxlength="300" placeholder="Ask anything about Void Links…" aria-label="Your question">
+          <input id="hb-ai-input" type="text" maxlength="300" placeholder="Ask Vortex anything…" aria-label="Your question">
           <button type="submit" aria-label="Send">${SEND_SVG}</button>
         </form>
       </div>
@@ -207,7 +207,7 @@
     mode = m;
     root.querySelectorAll('.hb-modes button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
     root.querySelectorAll('.hb-view').forEach(v => { v.hidden = v.dataset.view !== m; });
-    $('hb-sub').textContent = m === 'ai' ? 'AI assistant · instant answers' : 'Support team · replies by email';
+    $('hb-sub').textContent = m === 'ai' ? 'Your guide through the void' : 'Support team · replies by email';
     if (m === 'human') renderHuman();
   }
   root.querySelector('.hb-modes').addEventListener('click', e => {
@@ -285,12 +285,34 @@
 
   // Knowledge base. `k` are keywords (prefix-matched when 4+ letters).
   const KB = [
-    { k: ['hi', 'hello', 'hey', 'yo', 'sup', 'namaste', 'hola', 'help'], w: 0.5,
-      a: "Hey! I'm the Void Links help bot. Ask me about short links, profile pages, backgrounds, sound, icons, Discord, Spotify or your account." },
+    { k: ['hi', 'hello', 'hey', 'yo', 'sup', 'namaste', 'hola', 'help', 'hii', 'heyy'], w: 0.5,
+      a: "Hey! Vortex here. Ask me about short links, your page, backgrounds, sound, Discord, Spotify or your account. I'll pull you in the right direction." },
+    { k: ['who are you', 'what are you', 'your name', 'whats your name', 'vortex', 'are you a bot', 'are you ai', 'are you human', 'are you real', 'robot', 'chatbot'],
+      a: "I'm Vortex, the little robot orbiting this page. I know Void Links inside out and answer instantly. When a question is beyond my event horizon, I'll hand you to a real person on the team.", act: ['human'] },
+    { k: ['joke', 'funny', 'make me laugh'],
+      a: "Why did the URL go to the black hole? It wanted to get really, really short." },
+    { k: ['how are you', 'how r u', 'hows it going', 'whats up', 'wassup'],
+      a: 'Orbiting nicely, thanks! What can I help you with?' },
+    { k: ['what is void links', 'what is this', 'what is this site', 'what does this', 'what can i do', 'about void links', 'what is it', 'features', 'explain'],
+      a: 'Void Links does two things. Short links: paste a long URL, get a short one you can lock with a password, schedule, cap at a number of clicks and track. Pages: one link-in-bio page for everything you share, with your own background, music, Discord status and Spotify.', act: ['hero', 'pages'] },
+    { k: ['who made', 'who built', 'who created', 'creator', 'developer', 'owner', 'void century', 'made this', 'made by'],
+      a: 'Void Links is built by Void Century.' },
+    { k: ['black hole', 'blackhole', 'gargantua', 'animation', 'shader', 'webgl'],
+      a: 'That black hole is drawn live in your browser with WebGL: light bending around it is calculated every frame. Pages without their own background float over it too.' },
+    { k: ['how do i start', 'get started', 'getting started', 'begin', 'first step', 'new here', 'tutorial'],
+      a: 'Easiest start: paste a link into the box at the top and press Shorten. Want a page instead? Pick "Claim your page", choose a name and sign up. Everything else lives in your dashboard.', act: ['hero', 'claim'] },
+    { k: ['lock', 'password protect', 'protected', 'private link', 'schedule', 'expire', 'expiry', 'expires', 'max clicks', 'click limit', 'limit'],
+      a: 'In your dashboard → My Links, open a link to give it a password, a start and end time, or a maximum number of clicks. Visitors outside those rules see a clean message instead of the destination.' },
+    { k: ['edit link', 'change link', 'change destination', 'change where', 'pause link', 'disable link'],
+      a: 'Open the link in your dashboard → My Links. You can change where it goes, pause it, or delete it. The short link stays the same, so anything you already shared keeps working.' },
+    { k: ['share my page', 'page link', 'page url', 'where is my page', 'find my page'],
+      a: 'Your page lives at voidlinks.netlify.app/yourname. Copy it from the dashboard, or grab the QR code to share it offline.' },
+    { k: ['mobile', 'phone', 'iphone', 'android', 'app', 'download'],
+      a: 'No app needed. Void Links works in any browser on your phone, and your page is built to look good on small screens.' },
     { k: ['shorten', 'short link', 'shortener', 'url', 'slug', 'long link', 'custom link'],
       a: 'Paste any long URL into the box at the top of the page and press Shorten. You get a short link on this site to share. In your dashboard (My Links) you can pick a custom slug too.', act: ['hero'] },
     { k: ['claim', 'username', 'profile page', 'bio page', 'link in bio', 'linktree', 'my page', 'create page', 'make a page'],
-      a: 'Pick "Claim your page" at the top, type a username and sign up. You land in the editor where you add your name, avatar, bio, background, links and more. Hit Publish and your page lives at yoursite/@yourname.', act: ['claim', 'pages'] },
+      a: 'Pick "Claim your page" at the top, type a username and sign up. You land in the editor where you add your name, avatar, bio, background, links and more. Hit Publish and your page lives at voidlinks.netlify.app/yourname.', act: ['claim', 'pages'] },
     { k: ['background', 'wallpaper', 'video', 'gif', 'image', 'blur', 'dim', 'opacity'],
       a: 'In My Page → Background and sound, drop an image, GIF or MP4/WebM video. Use the Dim slider to darken it and the Blur slider to soften it so your text stays readable. With no background, your page floats over the black hole.', act: ['editor'] },
     { k: ['sound', 'audio', 'music', 'mute', 'volume', 'mp3', 'song plays'],
@@ -308,23 +330,23 @@
     { k: ['qr', 'qr code'],
       a: 'Open your dashboard → QR Codes to get a code for each short link. Dynamic codes keep working if you change where the link goes.' },
     { k: ['language', 'translate', 'hindi', 'spanish', 'french', 'german', 'turkish', 'portuguese'],
-      a: 'Use the language picker at the bottom of the page (or Settings in your dashboard). English, Español, Português, Français, Deutsch, Türkçe and हिन्दी are available.', act: ['language'] },
+      a: 'Use the language picker in the top bar (or Settings in your dashboard). English, Español, Português, Français, Deutsch, Türkçe and हिन्दी are available.', act: ['language'] },
     { k: ['password', 'email', 'avatar', 'profile picture', 'photo', 'settings', 'account', 'change name'],
       a: 'Dashboard → Settings lets you change your name, email, password and account avatar. You can also reuse your avatar on your page.', act: ['settings'] },
     { k: ['login', 'log in', 'sign in', 'signup', 'sign up', 'register', 'logout', 'log out'],
       a: 'Use Log in or Sign up at the top right. You can continue with Google, GitHub, Discord or email. To log out, click your name at the bottom of the dashboard sidebar.' },
     { k: ['delete', 'remove page', 'reset'],
       a: 'To start over, use Reset in the page editor. To remove your page completely, go to Settings → Danger zone → Delete my page.', act: ['settings'] },
-    { k: ['price', 'pricing', 'cost', 'pay', 'paid', 'premium', 'money'],
+    { k: ['free', 'price', 'pricing', 'cost', 'pay', 'paid', 'premium', 'money'],
       a: 'There\'s nothing to pay for. Every feature you see is available to everyone.' },
     { k: ['privacy', 'data', 'safe', 'secure', 'stored', 'tracking'],
-      a: 'Right now your page and uploads are stored in your own browser. Visitors only see what you publish. Links open in a new tab and we never put your details in URLs.' },
+      a: 'Your account and page are stored securely on our servers and only you can edit them. Visitors only see what you publish, and we never put your details in URLs. Read the Privacy page for the full picture.' },
     { k: ['human', 'person', 'staff', 'agent', 'support', 'someone', 'real', 'team', 'contact', 'talk'],
       a: 'Sure, I\'ll connect you with the support team.', handoff: true },
     { k: ['thanks', 'thank', 'thx', 'ty', 'great', 'awesome', 'cool', 'nice'], w: 0.5,
-      a: 'Anytime! Anything else I can help with?' },
+      a: 'Anytime! Ping me whenever you need me.' },
   ];
-  const SUGGEST = ['How do I claim a username?', 'Add a video background', 'My link shows red', 'Show my Discord status', 'Talk to a person'];
+  const SUGGEST = ['What can I do here?', 'How do I claim a username?', 'Lock a link with a password', 'Add a video background', 'My link shows red', 'Show my Discord status', 'Talk to a person'];
 
   function match(text) {
     const q = ' ' + text.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
@@ -357,7 +379,7 @@
   }
   function greet() {
     const name = me() ? me().name.split(' ')[0] : '';
-    bubble(aiLog, 'bot', `Hi${name ? ' ' + name : ''}! I'm the Void Links help bot. What can I help you with?`);
+    bubble(aiLog, 'bot', `Hey${name ? ' ' + name : ''}, I'm Vortex. I live at the edge of the void and know this place inside out. What do you need?`);
     renderChips(SUGGEST);
   }
 
@@ -372,7 +394,7 @@
     const [hit] = await Promise.all([aiApi.ask(text), new Promise(r => setTimeout(r, 550 + Math.random() * 450))]);
     t.remove();
     if (!hit) {
-      bubble(aiLog, 'bot', "I don't have an answer for that yet. Want me to pass it to the support team?", [A.human]);
+      bubble(aiLog, 'bot', "That one slipped past my event horizon. Want me to pass it to a real person on the team?", [A.human]);
     } else if (hit.handoff) {
       bubble(aiLog, 'bot', hit.a);
       setTimeout(go.human, 500);
