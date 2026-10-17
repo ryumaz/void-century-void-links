@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#000000">
+  <title>Opening link…</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text: #f5f5f7;
+      --muted: rgba(245,245,247,.66);
+      --dim: rgba(245,245,247,.42);
+      --line: rgba(255,255,255,.1);
+      --red: #f4b4b4;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; background: #000; color: var(--text); font-family: Inter, -apple-system, 'Segoe UI', sans-serif; }
+    #bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    body.no-webgl { background: radial-gradient(ellipse 60% 18% at 50% 50%, rgba(255,255,255,.12), transparent 70%), #000; }
+    /* Darkens the edges so the centre card always reads */
+    .veil { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0,0,0,.25), rgba(0,0,0,.75)); }
+
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 3; padding: 22px 28px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.15rem; letter-spacing: -.02em; }
+    .brand i { width: 28px; height: 28px; border-radius: 50%; background: #fff; display: grid; place-items: center; }
+
+    main { position: relative; z-index: 2; min-height: 100%; display: grid; place-items: center; padding: 90px 20px 40px; }
+    .card {
+      width: min(560px, 100%);
+      padding: 40px 36px 34px;
+      border-radius: 24px;
+      text-align: center;
+      background: rgba(6,6,8,.74);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      animation: rise .6s cubic-bezier(.2,.8,.2,1) both;
+    }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+    .badge { width: 58px; height: 58px; border-radius: 50%; margin: 0 auto 18px; display: grid; place-items: center;
+      background: rgba(255,255,255,.07); border: 1px solid var(--line); }
+    .badge.pulse { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,.18); } 50% { box-shadow: 0 0 0 12px rgba(255,255,255,0); } }
+    h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -.03em; margin: 0 0 10px; }
+    p { margin: 0 auto; color: var(--muted); line-height: 1.6; max-width: 400px; }
+    .slug { display: inline-block; margin: 16px 0 0; padding: 6px 12px; border-radius: 999px; font-size: .85rem;
+      font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--muted); background: rgba(255,255,255,.06); }
+
+    /* Countdown */
+    .cd { display: flex; justify-content: center; align-items: flex-start; gap: 10px; margin: 26px 0 8px; }
+    .cd-unit { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 78px; }
+    .cd-num {
+      width: 100%; padding: 14px 6px 12px; border-radius: 14px;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(2rem, 7vw, 2.9rem);
+      line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums;
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+      border: 1px solid var(--line); position: relative; overflow: hidden;
+    }
+    .cd-num::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(0,0,0,.45); }
+    .cd-num.tick span { display: inline-block; animation: tick .45s cubic-bezier(.2,.8,.2,1); }
+    @keyframes tick { from { opacity: 0; transform: translateY(-40%); filter: blur(2px); } to { opacity: 1; transform: none; filter: none; } }
+    .cd-unit small { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+    .cd-sep { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; color: var(--dim); padding-top: 14px; }
+    .when { margin-top: 18px; color: var(--text); font-weight: 500; }
+    .tz { margin-top: 4px; font-size: .82rem; color: var(--dim); }
+    .bar { height: 3px; border-radius: 3px; background: rgba(255,255,255,.08); margin: 22px auto 0; max-width: 360px; overflow: hidden; }
+    .bar i { display: block; height: 100%; width: 0; background: #fff; border-radius: 3px; transition: width 1s linear; }
+
+    .actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 11px; border: 0;
+      font: inherit; font-weight: 600; font-size: .92rem; text-decoration: none; cursor: pointer;
+      background: #fff; color: #000; transition: transform .15s, background .15s; }
+    .btn:hover { transform: translateY(-1px); background: #e8e8ea; }
+    .btn.ghost { background: rgba(255,255,255,.07); color: var(--text); border: 1px solid var(--line); }
+    .btn.ghost:hover { background: rgba(255,255,255,.12); }
+    .btn:disabled { opacity: .6; cursor: wait; transform: none; }
+
+    form { display: flex; flex-direction: column; gap: 10px; width: min(340px, 100%); margin: 22px auto 0; }
+    input { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 11px; padding: 13px 14px;
+      color: #fff; font: inherit; outline: none; text-align: center; }
+    input:focus { border-color: rgba(255,255,255,.42); }
+    .err { color: var(--red); min-height: 1.2em; font-size: .88rem; }
+    .shake { animation: shake .4s; }
+    @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+    .loader { display: flex; flex-direction: column; align-items: center; gap: 16px; color: var(--muted); }
+    .ring { width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(255,255,255,.15); border-top-color: #fff; animation: spin .9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    [hidden] { display: none !important; }
+    @media (max-width: 520px) {
+      .card { padding: 32px 18px 26px; border-radius: 20px; }
+      .cd { gap: 6px; }
+      .cd-unit { min-width: 0; flex: 1; }
+      .cd-sep { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+<!-- Short-link redirect. Netlify serves this page for any path that isn't a real
+     file (see _redirects). Supabase checks every rule for the link (password,
+     schedule, use limit, paused/revoked), logs the click, and returns where to go.
+     If the Netlify edge function is deployed it answers first for open links, and
+     this page handles everything that needs the visitor (password, countdown, messages). -->
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<header>
+  <a class="brand" href="index.html"><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round"><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-20 12 12)"/><circle cx="12" cy="12" r="2.2" fill="#000"/></svg></i>Void Links</a>
+</header>
+
+<main>
+  <div class="loader" id="wait">
+    <div class="ring" aria-hidden="true"></div>
+    <span>Taking you there…</span>
+  </div>
+
+  <!-- Opens later: live countdown -->
+  <section class="card" id="soon" hidden>
+    <div class="badge pulse" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+    </div>
+    <h1>This link opens soon</h1>
+    <p>The owner scheduled it. Keep this page open and it takes you there the moment it unlocks.</p>
+    <div class="cd" role="timer" aria-label="Time until the link opens">
+      <div class="cd-unit"><div class="cd-num" id="cd-d"><span>00</span></div><small>Days</small></div>
+      <span class="cd-sep" aria-hidden="true">:</span>
+      <div class="cd-unit"><div class="cd-num" id="cd-h"><span>00</span></div><small>Hours</small></div>
+      <span class="cd-sep" aria-hidden="true">:</span>
+      <div class="cd-unit"><div class="cd-num" id="cd-m"><span>00</span></div><small>Minutes</small></div>
+      <span class="cd-sep" aria-hidden="true">:</span>
+      <div class="cd-unit"><div class="cd-num" id="cd-s"><span>00</span></div><small>Seconds</small></div>
+    </div>
+    <p class="when" id="cd-when"></p>
+    <p class="tz" id="cd-tz"></p>
+    <div class="bar" aria-hidden="true"><i id="cd-bar"></i></div>
+    <div class="actions">
+      <button type="button" class="btn" id="cd-cal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        Add to calendar
+      </button>
+      <button type="button" class="btn ghost" id="cd-copy">Copy link</button>
+    </div>
+  </section>
+
+  <!-- Password -->
+  <section class="card" id="locked" hidden>
+    <div class="badge" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    </div>
+    <h1>This link is protected</h1>
+    <p>Enter the password the owner gave you.</p>
+    <span class="slug" id="pw-slug"></span>
+    <form id="pw-form" novalidate>
+      <input id="pw" type="password" autocomplete="off" placeholder="Password" aria-label="Password" maxlength="72">
+      <button type="submit" class="btn" id="pw-go" style="justify-content:center">Unlock link</button>
+      <span class="err" id="pw-err" aria-live="polite"></span>
+    </form>
+  </section>
+
+  <!-- Everything else -->
+  <section class="card" id="stopped" hidden>
+    <div class="badge" id="stop-icon" aria-hidden="true"></div>
+    <h1 id="stop-title">This link doesn't exist</h1>
+    <p id="stop-text">It may have been deleted, or there's a typo in the address.</p>
+    <span class="slug" id="stop-slug"></span>
+    <div class="actions"><a class="btn" href="index.html">Go to Void Links</a></div>
+  </section>
+</main>
+
+<script src="supabase-config.js"></script>
+<script src="blackhole.js"></script>
+<script>
+(async () => {
+  const cfg = window.SUPABASE_CONFIG || {};
+  const $ = id => document.getElementById(id);
+  const path = decodeURIComponent(location.pathname.replace(/^\/+|\/+$/g, ''));
+  // Profile pages: /@name → the site's page viewer
+  const profile = path.match(/^@([a-z0-9_.-]{2,20})$/i);
+  if (profile) { location.replace('/#@' + profile[1].toLowerCase()); return; }
+  const slug = new URLSearchParams(location.search).get('s') || path;
+  const host = (() => { try { return cfg.siteUrl ? new URL(cfg.siteUrl).host : (/^https?:$/.test(location.protocol) ? location.host : 'voidlinks'); } catch (_) { return 'voidlinks'; } })();
+  const pretty = host + '/' + slug;
+
+  const ICON = d => `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const MESSAGES = {
+    missing: ["This link doesn't exist", "It may have been deleted, or there's a typo in the address.", '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8.5 8.5l5 5M13.5 8.5l-5 5"/>'],
+    revoked: ['This link was revoked', 'The owner switched it off for good.', '<circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/>'],
+    paused: ['This link is paused', 'The owner has paused it for now. Try again later.', '<path d="M9 5v14M15 5v14"/>'],
+    expired: ['This link has expired', 'It was only available until a set time.', '<circle cx="12" cy="13" r="8"/><path d="M12 9v4M9 2h6"/>'],
+    used_up: ['This link has been used up', 'It could only be opened a limited number of times, and they’re all taken.', '<path d="M4 19h16M7 15l3-4 3 2 4-6"/>'],
+    error: ["Couldn't open this link", 'Check your connection and try again.', '<path d="M12 8v5M12 16h.01"/><circle cx="12" cy="12" r="9"/>'],
+  };
+  const show = id => ['wait', 'soon', 'locked', 'stopped'].forEach(x => { $(x).hidden = x !== id; });
+  function stop(status) {
+    const [title, text, icon] = MESSAGES[status] || MESSAGES.missing;
+    $('stop-title').textContent = title;
+    $('stop-text').textContent = text;
+    $('stop-icon').innerHTML = ICON(icon);
+    $('stop-slug').textContent = pretty;
+    document.title = title;
+    show('stopped');
+  }
+  if (!/^[A-Za-z0-9_-]{2,40}$/.test(slug) || !cfg.url) return stop('missing');
+
+  const ua = navigator.userAgent;
+  const device = /iPad|Tablet/i.test(ua) ? 'tablet' : /Mobi|Android|iPhone/i.test(ua) ? 'mobile' : 'desktop';
+  let referrer = null;
+  try { if (document.referrer) referrer = new URL(document.referrer).hostname.replace(/^www\./, ''); } catch (_) {}
+
+  const rpc = (fn, body) => fetch(cfg.url + '/rest/v1/rpc/' + fn, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: cfg.key },
+    body: JSON.stringify(body),
+  });
+  async function open(password) {
+    let res = await rpc('open_short_link', { p_slug: slug, p_password: password || null, p_device: device, p_referrer: referrer });
+    if (res.status === 404) {
+      // Database not upgraded yet: fall back to the original function
+      res = await rpc('follow_short_link', { p_slug: slug, p_device: device, p_referrer: referrer });
+      const dest = res.ok ? await res.json() : null;
+      return typeof dest === 'string' ? { status: 'ok', url: dest } : { status: 'missing' };
+    }
+    return res.ok ? res.json() : { status: 'error' };
+  }
+  function go(data) {
+    if (data.status === 'ok' && /^https?:\/\//i.test(data.url || '')) {
+      show('wait');
+      location.replace(data.url);
+      return true;
+    }
+    return false;
+  }
+  function handle(data) {
+    if (go(data)) return;
+    if (data.status === 'password') return askPassword();
+    if (data.status === 'scheduled' && data.starts_at) return countdown(new Date(data.starts_at));
+    stop(data.status);
+  }
+
+  // ---------- countdown ----------
+  let cdTimer = null;
+  function countdown(at) {
+    show('soon');
+    document.title = 'Opens soon · ' + pretty;
+    const firstSeen = Date.now();
+    $('cd-when').textContent = at.toLocaleString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+    let zone = '';
+    try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (_) {}
+    $('cd-tz').textContent = zone ? 'Shown in your time zone (' + zone.replace(/_/g, ' ') + ')' : '';
+    const set = (id, v) => {
+      const box = $(id), txt = String(v).padStart(2, '0');
+      if (box.firstElementChild.textContent === txt) return;
+      box.firstElementChild.textContent = txt;
+      box.classList.remove('tick');
+      void box.offsetWidth;   // restart the animation
+      box.classList.add('tick');
+    };
+    async function tick() {
+      const left = at - Date.now();
+      if (left <= 0) {
+        clearInterval(cdTimer);
+        ['cd-d', 'cd-h', 'cd-m', 'cd-s'].forEach(id => set(id, 0));
+        $('cd-bar').style.width = '100%';
+        // Unlocked: ask the server again (it decides, not this clock)
+        await new Promise(r => setTimeout(r, 800));
+        try { handle(await open()); } catch (_) { stop('error'); }
+        return;
+      }
+      const s = Math.floor(left / 1000);
+      set('cd-d', Math.floor(s / 86400));
+      set('cd-h', Math.floor(s / 3600) % 24);
+      set('cd-m', Math.floor(s / 60) % 60);
+      set('cd-s', s % 60);
+      // Progress across the last 24 hours (or since this page opened, if closer)
+      const span = Math.max(at - Math.min(firstSeen, at - 86400000), 1);
+      $('cd-bar').style.width = Math.max(2, Math.min(100, 100 - (left / span) * 100)) + '%';
+    }
+    tick();
+    cdTimer = setInterval(tick, 1000);
+    // Refresh the deadline when the tab comes back (the owner may have changed it)
+    document.addEventListener('visibilitychange', async () => {
+      if (document.hidden) return;
+      try {
+        const r = await open();
+        if (r.status !== 'scheduled') { clearInterval(cdTimer); handle(r); }
+      } catch (_) {}
+    });
+
+    $('cd-copy').onclick = () => {
+      navigator.clipboard.writeText(location.href).then(() => { $('cd-copy').textContent = 'Copied'; setTimeout(() => { $('cd-copy').textContent = 'Copy link'; }, 1600); }).catch(() => {});
+    };
+    $('cd-cal').onclick = () => {
+      const stamp = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+      const end = new Date(at.getTime() + 30 * 60000);
+      const url = /^https?:$/.test(location.protocol) ? location.href : pretty;
+      const ics = [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Void Links//Link schedule//EN', 'BEGIN:VEVENT',
+        'UID:' + slug + '-' + at.getTime() + '@voidlinks', 'DTSTAMP:' + stamp(new Date()),
+        'DTSTART:' + stamp(at), 'DTEND:' + stamp(end),
+        'SUMMARY:Link opens: ' + pretty, 'DESCRIPTION:The Void Links link ' + pretty + ' unlocks now.', 'URL:' + url,
+        'BEGIN:VALARM', 'TRIGGER:-PT5M', 'ACTION:DISPLAY', 'DESCRIPTION:Link opens in 5 minutes', 'END:VALARM',
+        'END:VEVENT', 'END:VCALENDAR',
+      ].join('\r\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+      a.download = 'void-links-' + slug + '.ics';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    };
+  }
+
+  // ---------- password ----------
+  function askPassword() {
+    show('locked');
+    document.title = 'Protected link';
+    $('pw-slug').textContent = pretty;
+    $('pw').focus();
+  }
+  $('pw-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const pw = $('pw').value;
+    if (!pw) { $('pw-err').textContent = 'Enter the password.'; return; }
+    $('pw-go').disabled = true;
+    $('pw-go').textContent = 'Checking…';
+    $('pw-err').textContent = '';
+    try {
+      const r = await open(pw);
+      if (r.status === 'wrong_password') {
+        $('pw-err').textContent = 'That password isn’t right.';
+        const card = $('locked');
+        card.classList.remove('shake');
+        void card.offsetWidth;
+        card.classList.add('shake');
+        $('pw').select();
+      } else if (r.status !== 'password') {
+        handle(r);
+      }
+    } catch (_) {
+      $('pw-err').textContent = 'Couldn’t check the password. Try again.';
+    }
+    $('pw-go').disabled = false;
+    $('pw-go').textContent = 'Unlock link';
+  });
+
+  try { handle(await open()); } catch (_) { stop('error'); }
+})();
+</script>
+</body>
+</html>

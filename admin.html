@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Void Links Staff</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #000; --panel: #0b0b0d; --panel-2: #121215;
+      --border: rgba(255,255,255,0.09); --border-hi: rgba(255,255,255,0.25);
+      --text: #f5f5f7; --muted: rgba(245,245,247,0.62); --dim: rgba(245,245,247,0.4);
+      --green: #b8f0cc; --red: #f4b4b4; --amber: #f0c27a;
+    }
+    html, body { height: 100%; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 15px; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 9px 16px; border-radius: 10px; border: 1px solid var(--border);
+      background: transparent; color: var(--text); font-weight: 600; font-size: 0.88rem;
+      white-space: nowrap; transition: background .15s, border-color .15s;
+    }
+    .btn:hover { border-color: var(--border-hi); background: rgba(255,255,255,0.05); }
+    .btn-primary { background: #fff; color: #000; border-color: #fff; }
+    .btn-primary:hover { background: #e6e6e8; }
+    .btn-danger { color: var(--red); border-color: rgba(244,180,180,0.3); }
+    .btn-danger:hover { background: rgba(244,180,180,0.1); }
+    .btn:disabled { opacity: .5; cursor: default; }
+    input, select, textarea {
+      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04); outline: none; font-size: 0.92rem;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--border-hi); }
+    select option { background: #111; }
+    :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    label { display: grid; gap: 6px; font-size: 0.82rem; color: var(--muted); font-weight: 500; }
+    .error { color: var(--red); font-size: 0.85rem; min-height: 1.2em; }
+    .muted { color: var(--muted); }
+    .dim { color: var(--dim); font-size: 0.82rem; }
+    [hidden] { display: none !important; }
+
+    /* login */
+    #login-view { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .login-card { width: 100%; max-width: 380px; padding: 32px; border-radius: 20px; background: var(--panel); border: 1px solid var(--border); display: grid; gap: 14px; }
+    .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.4rem; letter-spacing: -0.02em; }
+    .brand span { color: var(--dim); font-weight: 500; }
+
+    /* app shell */
+    #app { min-height: 100%; display: flex; flex-direction: column; }
+    header {
+      display: flex; align-items: center; gap: 24px; padding: 14px 24px;
+      border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(0,0,0,0.92); z-index: 5;
+    }
+    nav { display: flex; gap: 4px; flex: 1; overflow-x: auto; }
+    nav button { padding: 8px 14px; border-radius: 9px; border: 0; background: transparent; color: var(--muted); font-weight: 500; white-space: nowrap; }
+    nav button:hover { color: #fff; }
+    nav button[aria-selected="true"] { background: #fff; color: #000; }
+    .badge-count { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 4px; border-radius: 9px; background: var(--red); color: #000; font-size: 0.72rem; font-weight: 700; text-align: center; }
+    .me { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+    .role { padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,0.08); font-size: 0.72rem; font-weight: 600; text-transform: capitalize; }
+    main { flex: 1; padding: 24px; max-width: 1280px; width: 100%; margin: 0 auto; }
+    h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 16px 0; }
+    .toolbar input { max-width: 280px; }
+    .seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
+    .seg button { padding: 6px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: 0.85rem; font-weight: 500; }
+    .seg button[aria-pressed="true"] { background: #fff; color: #000; }
+
+    /* tickets */
+    .tickets { display: grid; grid-template-columns: minmax(260px, 360px) 1fr; gap: 16px; min-height: 60vh; }
+    .list { display: flex; flex-direction: column; gap: 6px; max-height: 72vh; overflow-y: auto; }
+    .item { text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel); display: grid; gap: 4px; }
+    .item:hover { border-color: var(--border-hi); }
+    .item[aria-current="true"] { border-color: #fff; }
+    .item-top { display: flex; justify-content: space-between; gap: 8px; font-size: 0.85rem; }
+    .item strong { font-size: 0.92rem; }
+    .snippet { font-size: 0.84rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pill { padding: 2px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; background: rgba(255,255,255,0.08); text-transform: capitalize; }
+    .pill.open { background: rgba(244,180,180,0.15); color: var(--red); }
+    .pill.answered, .pill.resolved { background: rgba(184,240,204,0.12); color: var(--green); }
+    .pill.closed { color: var(--dim); }
+    .thread { border-radius: 16px; border: 1px solid var(--border); background: var(--panel); display: flex; flex-direction: column; min-height: 60vh; }
+    .thread-empty { margin: auto; color: var(--dim); }
+    .thread-head { padding: 16px 18px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
+    .thread-head h2 { font-size: 1.05rem; }
+    .thread-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .msgs { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; max-height: 52vh; }
+    .msg { max-width: 78%; padding: 10px 13px; border-radius: 14px; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+    .msg small { display: block; font-size: 0.72rem; color: var(--dim); margin-bottom: 3px; }
+    .msg.user { align-self: flex-start; background: rgba(255,255,255,0.07); border-bottom-left-radius: 4px; }
+    .msg.staff { align-self: flex-end; background: #fff; color: #000; border-bottom-right-radius: 4px; }
+    .msg.staff small { color: rgba(0,0,0,0.55); }
+    .reply { display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid var(--border); }
+    .reply textarea { resize: vertical; min-height: 44px; }
+
+    /* tables */
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { font-weight: 600; color: var(--muted); font-size: 0.78rem; background: var(--panel); white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; }
+    td .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    td .btn { padding: 6px 10px; font-size: 0.8rem; }
+    .empty { padding: 28px; text-align: center; color: var(--dim); }
+
+    /* staff */
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin: 16px 0 24px; }
+    .card { padding: 20px; border-radius: 16px; background: var(--panel); border: 1px solid var(--border); display: grid; gap: 12px; align-content: start; }
+    .card h3 { font-size: 1rem; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    #toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+      padding: 11px 18px; border-radius: 10px; background: rgba(14,14,16,0.96); border: 1px solid var(--border);
+      font-size: 0.88rem; opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 50;
+    }
+    #toast.show { opacity: 1; }
+
+    @media (max-width: 860px) {
+      header { flex-wrap: wrap; gap: 10px; padding: 12px 14px; }
+      nav { order: 3; flex-basis: 100%; }
+      main { padding: 16px 14px; }
+      .tickets { grid-template-columns: 1fr; }
+      .list { max-height: 40vh; }
+      .msg { max-width: 92%; }
+      .row2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login -->
+<section id="login-view" hidden>
+  <form class="login-card" id="login-form" novalidate>
+    <div class="brand">Void Links <span>Staff</span></div>
+    <p class="muted">Sign in with the staff account your admin gave you.</p>
+    <label>Email<input id="login-email" type="email" autocomplete="username" required></label>
+    <label>Password<input id="login-pass" type="password" autocomplete="current-password" required></label>
+    <p class="error" id="login-error" aria-live="polite"></p>
+    <button type="submit" class="btn btn-primary">Log in</button>
+    <p class="dim">Forgot your password? Ask an admin to reset it, or use "Forgot password?" on the main site.</p>
+  </form>
+</section>
+
+<!-- Portal -->
+<div id="app" hidden>
+  <header>
+    <div class="brand">Void Links <span>Staff</span></div>
+    <nav aria-label="Sections">
+      <button data-tab="tickets" aria-selected="true">Tickets <span class="badge-count" id="count-tickets" hidden></span></button>
+      <button data-tab="reports" aria-selected="false">Reports <span class="badge-count" id="count-reports" hidden></span></button>
+      <button data-tab="users" aria-selected="false">Users</button>
+      <button data-tab="staff" aria-selected="false" id="tab-staff" hidden>Staff</button>
+    </nav>
+    <div class="me">
+      <span id="me-email"></span>
+      <span class="role" id="me-role"></span>
+      <button class="btn" id="logout">Log out</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Tickets -->
+    <section data-view="tickets">
+      <h1>Support tickets</h1>
+      <p class="muted">Requests from the help bot's "Talk to a person". Replies show up in the visitor's chat.</p>
+      <div class="toolbar">
+        <div class="seg" id="ticket-filter">
+          <button data-v="open" aria-pressed="true">Open</button>
+          <button data-v="answered" aria-pressed="false">Answered</button>
+          <button data-v="closed" aria-pressed="false">Closed</button>
+          <button data-v="all" aria-pressed="false">All</button>
+        </div>
+        <input id="ticket-search" type="search" placeholder="Search name, email or code" aria-label="Search tickets">
+        <button class="btn" id="ticket-refresh">Refresh</button>
+      </div>
+      <div class="tickets">
+        <div class="list" id="ticket-list"></div>
+        <div class="thread" id="thread"><p class="thread-empty">Pick a ticket to read it</p></div>
+      </div>
+    </section>
+
+    <!-- Reports -->
+    <section data-view="reports" hidden>
+      <h1>Reported pages</h1>
+      <p class="muted">Pages visitors flagged with the report button.</p>
+      <div class="toolbar">
+        <div class="seg" id="report-filter">
+          <button data-v="open" aria-pressed="true">Open</button>
+          <button data-v="resolved" aria-pressed="false">Resolved</button>
+          <button data-v="all" aria-pressed="false">All</button>
+        </div>
+        <button class="btn" id="report-refresh">Refresh</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Page</th><th>Reason</th><th>Details</th><th>When</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="report-rows"></tbody>
+      </table></div>
+    </section>
+
+    <!-- Users -->
+    <section data-view="users" hidden>
+      <h1>Users</h1>
+      <p class="muted">Every account and the page it owns.</p>
+      <div class="toolbar">
+        <input id="user-search" type="search" placeholder="Search email, name or username" aria-label="Search users">
+        <span class="dim" id="user-count"></span>
+        <button class="btn" id="user-refresh">Refresh</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Email</th><th>Name</th><th>Page</th><th>Views</th><th>Sign-in</th><th>Joined</th><th>Last seen</th><th>Actions</th></tr></thead>
+        <tbody id="user-rows"></tbody>
+      </table></div>
+    </section>
+
+    <!-- Staff (admins only) -->
+    <section data-view="staff" hidden>
+      <h1>Staff</h1>
+      <p class="muted">Who can use this portal. Support staff see tickets, reports and users; admins can also manage staff.</p>
+      <div class="cards">
+        <form class="card" id="staff-create" novalidate>
+          <h3>Create a staff login</h3>
+          <label>Email<input name="email" type="email" autocomplete="off" required></label>
+          <div class="row2">
+            <label>Password<input name="password" type="text" autocomplete="off" minlength="8" required></label>
+            <label>Role<select name="role"><option value="support">Support</option><option value="admin">Admin</option></select></label>
+          </div>
+          <p class="error" aria-live="polite"></p>
+          <button class="btn btn-primary" type="submit">Create login</button>
+          <p class="dim">Share the password with them privately. They can change it later with "Forgot password?" on the main site.</p>
+        </form>
+        <form class="card" id="staff-existing" novalidate>
+          <h3>Make an existing account staff</h3>
+          <label>Email<input name="email" type="email" autocomplete="off" required></label>
+          <label>Role<select name="role"><option value="support">Support</option><option value="admin">Admin</option></select></label>
+          <p class="error" aria-live="polite"></p>
+          <button class="btn" type="submit">Add as staff</button>
+        </form>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Email</th><th>Role</th><th>Added</th><th>Actions</th></tr></thead>
+        <tbody id="staff-rows"></tbody>
+      </table></div>
+    </section>
+  </main>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

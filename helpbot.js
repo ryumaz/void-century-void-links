@@ -1,0 +1,645 @@
+// ===== HELP BOT =====
+// Floating 3D robot (bottom-right) that opens a help chat with two modes:
+//   • AI assistant — answers from a built-in Void Links knowledge base (swap `aiApi.ask`
+//     for a real model behind a Supabase edge function later).
+//   • Talk to a person — opens a support ticket thread (swap `supportApi` for Supabase).
+// The robot is "Futuristic flying animated Robot - Low Poly" by Shayan (CC BY 4.0),
+// loaded lazily after the page is idle so it never slows the first paint.
+(function () {
+  const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js';
+  const GLTF_URL = 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js';
+  const MODEL_URL = 'assets/help-robot.glb.js';
+  const SUPPORT_KEY = 'lp-support';
+  const SEEN_KEY = 'lp-hb-seen';
+  const me = () => (typeof currentUser !== 'undefined' ? currentUser : null);
+  const toast = msg => (typeof showToast === 'function' ? showToast(msg) : null);
+
+  const SEND_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>';
+  const BOT_SVG = '<svg width="44" height="44" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="9" y="12" width="30" height="24" rx="11" fill="#f2f4f8"/><rect x="14" y="18" width="20" height="11" rx="5.5" fill="#0b0d12"/><circle cx="20" cy="23.5" r="2.2" fill="#6fd3ff"/><circle cx="28" cy="23.5" r="2.2" fill="#6fd3ff"/><path d="M24 12V7" stroke="#f2f4f8" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="6" r="2.5" fill="#6fd3ff"/></svg>';
+
+  // ---------- DOM ----------
+  const root = document.createElement('div');
+  root.id = 'help-bot';
+  root.innerHTML = `
+    <div class="hb-hint" id="hb-hint" hidden>
+      <span>Hi! Need a hand?</span>
+      <button type="button" class="hb-hint-x" aria-label="Dismiss">×</button>
+    </div>
+    <button type="button" class="hb-launch" id="hb-launch" aria-haspopup="dialog" aria-expanded="false" aria-controls="hb-panel" aria-label="Open help chat" title="Click for help · drag to move me">
+      <canvas class="hb-canvas" aria-hidden="true"></canvas>
+      <span class="hb-fallback">${BOT_SVG}<span class="hb-fallback-tag">HELP</span></span>
+    </button>
+    <section class="hb-panel" id="hb-panel" role="dialog" aria-label="Void Links help" hidden>
+      <header class="hb-head">
+        <span class="hb-avatar">${BOT_SVG}</span>
+        <div class="hb-title">
+          <strong>Void Links Help</strong>
+          <span id="hb-sub">AI assistant · instant answers</span>
+        </div>
+        <button type="button" class="hb-close" aria-label="Close help">×</button>
+      </header>
+      <div class="seg hb-modes" aria-label="Who do you want to talk to?">
+        <button type="button" data-mode="ai" aria-pressed="true">AI assistant</button>
+        <button type="button" data-mode="human" aria-pressed="false">Talk to a person</button>
+      </div>
+
+      <div class="hb-view" data-view="ai">
+        <div class="hb-log" id="hb-ai-log" aria-live="polite"></div>
+        <div class="hb-chips" id="hb-chips"></div>
+        <form class="hb-compose" id="hb-ai-form" autocomplete="off">
+          <input id="hb-ai-input" type="text" maxlength="300" placeholder="Ask anything about Void Links…" aria-label="Your question">
+          <button type="submit" aria-label="Send">${SEND_SVG}</button>
+        </form>
+      </div>
+
+      <div class="hb-view" data-view="human" hidden>
+        <form class="hb-ticket" id="hb-ticket" novalidate>
+          <p class="hb-lead">Our support team reads every message. Tell us what's going on and we'll reply here and by email.</p>
+          <div class="hb-row">
+            <label>Name<input id="hb-t-name" type="text" maxlength="40" required></label>
+            <label>Email<input id="hb-t-email" type="email" maxlength="80" required></label>
+          </div>
+          <label>Topic
+            <select id="hb-t-topic">
+              <option>Profile page</option>
+              <option>Short links</option>
+              <option>Account and login</option>
+              <option>Report a bug</option>
+              <option>Something else</option>
+            </select>
+          </label>
+          <label>Message<textarea id="hb-t-msg" rows="4" maxlength="1000" required></textarea></label>
+          <p class="hb-error" id="hb-t-error" aria-live="polite"></p>
+          <button type="submit" class="btn btn-primary">Send to support</button>
+        </form>
+        <div class="hb-thread" id="hb-thread" hidden>
+          <div class="hb-ticket-head">
+            <div><strong id="hb-ticket-id"></strong><span id="hb-ticket-meta"></span></div>
+            <button type="button" class="link-btn" id="hb-new-ticket">New request</button>
+          </div>
+          <div class="hb-log" id="hb-human-log" aria-live="polite"></div>
+          <form class="hb-compose" id="hb-human-form" autocomplete="off">
+            <input id="hb-human-input" type="text" maxlength="1000" placeholder="Add a message…" aria-label="Message to support">
+            <button type="submit" aria-label="Send">${SEND_SVG}</button>
+          </form>
+        </div>
+      </div>
+      <p class="hb-credit">Robot: <a href="https://sketchfab.com/3d-models/futuristic-flying-animated-robot-low-poly-c5b92c281dc444448e64c0607719c7a2" target="_blank" rel="noopener noreferrer">“Futuristic flying animated Robot” by Shayan</a>, CC BY 4.0</p>
+    </section>`;
+  document.body.appendChild(root);
+
+  const $ = id => root.querySelector('#' + id);
+  const panel = $('hb-panel'), launch = $('hb-launch'), hint = $('hb-hint');
+  const el = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  };
+
+  // ---------- open / close ----------
+  let mode = 'ai';
+  function openPanel(open = panel.hidden) {
+    panel.hidden = !open;
+    root.classList.toggle('open', open);
+    launch.setAttribute('aria-expanded', open);
+    hideHint();
+    if (open) placePanel();
+    if (open) {
+      if (mode === 'ai' && !aiLog.children.length) greet();
+      (mode === 'ai' ? $('hb-ai-input') : (ticket() ? $('hb-human-input') : $('hb-t-name'))).focus({ preventScroll: true });
+    }
+  }
+  // ---------- drag to move ----------
+  // Drag the robot anywhere; it snaps to the nearest side and remembers the spot.
+  // The chat panel opens on whichever side has room.
+  const POS_KEY = 'lp-hb-pos';
+  const EDGE = 8;
+  let drag = null, justDragged = false;
+  function clampPos(x, y) {
+    const w = launch.offsetWidth, h = launch.offsetHeight;
+    return {
+      x: Math.min(Math.max(EDGE, x), window.innerWidth - w - EDGE),
+      y: Math.min(Math.max(EDGE, y), window.innerHeight - h - EDGE),
+    };
+  }
+  function placePanel() {
+    const r = launch.getBoundingClientRect();
+    const left = r.left + r.width / 2 < window.innerWidth / 2;
+    root.classList.toggle('hb-left', left);
+    const above = r.top, below = window.innerHeight - r.bottom;
+    const up = above >= below;
+    Object.assign(panel.style, {
+      left: left ? '6px' : 'auto',
+      right: left ? 'auto' : '6px',
+      bottom: up ? (r.height - 2) + 'px' : 'auto',
+      top: up ? 'auto' : (r.height - 2) + 'px',
+      height: Math.max(320, Math.min(600, (up ? above : below) - 16)) + 'px',
+    });
+    root.classList.toggle('hb-below', !up);
+  }
+  function setPos(x, y) {
+    const p = clampPos(x, y);
+    Object.assign(root.style, { left: p.x + 'px', top: p.y + 'px', right: 'auto', bottom: 'auto' });
+    placePanel();
+    return p;
+  }
+  function restorePos() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(POS_KEY) || 'null'); } catch (_) {}
+    if (!saved) { placePanel(); return; }
+    const w = launch.offsetWidth || 128;
+    setPos(saved.side === 'left' ? EDGE : window.innerWidth - w - EDGE, saved.y * window.innerHeight);
+  }
+  launch.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    const r = root.getBoundingClientRect();
+    drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: r.left, oy: r.top, moved: false };
+    // Capture right away so a quick flick that leaves the robot still drags it
+    try { launch.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  launch.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    if (!drag.moved) {
+      if (Math.hypot(dx, dy) < 6) return;
+      drag.moved = true;
+      root.classList.add('hb-dragging');
+      hideHint();
+    }
+    setPos(drag.ox + dx, drag.oy + dy);
+  });
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    const moved = drag.moved;
+    drag = null;
+    if (!moved) return;
+    root.classList.remove('hb-dragging');
+    justDragged = true;
+    setTimeout(() => { justDragged = false; }, 0);
+    // Snap to the nearest side
+    const r = root.getBoundingClientRect();
+    const side = r.left + r.width / 2 < window.innerWidth / 2 ? 'left' : 'right';
+    root.classList.add('hb-snapping');
+    const p = setPos(side === 'left' ? EDGE : window.innerWidth - r.width - EDGE, r.top);
+    setTimeout(() => root.classList.remove('hb-snapping'), 320);
+    try { localStorage.setItem(POS_KEY, JSON.stringify({ side, y: p.y / window.innerHeight })); } catch (_) {}
+  }
+  launch.addEventListener('pointerup', endDrag);
+  launch.addEventListener('pointercancel', endDrag);
+  // A drag must not also count as a click
+  launch.addEventListener('click', e => { if (justDragged) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+  window.addEventListener('resize', restorePos);
+  restorePos();
+
+  launch.addEventListener('click', () => openPanel());
+  root.querySelector('.hb-close').addEventListener('click', () => { openPanel(false); launch.focus(); });
+  panel.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { openPanel(false); launch.focus(); e.stopPropagation(); }
+  });
+
+  function setMode(m) {
+    mode = m;
+    root.querySelectorAll('.hb-modes button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
+    root.querySelectorAll('.hb-view').forEach(v => { v.hidden = v.dataset.view !== m; });
+    $('hb-sub').textContent = m === 'ai' ? 'AI assistant · instant answers' : 'Support team · replies by email';
+    if (m === 'human') renderHuman();
+  }
+  root.querySelector('.hb-modes').addEventListener('click', e => {
+    const b = e.target.closest('button[data-mode]');
+    if (b) setMode(b.dataset.mode);
+  });
+
+  // First-visit nudge
+  function hideHint() {
+    hint.hidden = true;
+    try { localStorage.setItem(SEEN_KEY, '1'); } catch (_) {}
+  }
+  hint.querySelector('.hb-hint-x').addEventListener('click', hideHint);
+  hint.addEventListener('click', e => { if (!e.target.closest('.hb-hint-x')) openPanel(true); });
+  let seen = false;
+  try { seen = localStorage.getItem(SEEN_KEY) === '1'; } catch (_) {}
+  if (!seen) setTimeout(() => { if (panel.hidden) hint.hidden = false; }, 6000);
+
+  // ---------- AI assistant ----------
+  const aiLog = $('hb-ai-log');
+  const chips = $('hb-chips');
+
+  function bubble(log, who, text, actions = []) {
+    const b = el('div', 'hb-msg hb-' + who);
+    text.split('\n').forEach((line, i) => {
+      if (i) b.appendChild(el('br'));
+      b.appendChild(document.createTextNode(line));
+    });
+    if (actions.length) {
+      const row = el('div', 'hb-actions');
+      actions.forEach(a => {
+        const btn = el('button', 'hb-action', a.label);
+        btn.type = 'button';
+        btn.addEventListener('click', a.run);
+        row.appendChild(btn);
+      });
+      b.appendChild(row);
+    }
+    log.appendChild(b);
+    log.scrollTop = log.scrollHeight;
+    return b;
+  }
+  function typing(log) {
+    const t = el('div', 'hb-msg hb-bot hb-typing');
+    t.innerHTML = '<span></span><span></span><span></span>';
+    t.setAttribute('aria-label', 'Typing');
+    log.appendChild(t);
+    log.scrollTop = log.scrollHeight;
+    return t;
+  }
+
+  // Actions the bot can take for the visitor
+  const go = {
+    hero: () => { openPanel(false); window.scrollTo({ top: 0, behavior: 'smooth' }); if (typeof setHeroMode === 'function') setHeroMode('shorten'); },
+    claim: () => { openPanel(false); window.scrollTo({ top: 0, behavior: 'smooth' }); if (typeof setHeroMode === 'function') setHeroMode('claim'); },
+    editor: () => { openPanel(false); if (typeof openDashboard === 'function') openDashboard('page'); },
+    settings: () => { openPanel(false); if (typeof openDashboard === 'function') openDashboard('settings'); },
+    language: () => { openPanel(false); document.getElementById('lang-picker')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => document.querySelector('.lang-btn')?.click(), 700); },
+    pages: () => { openPanel(false); document.getElementById('pages')?.scrollIntoView({ behavior: 'smooth' }); },
+    human: () => {
+      setMode('human');
+      const last = [...aiLog.querySelectorAll('.hb-user')].pop();
+      if (last && !$('hb-t-msg').value) $('hb-t-msg').value = last.textContent;
+    },
+  };
+  const A = {
+    hero: { label: 'Take me there', run: go.hero },
+    claim: { label: 'Claim a username', run: go.claim },
+    editor: { label: 'Open my page editor', run: go.editor },
+    settings: { label: 'Open settings', run: go.settings },
+    language: { label: 'Change language', run: go.language },
+    pages: { label: 'See an example page', run: go.pages },
+    human: { label: 'Talk to a person', run: go.human },
+  };
+
+  // Knowledge base. `k` are keywords (prefix-matched when 4+ letters).
+  const KB = [
+    { k: ['hi', 'hello', 'hey', 'yo', 'sup', 'namaste', 'hola', 'help'], w: 0.5,
+      a: "Hey! I'm the Void Links help bot. Ask me about short links, profile pages, backgrounds, sound, icons, Discord, Spotify or your account." },
+    { k: ['shorten', 'short link', 'shortener', 'url', 'slug', 'long link', 'custom link'],
+      a: 'Paste any long URL into the box at the top of the page and press Shorten. You get a short link on this site to share. In your dashboard (My Links) you can pick a custom slug too.', act: ['hero'] },
+    { k: ['claim', 'username', 'profile page', 'bio page', 'link in bio', 'linktree', 'my page', 'create page', 'make a page'],
+      a: 'Pick "Claim your page" at the top, type a username and sign up. You land in the editor where you add your name, avatar, bio, background, links and more. Hit Publish and your page lives at yoursite/@yourname.', act: ['claim', 'pages'] },
+    { k: ['background', 'wallpaper', 'video', 'gif', 'image', 'blur', 'dim', 'opacity'],
+      a: 'In My Page → Background and sound, drop an image, GIF or MP4/WebM video. Use the Dim slider to darken it and the Blur slider to soften it so your text stays readable. With no background, your page floats over the black hole.', act: ['editor'] },
+    { k: ['sound', 'audio', 'music', 'mute', 'volume', 'mp3', 'song plays'],
+      a: 'Under Sound pick Off, Video sound (uses your background video\'s audio) or Own audio (upload an MP3, OGG or WAV). Visitors click to enter first, and they can mute any time. Muted means silent, video included.', act: ['editor'] },
+    { k: ['icon', 'icons', 'logo', 'custom icon', 'github icon'],
+      a: 'Each link has an icon button on its left. Choose Automatic, one of 12 platforms (GitHub, Discord, Instagram, YouTube…) or upload your own image (under 1 MB). You can also show links as buttons or as a row of icons.', act: ['editor'] },
+    { k: ['link not', 'not working', 'invalid', 'red', 'cant add', 'can not add', 'add link', 'broken', 'doesnt work'],
+      a: 'A link turns red when it can\'t be read. Either paste the full link (instagram.com/name), or pick the platform icon and type just your username. The note under the row shows where it will go.', act: ['editor', 'human'] },
+    { k: ['discord', 'status', 'lanyard', 'offline', 'presence', 'activity'],
+      a: 'Add your Discord user ID in My Page → Spotify and Discord. Your status comes from Lanyard, so join discord.gg/lanyard first and stay in it. If it says Offline while you\'re online, check you\'re not set to Invisible and that you\'re still in the Lanyard server.', act: ['editor'] },
+    { k: ['spotify', 'listening', 'now playing', 'playlist', 'track'],
+      a: 'Two options: paste a Spotify song, album or playlist link to embed a player, or press Connect Spotify to show what you\'re listening to right now (needs the site running online, not from a file).', act: ['editor'] },
+    { k: ['views', 'view count', 'visits', 'analytics', 'clicks', 'stats', 'traffic'],
+      a: 'Every visit to your page adds a view, shown on the page and in your dashboard overview. Short-link clicks, countries and devices are in the Analytics tab.', act: ['editor'] },
+    { k: ['qr', 'qr code'],
+      a: 'Open your dashboard → QR Codes to get a code for each short link. Dynamic codes keep working if you change where the link goes.' },
+    { k: ['language', 'translate', 'hindi', 'spanish', 'french', 'german', 'turkish', 'portuguese'],
+      a: 'Use the language picker at the bottom of the page (or Settings in your dashboard). English, Español, Português, Français, Deutsch, Türkçe and हिन्दी are available.', act: ['language'] },
+    { k: ['password', 'email', 'avatar', 'profile picture', 'photo', 'settings', 'account', 'change name'],
+      a: 'Dashboard → Settings lets you change your name, email, password and account avatar. You can also reuse your avatar on your page.', act: ['settings'] },
+    { k: ['login', 'log in', 'sign in', 'signup', 'sign up', 'register', 'logout', 'log out'],
+      a: 'Use Log in or Sign up at the top right. You can continue with Google, GitHub, Discord or email. To log out, click your name at the bottom of the dashboard sidebar.' },
+    { k: ['delete', 'remove page', 'reset'],
+      a: 'To start over, use Reset in the page editor. To remove your page completely, go to Settings → Danger zone → Delete my page.', act: ['settings'] },
+    { k: ['price', 'pricing', 'cost', 'pay', 'paid', 'premium', 'money'],
+      a: 'There\'s nothing to pay for. Every feature you see is available to everyone.' },
+    { k: ['privacy', 'data', 'safe', 'secure', 'stored', 'tracking'],
+      a: 'Right now your page and uploads are stored in your own browser. Visitors only see what you publish. Links open in a new tab and we never put your details in URLs.' },
+    { k: ['human', 'person', 'staff', 'agent', 'support', 'someone', 'real', 'team', 'contact', 'talk'],
+      a: 'Sure, I\'ll connect you with the support team.', handoff: true },
+    { k: ['thanks', 'thank', 'thx', 'ty', 'great', 'awesome', 'cool', 'nice'], w: 0.5,
+      a: 'Anytime! Anything else I can help with?' },
+  ];
+  const SUGGEST = ['How do I claim a username?', 'Add a video background', 'My link shows red', 'Show my Discord status', 'Talk to a person'];
+
+  function match(text) {
+    const q = ' ' + text.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+    let best = null, top = 0;
+    for (const item of KB) {
+      let s = 0;
+      for (const k of item.k) {
+        const hit = k.includes(' ') ? q.includes(' ' + k) : (k.length >= 4 ? q.includes(' ' + k) : q.includes(' ' + k + ' '));
+        if (hit) s += k.split(' ').length;
+      }
+      s *= item.w || 1;
+      if (s > top) { top = s; best = item; }
+    }
+    return best;
+  }
+
+  const aiApi = {
+    // Replace with a call to your own endpoint (e.g. a Supabase edge function that calls an LLM).
+    async ask(text) { return match(text); },
+  };
+
+  function renderChips(list) {
+    chips.textContent = '';
+    list.forEach(s => {
+      const c = el('button', 'hb-chip', s);
+      c.type = 'button';
+      c.addEventListener('click', () => ask(s));
+      chips.appendChild(c);
+    });
+  }
+  function greet() {
+    const name = me() ? me().name.split(' ')[0] : '';
+    bubble(aiLog, 'bot', `Hi${name ? ' ' + name : ''}! I'm the Void Links help bot. What can I help you with?`);
+    renderChips(SUGGEST);
+  }
+
+  let busy = false;
+  async function ask(text) {
+    text = text.trim();
+    if (!text || busy) return;
+    busy = true;
+    bubble(aiLog, 'user', text);
+    chips.textContent = '';
+    const t = typing(aiLog);
+    const [hit] = await Promise.all([aiApi.ask(text), new Promise(r => setTimeout(r, 550 + Math.random() * 450))]);
+    t.remove();
+    if (!hit) {
+      bubble(aiLog, 'bot', "I don't have an answer for that yet. Want me to pass it to the support team?", [A.human]);
+    } else if (hit.handoff) {
+      bubble(aiLog, 'bot', hit.a);
+      setTimeout(go.human, 500);
+    } else {
+      bubble(aiLog, 'bot', hit.a, (hit.act || []).map(k => A[k]));
+    }
+    renderChips(SUGGEST.filter(s => s.toLowerCase() !== text.toLowerCase()).slice(0, 3));
+    busy = false;
+  }
+  $('hb-ai-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const input = $('hb-ai-input');
+    ask(input.value);
+    input.value = '';
+  });
+
+  // ---------- talk to a person ----------
+  // Requests are stored in Supabase (support_tickets / support_messages) through
+  // window.DB. This browser keeps only the request id + secret so the visitor can
+  // reopen their own thread. The team replies by adding a row to support_messages
+  // with sender = 'staff' (Supabase → Table Editor), and it shows up here.
+  const ticket = () => { try { return JSON.parse(localStorage.getItem(SUPPORT_KEY)); } catch (_) { return null; } };
+  const saveTicket = t => { try { localStorage.setItem(SUPPORT_KEY, JSON.stringify(t)); } catch (_) {} };
+  const supportApi = {
+    async create(name, email, topic, body) {
+      const r = await window.DB.createTicket(name, email, topic, body);
+      const t = { id: r.id, secret: r.secret, code: r.code, name, email, topic, messages: [{ from: 'you', text: body }] };
+      saveTicket(t);
+      return t;
+    },
+    async send(t, body) {
+      await window.DB.addTicketMessage(t.id, t.secret, body);
+      t.messages.push({ from: 'you', text: body });
+      saveTicket(t);
+    },
+    async refresh(t) {
+      const r = await window.DB.getTicket(t.id, t.secret);
+      if (!r) return null;   // removed on the server
+      t.messages = r.messages.map(m => ({ from: m.sender === 'user' ? 'you' : m.sender, text: m.body }));
+      t.status = r.status;
+      saveTicket(t);
+      return t;
+    },
+  };
+
+  function renderHuman() {
+    let t = ticket();
+    if (t && !t.secret) { try { localStorage.removeItem(SUPPORT_KEY); } catch (_) {} t = null; }   // old local-only request
+    $('hb-ticket').hidden = !!t;
+    $('hb-thread').hidden = !t;
+    if (!t) {
+      const u = me();
+      if (u && !$('hb-t-name').value) $('hb-t-name').value = u.name || '';
+      if (u && !$('hb-t-email').value) $('hb-t-email').value = u.email || '';
+      return;
+    }
+    $('hb-ticket-id').textContent = 'Request ' + t.code;
+    $('hb-ticket-meta').textContent = `${t.topic} · replies go to ${t.email}`;
+    const log = $('hb-human-log');
+    log.textContent = '';
+    bubble(log, 'note', `Thanks, ${t.name.split(' ')[0]}! Your request ${t.code} is with the support team.`);
+    t.messages.forEach(m => {
+      if (m.from === 'staff') {
+        const b = bubble(log, 'bot', m.text);
+        b.prepend(el('strong', 'hb-staff', 'Support team'), el('br'));
+      } else {
+        bubble(log, m.from === 'you' ? 'user' : 'note', m.text);
+      }
+    });
+    const last = t.messages[t.messages.length - 1];
+    if (!last || last.from === 'you') {
+      const waiting = el('div', 'hb-status');
+      waiting.innerHTML = '<span class="hb-pulse" aria-hidden="true"></span>';
+      waiting.appendChild(document.createTextNode('Waiting for the support team. We usually reply within a day.'));
+      log.appendChild(waiting);
+    }
+    log.scrollTop = log.scrollHeight;
+  }
+
+  // Check for staff replies while the thread is open
+  let pollTimer = null;
+  async function pollTicket() {
+    const t = ticket();
+    if (!t || !t.secret || !window.DB || panel.hidden || mode !== 'human') return;
+    const before = t.messages.length;
+    try {
+      const fresh = await supportApi.refresh(t);
+      if (!fresh) { try { localStorage.removeItem(SUPPORT_KEY); } catch (_) {} }
+      if (!fresh || fresh.messages.length !== before) renderHuman();
+    } catch (_) {}
+  }
+  setInterval(pollTicket, 20000);
+  root.querySelector('.hb-modes').addEventListener('click', () => setTimeout(pollTicket, 50));
+  launch.addEventListener('click', () => setTimeout(pollTicket, 50));
+
+  $('hb-ticket').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = $('hb-t-name').value.trim();
+    const email = $('hb-t-email').value.trim();
+    const msg = $('hb-t-msg').value.trim();
+    const err = $('hb-t-error');
+    if (!name) { err.textContent = 'Please add your name.'; $('hb-t-name').focus(); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Please add an email we can reply to.'; $('hb-t-email').focus(); return; }
+    if (msg.length < 5) { err.textContent = 'Tell us a little more so we can help.'; $('hb-t-msg').focus(); return; }
+    if (!window.DB) { err.textContent = "Can't reach the server right now. Please try again later."; return; }
+    err.textContent = '';
+    const btn = $('hb-ticket').querySelector('button[type="submit"]');
+    btn.disabled = true;
+    try {
+      await supportApi.create(name, email, $('hb-t-topic').value, msg);
+    } catch (_) {
+      err.textContent = "Couldn't send. Check your connection and try again.";
+      return;
+    } finally {
+      btn.disabled = false;
+    }
+    $('hb-t-msg').value = '';
+    renderHuman();
+    toast('Sent to support');
+    $('hb-human-input').focus();
+  });
+  $('hb-human-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const input = $('hb-human-input');
+    const text = input.value.trim();
+    const t = ticket();
+    if (!text || !t) return;
+    try { await supportApi.send(t, text); } catch (_) { toast("Couldn't send. Try again."); return; }
+    input.value = '';
+    renderHuman();
+  });
+  $('hb-new-ticket').addEventListener('click', () => {
+    try { localStorage.removeItem(SUPPORT_KEY); } catch (_) {}
+    renderHuman();
+    $('hb-t-msg').focus();
+  });
+
+  // ---------- 3D robot ----------
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  async function initRobot() {
+    try {
+      if (!window.THREE) await loadScript(THREE_URL);
+      if (!THREE.GLTFLoader) await loadScript(GLTF_URL);
+      if (!window.HELP_ROBOT_GLB) await loadScript(MODEL_URL);
+    } catch (_) { return; }   // offline or blocked: the flat robot icon stays
+    const bin = Uint8Array.from(atob(window.HELP_ROBOT_GLB), c => c.charCodeAt(0)).buffer;
+    new THREE.GLTFLoader().parse(bin, '', setupRobot, () => {});
+  }
+
+  function labelSprite() {
+    const c = document.createElement('canvas');
+    c.width = 256; c.height = 104;
+    const x = c.getContext('2d');
+    const r = 44;
+    x.fillStyle = 'rgba(6,8,12,0.88)';
+    x.strokeStyle = 'rgba(255,255,255,0.9)';
+    x.lineWidth = 5;
+    x.beginPath();
+    x.moveTo(r + 4, 4); x.arcTo(252, 4, 252, 100, r); x.arcTo(252, 100, 4, 100, r); x.arcTo(4, 100, 4, 4, r); x.arcTo(4, 4, 252, 4, r);
+    x.closePath();
+    x.fill();
+    x.stroke();
+    x.fillStyle = '#ffffff';
+    x.font = '700 54px "Space Grotesk", Inter, Arial, sans-serif';
+    x.textAlign = 'center';
+    x.textBaseline = 'middle';
+    x.fillText('HELP', 128, 55);
+    const tex = new THREE.CanvasTexture(c);
+    tex.encoding = THREE.sRGBEncoding;
+    tex.anisotropy = 4;
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+    sprite.renderOrder = 10;
+    return sprite;
+  }
+
+  function setupRobot(gltf) {
+    const canvas = root.querySelector('.hb-canvas');
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
+    } catch (_) { return; }
+    const SIZE = canvas.clientWidth || 128;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(SIZE, SIZE, false);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
+    camera.position.set(0, 0.15, 4.6);
+    camera.lookAt(0, 0.1, 0);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x1b2a44, 1.25));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    keyLight.position.set(2, 3, 4);
+    scene.add(keyLight);
+    const rim = new THREE.DirectionalLight(0x8fd8ff, 0.8);
+    rim.position.set(-3, 1, -2);
+    scene.add(rim);
+
+    const model = gltf.scene;
+    const mixer = new THREE.AnimationMixer(model);
+    if (gltf.animations[0]) mixer.clipAction(gltf.animations[0]).play();
+    mixer.update(0);
+
+    // Centre and scale to a ~1.7 unit tall robot
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const holder = new THREE.Group();
+    model.position.sub(center);
+    holder.add(model);
+    holder.scale.setScalar(1.7 / Math.max(size.x, size.y, size.z));
+    const pivot = new THREE.Group();
+    pivot.add(holder);
+    scene.add(pivot);
+
+    // "HELP" badge sitting on the robot's head
+    const label = labelSprite();
+    const top = (size.y / Math.max(size.x, size.y, size.z)) * 1.7 / 2;
+    label.position.set(0, top + 0.08, 0.15);
+    label.scale.set(0.78, 0.317, 1);
+    pivot.add(label);
+    if (document.fonts) document.fonts.ready.then(() => { const fresh = labelSprite(); label.material.map = fresh.material.map; label.material.needsUpdate = true; });
+
+    root.classList.add('has-3d');
+
+    // Look toward the cursor
+    let mx = 0, my = 0, rotY = 0, rotX = 0;
+    window.addEventListener('pointermove', e => {
+      const r = canvas.getBoundingClientRect();
+      mx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (window.innerWidth / 2)));
+      my = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (window.innerHeight / 2)));
+    }, { passive: true });
+
+    const clock = new THREE.Clock();
+    let acc = 0, running = true;
+    function frame() {
+      if (!running) return;
+      requestAnimationFrame(frame);
+      const dt = Math.min(clock.getDelta(), 0.1);
+      acc += dt;
+      if (acc < 1 / 30) return;   // 30fps is plenty for a small mascot
+      const step = acc;
+      acc = 0;
+      mixer.update(step);
+      const t = clock.elapsedTime;
+      const open = root.classList.contains('open');
+      const targetY = open ? -0.55 : mx * 0.7;
+      const targetX = open ? 0.05 : my * 0.25;
+      rotY += (targetY - rotY) * 0.08;
+      rotX += (targetX - rotX) * 0.08;
+      pivot.rotation.set(rotX, rotY, 0);
+      pivot.position.y = Math.sin(t * 1.8) * 0.06;
+      renderer.render(scene, camera);
+    }
+    frame();
+    document.addEventListener('visibilitychange', () => {
+      running = !document.hidden;
+      if (running) { clock.getDelta(); frame(); }
+    });
+  }
+
+  const start = () => setTimeout(initRobot, 1200);
+  if (document.readyState === 'complete') start();
+  else window.addEventListener('load', start);
+})();

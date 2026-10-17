@@ -1,0 +1,21 @@
+# Old copies and notes that shouldn't go online
+index_before_blackhole.html
+index_yellow_version.html
+preview.html
+New Text Document.txt
+including feature.txt
+
+# Tool folders
+.claude/
+.taste-skill/
+.netlify/
+
+# Editor / OS clutter
+.vscode/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Never commit secrets
+.env
+.env.*

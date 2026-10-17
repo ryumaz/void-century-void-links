@@ -1,0 +1,25 @@
+# Netlify settings. The site is plain static files: no build step.
+[build]
+  publish = "."
+
+# Short-link redirects run at the edge when deployed via Git or the Netlify CLI
+# (see netlify/edge-functions/shortlink.ts). Routing for drag-and-drop lives in _redirects.
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Big static files rarely change: let browsers cache them
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/admin*"
+  [headers.values]
+    X-Robots-Tag = "noindex"

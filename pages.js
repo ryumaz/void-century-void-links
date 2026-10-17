@@ -1,0 +1,1307 @@
+// ===== PROFILE PAGES =====
+// A link-in-bio builder: username, avatar, bio, background image/GIF/video with sound,
+// links with platform or custom icons, a Spotify embed and a live Discord status card.
+// Pages are stored in Supabase (table `pages`, files in the `media` bucket) through
+// window.DB (backend.js), so anyone can open them at index.html#@username.
+(function () {
+  const t = key => (window.i18n ? window.i18n.t(key) : key);
+  const $ = id => document.getElementById(id);
+
+  const MUTE_KEY = 'lp-muted';
+  const MAX_MEDIA = 40 * 1024 * 1024;
+  const MAX_AUDIO = 15 * 1024 * 1024;
+  const MAX_ICON = 1024 * 1024;
+  const MAX_LINKS = 10;
+  const USER_RE = /^[a-z0-9_.-]{2,20}$/;
+  const cleanUser = v => (v || '').toLowerCase().replace(/[^a-z0-9_.-]/g, '').slice(0, 20);
+
+  // ---------- storage ----------
+  // The signed-in user's own page (one per account), as last loaded from the database
+  let myPageCache = null;
+  let syncing = Promise.resolve();
+  const takenCache = {};   // username → owner id, from availability checks
+
+  // ---------- icons ----------
+  // fill: brand marks drawn as solid shapes; stroke: line icons (24×24 grid)
+  const ICONS = {
+    github: { name: 'GitHub', hosts: ['github.com'], handle: h => `github.com/${h}`,
+      fill: 'M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z' },
+    discord: { name: 'Discord', hosts: ['discord.gg', 'discord.com', 'discordapp.com'],
+      handle: h => (/^\d{17,20}$/.test(h) ? `discord.com/users/${h}` : `discord.gg/${h}`),
+      fill: 'M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.079.11 18.1.128 18.11a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z' },
+    x: { name: 'X', hosts: ['x.com', 'twitter.com'], handle: h => `x.com/${h}`,
+      fill: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' },
+    instagram: { name: 'Instagram', hosts: ['instagram.com'], handle: h => `instagram.com/${h}`,
+      stroke: '<rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>' },
+    youtube: { name: 'YouTube', hosts: ['youtube.com', 'youtu.be'], handle: h => `youtube.com/@${h}`,
+      stroke: '<path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/>' },
+    spotify: { name: 'Spotify', hosts: ['open.spotify.com', 'spotify.com', 'spotify.link'], handle: h => `open.spotify.com/user/${h}`,
+      stroke: '<circle cx="12" cy="12" r="10"/><path d="M7 9.6c3.4-1 6.9-.7 10 .9"/><path d="M7.6 12.9c2.9-.8 5.7-.5 8.2.9"/><path d="M8.2 16c2.2-.6 4.3-.4 6.3.6"/>' },
+    tiktok: { name: 'TikTok', hosts: ['tiktok.com'], handle: h => `tiktok.com/@${h}`,
+      stroke: '<path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.5 2.6 2.3 4.4 5 4.6"/>' },
+    twitch: { name: 'Twitch', hosts: ['twitch.tv'], handle: h => `twitch.tv/${h}`,
+      stroke: '<path d="M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m5 4V7"/>' },
+    telegram: { name: 'Telegram', hosts: ['t.me', 'telegram.me'], handle: h => `t.me/${h}`,
+      stroke: '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>' },
+    linkedin: { name: 'LinkedIn', hosts: ['linkedin.com'], handle: h => `linkedin.com/in/${h}`,
+      stroke: '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/>' },
+    email: { name: 'Email', hosts: [], handle: h => (h.includes('@') ? `mailto:${h}` : null),
+      stroke: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>' },
+    website: { name: 'Website', hosts: [], handle: null,
+      stroke: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>' },
+  };
+  const ICON_KEYS = Object.keys(ICONS);
+
+  function iconSvg(key, size = 20) {
+    const ic = ICONS[key] || ICONS.website;
+    return ic.fill
+      ? `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${ic.fill}"/></svg>`
+      : `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic.stroke}</svg>`;
+  }
+  const AUTO_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3Z"/></svg>';
+  const UPLOAD_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+  const EYE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const ARROW = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>';
+  const MUSIC = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+
+  // ---------- link resolving ----------
+  const hostOf = url => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch (_) { return ''; } };
+  function iconForHost(host) {
+    return ICON_KEYS.find(k => ICONS[k].hosts.some(h => host === h || host.endsWith('.' + h))) || null;
+  }
+  function iconForLabel(label) {
+    const l = (label || '').trim().toLowerCase();
+    if (!l) return null;
+    if (l === 'twitter') return 'x';
+    if (l === 'mail' || l === 'e-mail') return 'email';
+    return ICON_KEYS.find(k => k === l || ICONS[k].name.toLowerCase() === l) || null;
+  }
+  function normalizeUrl(raw) {
+    let v = (raw || '').trim();
+    if (!v) return null;
+    if (/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(v)) return v;
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(v)) v = 'https://' + v;
+    try {
+      const u = new URL(v);
+      if ((u.protocol === 'http:' || u.protocol === 'https:') && u.hostname.includes('.')) return u.href;
+    } catch (_) {}
+    return null;   // javascript:, data:, garbage → dropped
+  }
+  // Turns what the user typed into { href, icon } or null.
+  // Handles plain usernames: label "Instagram" + "dsms" → https://instagram.com/dsms
+  function resolveLink(link) {
+    const raw = (link.url || '').trim();
+    if (!raw) return null;
+    const chosen = ICONS[link.icon] ? link.icon : null;
+    if (/^[^\s@/]+@[^\s@/]+\.[^\s@/]+$/.test(raw)) {
+      return { href: 'mailto:' + raw, icon: chosen || 'email' };
+    }
+    const looksLikeHandle = !/[./:]/.test(raw.replace(/^@/, ''));
+    if (looksLikeHandle) {
+      const platform = chosen || iconForLabel(link.label);
+      const build = platform && ICONS[platform].handle;
+      const path = build ? build(raw.replace(/^@/, '')) : null;
+      if (!path) return null;
+      return { href: path.startsWith('mailto:') ? path : 'https://' + path, icon: platform };
+    }
+    const href = normalizeUrl(raw);
+    if (!href) return null;
+    return { href, icon: chosen || iconForHost(hostOf(href)) || iconForLabel(link.label) || 'website' };
+  }
+
+  function spotifyEmbed(raw) {
+    const m = (raw || '').match(/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(track|album|playlist|artist|episode|show)\/([A-Za-z0-9]{10,40})/)
+      || (raw || '').match(/^spotify:(track|album|playlist|artist|episode|show):([A-Za-z0-9]{10,40})$/);
+    if (!m) return null;
+    return { src: `https://open.spotify.com/embed/${m[1]}/${m[2]}?theme=0`, height: (m[1] === 'track' || m[1] === 'episode') ? 80 : 152 };
+  }
+
+  // ---------- Discord status (Lanyard) ----------
+  // Lanyard is a free public API that exposes a Discord user's live presence,
+  // including what they're listening to on Spotify, once they join discord.gg/lanyard.
+  const lanyardCache = new Map();
+  async function lanyard(id) {
+    const hit = lanyardCache.get(id);
+    if (hit && Date.now() - hit.at < 25000) return hit.data;
+    let data = 'error';
+    try {
+      const res = await fetch(`https://api.lanyard.rest/v1/users/${id}`);
+      const json = await res.json();
+      data = json.success ? json.data : null;
+    } catch (_) {}
+    lanyardCache.set(id, { at: Date.now(), data });
+    return data;
+  }
+
+
+  // ---------- Spotify "now playing" ----------
+  // Uses Spotify's Authorization Code + PKCE flow, so no client secret is needed in the browser.
+  // Setup: create an app at https://developer.spotify.com/dashboard, add this page's address
+  // (e.g. https://yoursite.netlify.app/) as a Redirect URI, and put the Client ID in supabase-config.js.
+  // It can't run from file:// because Spotify needs a web address to send you back to.
+  // Until the backend exists the token lives in this browser, so only you see your live song;
+  // a Supabase function holding your token will let every visitor see it.
+  const SPOTIFY_CLIENT_ID = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.spotifyClientId) || '';
+  const SP_KEY = 'lp-spotify';
+  const SP_SCOPES = 'user-read-currently-playing user-read-playback-state';
+  const spRedirect = () => location.origin + location.pathname;
+  const spBlocker = () => (!SPOTIFY_CLIENT_ID ? 'noid' : (!/^https?:$/.test(location.protocol) ? 'file' : ''));
+  const spLoad = () => { try { return JSON.parse(localStorage.getItem(SP_KEY)); } catch (_) { return null; } };
+  const spSave = v => { try { v ? localStorage.setItem(SP_KEY, JSON.stringify(v)) : localStorage.removeItem(SP_KEY); } catch (_) {} };
+  const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  async function spConnect() {
+    const verifier = b64url(crypto.getRandomValues(new Uint8Array(64)));
+    const challenge = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
+    const state = b64url(crypto.getRandomValues(new Uint8Array(16)));
+    sessionStorage.setItem('lp-sp-pkce', JSON.stringify({ verifier, state }));
+    const q = new URLSearchParams({
+      client_id: SPOTIFY_CLIENT_ID, response_type: 'code', redirect_uri: spRedirect(),
+      code_challenge_method: 'S256', code_challenge: challenge, scope: SP_SCOPES, state,
+    });
+    location.href = 'https://accounts.spotify.com/authorize?' + q;
+  }
+  async function spToken(body) {
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ client_id: SPOTIFY_CLIENT_ID, ...body }),
+    });
+    if (!res.ok) throw new Error('spotify token ' + res.status);
+    const j = await res.json();
+    const prev = spLoad() || {};
+    const v = { access: j.access_token, refresh: j.refresh_token || prev.refresh, expires: Date.now() + (j.expires_in - 60) * 1000 };
+    spSave(v);
+    return v;
+  }
+  // Coming back from Spotify's login page: swap the code for a token
+  async function spHandleRedirect() {
+    const params = new URLSearchParams(location.search);
+    const code = params.get('code'), state = params.get('state'), err = params.get('error');
+    if (!code && !err) return false;
+    let pkce = null;
+    try { pkce = JSON.parse(sessionStorage.getItem('lp-sp-pkce')); } catch (_) {}
+    history.replaceState(null, '', location.pathname + location.hash);
+    if (!pkce || state !== pkce.state) return false;
+    sessionStorage.removeItem('lp-sp-pkce');
+    if (err) { toast(t('toast.sp_fail')); return true; }
+    try {
+      await spToken({ grant_type: 'authorization_code', code, redirect_uri: spRedirect(), code_verifier: pkce.verifier });
+      toast(t('toast.sp_ok'));
+    } catch (_) { toast(t('toast.sp_fail')); }
+    return true;
+  }
+  async function spAccess() {
+    let v = spLoad();
+    if (!v) return null;
+    if (Date.now() > v.expires) {
+      try { v = await spToken({ grant_type: 'refresh_token', refresh_token: v.refresh }); } catch (_) { return null; }
+    }
+    return v.access;
+  }
+  let npCache = { at: 0, data: null };
+  async function spNowPlaying() {
+    if (Date.now() - npCache.at < 10000) return npCache.data;
+    const token = await spAccess();
+    let data = null;
+    if (token) {
+      try {
+        const res = await fetch('https://api.spotify.com/v1/me/player/currently-playing', { headers: { Authorization: 'Bearer ' + token } });
+        if (res.status === 200) {
+          const j = await res.json();
+          if (j.item && j.currently_playing_type === 'track') {
+            const imgs = j.item.album.images || [];
+            data = {
+              song: j.item.name, artist: j.item.artists.map(a => a.name).join(', '),
+              art: (imgs[1] || imgs[0] || {}).url || '', url: j.item.external_urls.spotify,
+              progress: j.progress_ms, duration: j.item.duration_ms, playing: j.is_playing, at: Date.now(),
+            };
+          }
+        }
+      } catch (_) {}
+    }
+    npCache = { at: Date.now(), data };
+    return data;
+  }
+  const exampleNp = () => ({ song: 'No. 1 Party Anthem', artist: 'Arctic Monkeys', art: '', duration: 243000, progress: 7000, playing: true, at: Date.now() });
+  const fmtTime = ms => { const sec = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`; };
+
+  function renderNowPlaying(box, np, example) {
+    box.textContent = '';
+    box.classList.toggle('np-example', !!example);
+    const head = el('p', 'np-head');
+    head.innerHTML = iconSvg('spotify', 14);
+    head.appendChild(document.createTextNode(' ' + t(example ? 'np.example' : 'np.listening')));
+    const row = el('div', 'np-row');
+    const art = el('div', 'np-art');
+    if (np.art) { const img = el('img'); img.src = np.art; img.alt = ''; art.appendChild(img); } else { art.innerHTML = MUSIC; }
+    const info = el('div', 'np-info');
+    let song = el('strong', 'np-song', np.song);
+    if (np.url) { song = el('a', 'np-song', np.song); song.href = np.url; song.target = '_blank'; song.rel = 'noopener noreferrer'; }
+    const bar = el('div', 'np-bar');
+    const fill = el('span');
+    bar.appendChild(fill);
+    const cur = el('span');
+    const times = el('div', 'np-times');
+    times.append(cur, el('span', '', fmtTime(np.duration)));
+    info.append(song, el('span', 'np-artist', np.artist), bar, times);
+    row.append(art, info);
+    box.append(head, row);
+    box._np = { ...np, fill, cur };
+    tickNp(box);
+  }
+  function tickNp(box) {
+    const n = box._np;
+    if (!n || !n.duration) return;
+    const pos = Math.min(n.duration, n.progress + (n.playing ? Date.now() - n.at : 0));
+    n.fill.style.width = (pos / n.duration * 100).toFixed(2) + '%';
+    n.cur.textContent = fmtTime(pos);
+  }
+  setInterval(() => document.querySelectorAll('.pc-np:not([hidden])').forEach(tickNp), 1000);
+
+  // ---------- DOM helpers ----------
+  const el = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  };
+  const toast = msg => (typeof showToast === 'function' ? showToast(msg) : null);
+  // Shareable page address: yoursite/@name once hosted, or a #@name link locally
+  const pageUrl = user => (window.DB ? DB.pageUrl(user) : `${location.href.split('#')[0]}#@${user}`);
+  const uid = () => Math.random().toString(36).slice(2, 10);
+  // currentUser is a top-level `let` in index.html, so it isn't on window
+  const me = () => (typeof currentUser !== 'undefined' ? currentUser : null);
+
+  // ---------- rendering (shared by preview, demo and full page) ----------
+  // data:  { username, name, bio, dim, layout, links, views, spotify, discordId }
+  // media: { avatarUrl, bgUrl, bgType, icons: { [linkId]: url } }
+  // opts:  { discord: <lanyard-like object> } to show a static status (demo)
+  function ensureCard(root) {
+    const card = root.querySelector('.profile-card');
+    if (!card.dataset.ready) {
+      card.dataset.ready = '1';
+      card.innerHTML = `
+        <div class="pc-avatar"></div>
+        <h3 class="pc-name"></h3>
+        <p class="pc-handle"></p>
+        <p class="pc-bio"></p>
+        <div class="pc-discord" hidden></div>
+        <div class="pc-np" hidden></div>
+        <div class="pc-links"></div>
+        <div class="pc-spotify" hidden></div>`;
+    }
+    return card;
+  }
+
+  function renderBackground(root, media, dimPct, blurPx) {
+    const bg = root.querySelector('.profile-bg');
+    const dim = root.querySelector('.profile-dim');
+    const src = media.bgUrl || '';
+    // Only rebuild when the source changes, so videos don't restart on every keystroke
+    if (bg.dataset.src !== src) {
+      bg.dataset.src = src;
+      bg.textContent = '';
+      if (src && media.bgType === 'video') {
+        const v = el('video');
+        Object.assign(v, { src, muted: true, loop: true, autoplay: true, playsInline: true });
+        v.setAttribute('muted', '');
+        v.setAttribute('playsinline', '');
+        bg.appendChild(v);
+        v.play().catch(() => {});
+      } else if (src) {
+        const img = el('img');
+        img.src = src;
+        img.alt = '';
+        bg.appendChild(img);
+      }
+    }
+    root.classList.toggle('show-void', !src);
+    dim.style.opacity = src ? ((dimPct ?? 35) / 100).toFixed(2) : '0';
+    // Blur is set for the full screen; the small preview phone scales it down to match
+    const mediaEl = bg.firstElementChild;
+    if (mediaEl) {
+      const scale = root.id === 'profile-view' ? 1 : Math.max(0.25, root.clientWidth / Math.max(window.innerWidth, 1));
+      const b = (blurPx || 0) * scale;
+      mediaEl.style.filter = b ? `blur(${b.toFixed(1)}px)` : '';
+      mediaEl.style.transform = b ? 'scale(1.08)' : '';   // hides the soft edge blur creates
+    }
+  }
+
+  function renderDiscordCard(box, data) {
+    box.textContent = '';
+    if (data === 'loading') { box.appendChild(el('p', 'dc-note', '…')); return; }
+    if (!data || data === 'error') {
+      const row = el('div', 'dc-row');
+      row.appendChild(el('span', 'dc-x', '✕'));
+      const txt = el('div', 'dc-text');
+      txt.appendChild(el('strong', '', data === 'error' ? t('dc.error') : t('dc.notfound')));
+      const note = el('p', 'dc-note');
+      note.append(t('dc.join') + ' ');
+      const a = el('a', '', 'discord.gg/lanyard');
+      a.href = 'https://discord.gg/lanyard';
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      note.appendChild(a);
+      txt.appendChild(note);
+      row.appendChild(txt);
+      box.appendChild(row);
+      return;
+    }
+    const u = data.discord_user || {};
+    const row = el('div', 'dc-row');
+    const av = el('div', 'dc-avatar');
+    if (u.avatar && u.id) {
+      const img = el('img');
+      img.src = `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`;
+      img.alt = '';
+      av.appendChild(img);
+    } else {
+      av.innerHTML = iconSvg('discord', 20);
+    }
+    const status = ['online', 'idle', 'dnd'].includes(data.discord_status) ? data.discord_status : 'offline';
+    av.appendChild(el('span', 'dc-dot dc-' + status));
+    row.appendChild(av);
+
+    const txt = el('div', 'dc-text');
+    txt.appendChild(el('strong', '', u.global_name || u.display_name || u.username || 'Discord'));
+    let line = t('dc.' + status);
+    let art = null;
+    if (data.listening_to_spotify && data.spotify) {
+      line = `${t('dc.listening')} ${data.spotify.song} · ${data.spotify.artist}`;
+      art = data.spotify.album_art_url || '';
+    } else {
+      const acts = data.activities || [];
+      const game = acts.find(a => a.type === 0);
+      const custom = acts.find(a => a.type === 4 && a.state);
+      if (game) line = `${t('dc.playing')} ${game.name}`;
+      else if (custom) line = custom.state;
+    }
+    txt.appendChild(el('p', 'dc-note', line));
+    row.appendChild(txt);
+    if (art !== null) {
+      const cover = el('div', 'dc-art');
+      if (art) {
+        const img = el('img');
+        img.src = art;
+        img.alt = '';
+        cover.appendChild(img);
+      } else {
+        cover.innerHTML = MUSIC;
+      }
+      row.appendChild(cover);
+    }
+    box.appendChild(row);
+  }
+
+  // ---------- custom cursor ----------
+  // Presets are tiny SVGs; uploaded images are turned into a 32x32 PNG (the size every browser accepts).
+  const svgCursor = svg => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+  const CURSOR_PRESETS = {
+    crosshair: svgCursor("<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><g stroke-linecap='round'><path d='M16 4v7M16 21v7M4 16h7M21 16h7' stroke='black' stroke-opacity='.55' stroke-width='3.5'/><path d='M16 4v7M16 21v7M4 16h7M21 16h7' stroke='white' stroke-width='1.5'/></g><circle cx='16' cy='16' r='1.7' fill='white' stroke='black' stroke-opacity='.5'/></svg>") + ' 16 16, crosshair',
+    dot: svgCursor("<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><circle cx='16' cy='16' r='6' fill='white' stroke='black' stroke-opacity='.45' stroke-width='2'/></svg>") + ' 16 16, default',
+  };
+  function cursorCss(data, url) {
+    if (!data) return '';
+    if (data.cursor === 'custom' && url) return `url("${url}") ${data.cursorHotspot === 'center' ? '16 16' : '0 0'}, auto`;
+    return CURSOR_PRESETS[data.cursor] || '';
+  }
+  function applyCursor(root, css) {
+    root.classList.toggle('has-cursor', !!css);
+    if (css) root.style.setProperty('--page-cursor', css);
+    else root.style.removeProperty('--page-cursor');
+  }
+  // Any image -> 32x32 transparent PNG, centred and scaled to fit
+  async function makeCursor(file) {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((resolve, reject) => {
+        const i = new Image();
+        i.onload = () => resolve(i);
+        i.onerror = reject;
+        i.src = url;
+      });
+      const c = document.createElement('canvas');
+      c.width = c.height = 32;
+      const iw = img.naturalWidth || 32, ih = img.naturalHeight || 32;
+      const k = Math.min(32 / iw, 32 / ih);
+      const w = Math.max(1, Math.round(iw * k)), h = Math.max(1, Math.round(ih * k));
+      const ctx = c.getContext('2d');
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, Math.round((32 - w) / 2), Math.round((32 - h) / 2), w, h);
+      return await new Promise(r => c.toBlob(r, 'image/png'));
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  function renderProfile(root, data, media, opts = {}) {
+    renderBackground(root, media, data.dim, data.blur);
+    applyCursor(root, cursorCss(data, media.cursorUrl || data.cursorUrl));
+    const card = ensureCard(root);
+
+    const avatar = card.querySelector('.pc-avatar');
+    avatar.textContent = '';
+    if (media.avatarUrl) {
+      const img = el('img');
+      img.src = media.avatarUrl;
+      img.alt = '';
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = (data.name || data.username || '?').trim().charAt(0).toUpperCase() || '?';
+    }
+    card.querySelector('.pc-name').textContent = data.name || t('b.name_ph');
+
+    const handle = card.querySelector('.pc-handle');
+    handle.textContent = '@' + (data.username || 'you');
+    if (data.views !== undefined) {
+      const views = el('span', 'pc-views');
+      views.innerHTML = EYE;
+      views.appendChild(document.createTextNode(` ${Number(data.views).toLocaleString()} ${t(data.views === 1 ? 'b.view' : 'b.views')}`));
+      handle.appendChild(views);
+    }
+    const bio = card.querySelector('.pc-bio');
+    bio.textContent = data.bio || '';
+    bio.hidden = !data.bio;
+
+    // Discord status
+    const dBox = card.querySelector('.pc-discord');
+    const discordId = (data.discordId || '').trim();
+    if (opts.discord) {
+      dBox.hidden = false;
+      renderDiscordCard(dBox, opts.discord);
+    } else if (/^\d{17,20}$/.test(discordId)) {
+      dBox.hidden = false;
+      if (dBox.dataset.id !== discordId) {
+        dBox.dataset.id = discordId;
+        renderDiscordCard(dBox, 'loading');
+      }
+      lanyard(discordId).then(d => {
+        if (dBox.dataset.id !== discordId) return;
+        renderDiscordCard(dBox, d);
+        if (opts.onDiscord) opts.onDiscord(d);
+      });
+    } else {
+      dBox.hidden = true;
+      dBox.dataset.id = '';
+    }
+
+    // Spotify now playing (owner opted in)
+    const npBox = card.querySelector('.pc-np');
+    npBox.dataset.want = data.nowPlaying ? '1' : '';
+    if (!data.nowPlaying) {
+      npBox.hidden = true;
+    } else {
+      spNowPlaying().then(np => {
+        if (!npBox.dataset.want) return;
+        if (np) { npBox.hidden = false; renderNowPlaying(npBox, np, false); }
+        else if (opts.preview) { npBox.hidden = false; renderNowPlaying(npBox, exampleNp(), true); }
+        else npBox.hidden = true;
+      });
+    }
+
+    // Links
+    const list = card.querySelector('.pc-links');
+    list.textContent = '';
+    const asIcons = data.layout === 'icons';
+    list.classList.toggle('as-icons', asIcons);
+    (data.links || []).forEach(l => {
+      const r = resolveLink(l);
+      if (!r) return;
+      const a = el('a', asIcons ? 'pc-icon' : 'pc-link');
+      a.href = r.href;
+      if (!r.href.startsWith('mailto:')) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+      const label = l.label || ICONS[r.icon]?.name || hostOf(r.href);
+      const customUrl = l.icon === 'custom' && media.icons && media.icons[l.id];
+      const glyph = el('span', asIcons ? 'pc-icon-glyph' : 'pc-link-icon');
+      if (customUrl) {
+        const img = el('img');
+        img.src = customUrl;
+        img.alt = '';
+        glyph.appendChild(img);
+      } else {
+        glyph.innerHTML = iconSvg(r.icon, asIcons ? 30 : 18);
+      }
+      a.appendChild(glyph);
+      if (asIcons) {
+        a.title = label;
+        a.setAttribute('aria-label', label);
+      } else {
+        a.appendChild(el('span', 'pc-link-label', label));
+        a.insertAdjacentHTML('beforeend', ARROW);
+      }
+      list.appendChild(a);
+    });
+
+    // Spotify embed (rebuilt only when the link changes)
+    const sBox = card.querySelector('.pc-spotify');
+    const embed = spotifyEmbed(data.spotify);
+    if (!embed) {
+      sBox.hidden = true;
+      sBox.textContent = '';
+      sBox.dataset.src = '';
+    } else if (sBox.dataset.src !== embed.src) {
+      sBox.hidden = false;
+      sBox.dataset.src = embed.src;
+      sBox.textContent = '';
+      const f = el('iframe');
+      Object.assign(f, { src: embed.src, height: embed.height, loading: 'lazy', title: 'Spotify' });
+      f.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture');
+      f.setAttribute('frameborder', '0');
+      sBox.appendChild(f);
+    }
+  }
+
+  // ---------- segmented controls ----------
+  function seg(root, value) {
+    root.querySelectorAll('button[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === value));
+  }
+  const segValue = root => (root.querySelector('button[aria-pressed="true"]') || root.querySelector('button[data-v]')).dataset.v;
+
+  // ---------- builder ----------
+  const builder = document.querySelector('.builder');
+  const form = $('builder-form');
+  if (!builder || !form) return;
+  const home = builder.parentElement;
+  const phone = $('pb-phone');
+  const fUser = $('pb-username'), fName = $('pb-name'), fBio = $('pb-bio'), fDim = $('pb-dim');
+  const fAvatar = $('pb-avatar'), fBg = $('pb-bg'), drop = $('pb-drop');
+  const fAudio = $('pb-audio'), fVolume = $('pb-volume'), fSpotify = $('pb-spotify'), fDiscord = $('pb-discord');
+  const fBlur = $('pb-blur'), fNowPlaying = $('pb-nowplaying');
+  const segSound = $('pb-sound'), segLayout = $('pb-layout');
+  const segCursor = $('pb-cursor'), segCursorHot = $('pb-cursor-hot'), fCursor = $('pb-cursor-file');
+  const linksBox = $('pb-links');
+
+  // Each media slot is either a new local file (Blob, not uploaded yet) or a file
+  // already in storage ({ url, path }). Uploads happen on Publish.
+  const draft = {
+    avatarBlob: null, avatarUrl: '', avatarPath: null,
+    bgBlob: null, bgUrl: '', bgPath: null, bgType: '', bgName: '',
+    audioBlob: null, audioUrl: '', audioPath: null, audioName: '',
+    cursorBlob: null, cursorUrl: '', cursorPath: null,
+    icons: {},          // linkId → { blob, url, path }
+  };
+  const revoke = url => { if (url && url.startsWith('blob:')) URL.revokeObjectURL(url); };
+
+  function setBlob(kind, blob, name, remote) {
+    revoke(draft[kind + 'Url']);
+    draft[kind + 'Blob'] = blob || null;
+    draft[kind + 'Url'] = blob ? URL.createObjectURL(blob) : (remote ? remote.url : '');
+    draft[kind + 'Path'] = !blob && remote ? remote.path : null;
+    const has = !!(blob || remote);
+    if (kind === 'bg') {
+      draft.bgType = blob ? (blob.type.startsWith('video/') ? 'video' : 'image') : (remote ? remote.type || 'image' : '');
+      draft.bgName = has ? (name || draft.bgType) : '';
+    }
+    if (kind === 'audio') draft.audioName = has ? (name || 'audio') : '';
+  }
+  function setIcon(id, blob, remote) {
+    if (draft.icons[id]) revoke(draft.icons[id].url);
+    if (blob) draft.icons[id] = { blob, url: URL.createObjectURL(blob), path: null };
+    else if (remote) draft.icons[id] = { blob: null, url: remote.url, path: remote.path };
+    else delete draft.icons[id];
+  }
+  const iconUrls = () => Object.fromEntries(Object.entries(draft.icons).map(([k, v]) => [k, v.url]));
+
+  // --- link rows ---
+  let openMenu = null;
+  function closeIconMenu() {
+    if (openMenu) { openMenu.remove(); openMenu = null; }
+  }
+  document.addEventListener('click', e => {
+    if (openMenu && !e.target.closest('.icon-menu, .icon-pick')) closeIconMenu();
+  });
+
+  function paintIconButton(row) {
+    const btn = row.querySelector('.icon-pick');
+    const link = rowLink(row);
+    const r = resolveLink(link);
+    if (link.icon === 'custom' && draft.icons[link.id]) {
+      btn.innerHTML = '';
+      const img = el('img');
+      img.src = draft.icons[link.id].url;
+      img.alt = '';
+      btn.appendChild(img);
+    } else if (ICONS[link.icon]) {
+      btn.innerHTML = iconSvg(link.icon, 18);
+    } else {
+      btn.innerHTML = r ? iconSvg(r.icon, 18) : AUTO_SVG;
+    }
+    btn.title = t('b.icon');
+  }
+
+  function showIconMenu(row) {
+    closeIconMenu();
+    const menu = el('div', 'icon-menu');
+    menu.setAttribute('role', 'menu');
+    const add = (key, html, title) => {
+      const b = el('button');
+      b.type = 'button';
+      b.innerHTML = html;
+      b.title = title;
+      b.setAttribute('aria-label', title);
+      b.dataset.icon = key;
+      if ((row.dataset.icon || 'auto') === key) b.classList.add('on');
+      menu.appendChild(b);
+    };
+    add('auto', AUTO_SVG, t('b.icon_auto'));
+    ICON_KEYS.forEach(k => add(k, iconSvg(k, 18), ICONS[k].name));
+    add('custom', UPLOAD_SVG, t('b.icon_upload'));
+    menu.addEventListener('click', e => {
+      const b = e.target.closest('button[data-icon]');
+      if (!b) return;
+      if (b.dataset.icon === 'custom') {
+        row.querySelector('.icon-file').click();
+      } else {
+        row.dataset.icon = b.dataset.icon;
+        setIcon(row.dataset.id, null);
+        update();
+      }
+      closeIconMenu();
+    });
+    row.appendChild(menu);
+    openMenu = menu;
+  }
+
+  function linkRow(link = {}) {
+    const row = el('div', 'link-row-edit');
+    row.dataset.id = link.id || uid();
+    row.dataset.icon = link.icon || 'auto';
+    const pick = el('button', 'icon-pick');
+    pick.type = 'button';
+    pick.setAttribute('aria-haspopup', 'menu');
+    pick.addEventListener('click', e => { e.stopPropagation(); openMenu && openMenu.parentElement === row ? closeIconMenu() : showIconMenu(row); });
+    const file = el('input', 'icon-file');
+    Object.assign(file, { type: 'file', accept: 'image/*', hidden: true });
+    file.addEventListener('change', () => {
+      const f = file.files[0];
+      if (!f || !f.type.startsWith('image/')) return;
+      if (f.size > MAX_ICON) { toast(t('toast.icon')); return; }
+      row.dataset.icon = 'custom';
+      setIcon(row.dataset.id, f);
+      update();
+    });
+    const label = el('input', 'link-label');
+    Object.assign(label, { type: 'text', maxLength: 40, value: link.label || '', placeholder: t('b.label_ph') });
+    label.setAttribute('aria-label', t('b.label_ph'));
+    label.dataset.i18nPh = 'b.label_ph';
+    const url = el('input', 'link-url');
+    Object.assign(url, { type: 'text', value: link.url || '', placeholder: t('b.url_ph') });
+    url.dataset.i18nPh = 'b.url_ph';
+    url.setAttribute('aria-label', 'URL');
+    url.spellcheck = false;
+    const remove = el('button', 'link-remove', '×');
+    remove.type = 'button';
+    remove.setAttribute('aria-label', t('b.remove'));
+    remove.addEventListener('click', () => { setIcon(row.dataset.id, null); row.remove(); update(); });
+    const note = el('p', 'row-note');
+    row.append(pick, label, url, remove, note, file);
+    return row;
+  }
+  function addLink(link) {
+    if (linksBox.children.length >= MAX_LINKS) return null;
+    const row = linkRow(link);
+    linksBox.appendChild(row);
+    return row;
+  }
+  function rowLink(row) {
+    return {
+      id: row.dataset.id,
+      icon: row.dataset.icon || 'auto',
+      label: row.querySelector('.link-label').value.trim(),
+      url: row.querySelector('.link-url').value.trim(),
+    };
+  }
+  const readLinks = () => [...linksBox.children].map(rowLink).filter(l => l.url);
+
+  function paintRows() {
+    [...linksBox.children].forEach(row => {
+      const link = rowLink(row);
+      const note = row.querySelector('.row-note');
+      const r = link.url ? resolveLink(link) : null;
+      row.classList.toggle('invalid', !!link.url && !r);
+      if (link.url && !r) {
+        note.textContent = t('b.link_bad');
+      } else if (r && r.href.replace(/^https:\/\//, '').replace(/\/$/, '') !== link.url.replace(/^https?:\/\//, '').replace(/\/$/, '')) {
+        note.textContent = '→ ' + r.href.replace(/^https:\/\//, '').replace(/^mailto:/, '');
+      } else {
+        note.textContent = '';
+      }
+      note.hidden = !note.textContent;
+      paintIconButton(row);
+    });
+    const full = linksBox.children.length >= MAX_LINKS;
+    const addBtn = $('pb-add-link');
+    addBtn.disabled = full;
+    addBtn.textContent = full ? t('b.links_max') : t('b.addlink');
+  }
+
+  function currentData() {
+    const username = cleanUser(fUser.value);
+    const existing = myPageCache && myPageCache.username === username ? myPageCache : null;
+    return {
+      username,
+      name: fName.value.trim(),
+      bio: fBio.value.trim(),
+      dim: Number(fDim.value),
+      blur: Number(fBlur.value),
+      layout: segValue(segLayout),
+      sound: segValue(segSound),
+      volume: Number(fVolume.value),
+      spotify: fSpotify.value.trim(),
+      discordId: fDiscord.value.trim(),
+      nowPlaying: fNowPlaying.checked,
+      links: readLinks(),
+      views: existing ? existing.views : 0,
+      cursor: segValue(segCursor),
+      cursorHotspot: segValue(segCursorHot),
+      hadCursor: !!(myPageCache && myPageCache.cursor && myPageCache.cursor !== 'default'),
+    };
+  }
+
+  function usernameNote() {
+    const note = $('pb-username-note');
+    const u = cleanUser(fUser.value);
+    note.className = 'field-note';
+    if (!u) { note.textContent = ''; return false; }
+    if (!USER_RE.test(u)) { note.textContent = t('b.invalid'); note.classList.add('bad'); return false; }
+    const mine = !!(myPageCache && myPageCache.username === u);
+    if (!mine && takenCache[u] && takenCache[u] !== (me() && me().id)) {
+      note.textContent = `${siteHost()}/@${u} · ${t('b.taken')}`;
+      note.classList.add('bad');
+      return false;
+    }
+    note.textContent = `${siteHost()}/@${u} · ${mine ? t('b.yours') : (u in takenCache ? t('b.available') : t('b.checking'))}`;
+    note.classList.add('good');
+    if (!mine && !(u in takenCache)) checkUsername(u);
+    return true;
+  }
+  // Ask the database whether someone else already has this name (debounced)
+  let checkTimer = null;
+  function checkUsername(u) {
+    clearTimeout(checkTimer);
+    checkTimer = setTimeout(async () => {
+      if (!window.DB) return;
+      takenCache[u] = await DB.usernameOwner(u).catch(() => null);
+      if (cleanUser(fUser.value) === u) usernameNote();
+    }, 350);
+  }
+
+  function update() {
+    const cleaned = cleanUser(fUser.value);
+    if (fUser.value !== cleaned) fUser.value = cleaned;
+    usernameNote();
+
+    $('pb-bg-name').textContent = draft.bgName;
+    drop.classList.toggle('has-file', !!draft.bgUrl);
+    $('pb-bg-remove').hidden = !draft.bgUrl;
+    $('pb-bg-note').hidden = !!draft.bgUrl;
+
+    const av = $('pb-avatar-preview');
+    av.style.backgroundImage = draft.avatarUrl ? `url("${draft.avatarUrl}")` : '';
+    av.textContent = draft.avatarUrl ? '' : '+';
+
+    // Sound
+    const sound = segValue(segSound);
+    $('pb-audio-drop').hidden = sound !== 'file';
+    $('pb-audio-name').textContent = draft.audioName;
+    $('pb-audio-drop').classList.toggle('has-file', !!draft.audioUrl);
+    $('pb-volume-row').hidden = sound === 'none';
+    const sNote = $('pb-sound-note');
+    if (sound === 'video' && draft.bgType !== 'video') sNote.textContent = t('b.sound_needvideo');
+    else if (sound === 'file' && !draft.audioUrl) sNote.textContent = t('b.sound_needfile');
+    else if (sound !== 'none') sNote.textContent = t('b.sound_note');
+    else sNote.textContent = '';
+
+    // Integrations
+    const sp = fSpotify.value.trim();
+    $('pb-spotify-note').textContent = sp && !spotifyEmbed(sp) ? t('b.spotify_bad') : '';
+    const dc = fDiscord.value.trim();
+    $('pb-discord-note-bad').textContent = dc && !/^\d{17,20}$/.test(dc) ? t('b.discord_bad') : '';
+    if (!/^\d{17,20}$/.test(dc)) $('pb-discord-hint').textContent = '';
+
+    // Spotify connection
+    const spOn = !!spLoad();
+    const blocker = spBlocker();
+    $('pb-sp-connect-label').textContent = t(spOn ? 'b.sp_disconnect' : 'b.sp_connect');
+    $('pb-sp-status').textContent = spOn ? t('b.sp_connected') : '';
+    $('pb-sp-help').textContent = spOn ? (fNowPlaying.checked ? t('b.sp_onlyyou') : '')
+      : (blocker === 'noid' ? t('b.sp_noid') : blocker === 'file' ? t('b.sp_file') : (fNowPlaying.checked ? t('b.sp_needconnect') : ''));
+
+    // Cursor
+    const cur = segValue(segCursor);
+    $('pb-cursor-custom').hidden = cur !== 'custom';
+    $('pb-cursor-drop').classList.toggle('has-file', !!draft.cursorUrl);
+    $('pb-cursor-swatch').style.backgroundImage = draft.cursorUrl ? `url("${draft.cursorUrl}")` : '';
+    $('pb-cursor-note').textContent = cur === 'custom' && !draft.cursorUrl ? t('b.cursor_need') : cur !== 'default' ? t('b.cursor_try') : '';
+
+    paintRows();
+    renderProfile(phone, currentData(), { ...draft, icons: iconUrls() }, {
+      preview: true,
+      onDiscord: d => {
+        $('pb-discord-hint').textContent = d && d !== 'error' && d.discord_status === 'offline' ? t('b.discord_offline') : '';
+      },
+    });
+  }
+
+  function acceptFile(file, kind) {
+    if (!file) return;
+    const ok = {
+      avatar: file.type.startsWith('image/'),
+      bg: file.type.startsWith('image/') || file.type === 'video/mp4' || file.type === 'video/webm',
+      audio: file.type.startsWith('audio/'),
+    }[kind];
+    if (!ok) return;
+    if (file.size > (kind === 'audio' ? MAX_AUDIO : MAX_MEDIA)) { toast(t('toast.full')); return; }
+    setBlob(kind, file, file.name);
+    if (kind === 'bg' && draft.bgType === 'video' && segValue(segSound) === 'none') seg(segSound, 'video');
+    update();
+  }
+
+  fAvatar.addEventListener('change', () => acceptFile(fAvatar.files[0], 'avatar'));
+  fBg.addEventListener('change', () => acceptFile(fBg.files[0], 'bg'));
+  fAudio.addEventListener('change', () => acceptFile(fAudio.files[0], 'audio'));
+  [[drop, 'bg'], [$('pb-audio-drop'), 'audio']].forEach(([zone, kind]) => {
+    ['dragenter', 'dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('drag'); }));
+    ['dragleave', 'drop'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('drag'); }));
+    zone.addEventListener('drop', e => acceptFile(e.dataTransfer.files[0], kind));
+  });
+  $('pb-bg-remove').addEventListener('click', () => { setBlob('bg', null); fBg.value = ''; update(); });
+  fCursor.addEventListener('change', async () => {
+    const file = fCursor.files[0];
+    fCursor.value = '';
+    if (!file || !file.type.startsWith('image/')) return;
+    if (file.size > MAX_ICON * 5) { toast(t('toast.full')); return; }
+    try {
+      const png = await makeCursor(file);
+      setBlob('cursor', png, file.name);
+      seg(segCursor, 'custom');
+      update();
+    } catch (_) { toast(t('b.cursor_bad')); }
+  });
+  [segSound, segLayout, segCursor, segCursorHot].forEach(s => s.addEventListener('click', e => {
+    const b = e.target.closest('button[data-v]');
+    if (!b) return;
+    seg(s, b.dataset.v);
+    update();
+  }));
+  $('pb-add-link').addEventListener('click', () => {
+    const row = addLink();
+    if (row) row.querySelector('.link-label').focus();
+    update();
+  });
+  form.addEventListener('input', update);
+
+  function resetBuilder() {
+    form.reset();
+    setBlob('bg', null);
+    setBlob('avatar', null);
+    setBlob('audio', null);
+    setBlob('cursor', null);
+    seg(segCursor, 'default');
+    seg(segCursorHot, 'tip');
+    Object.keys(draft.icons).forEach(id => setIcon(id, null));
+    linksBox.textContent = '';
+    addLink({ label: 'GitHub', icon: 'github' });
+    addLink();
+    seg(segSound, 'none');
+    seg(segLayout, 'buttons');
+    $('pb-result').hidden = true;
+    update();
+  }
+  $('pb-reset').addEventListener('click', resetBuilder);
+
+  $('pb-sp-connect').addEventListener('click', () => {
+    if (spLoad()) {
+      spSave(null);
+      npCache = { at: 0, data: null };
+      toast(t('toast.sp_off'));
+      update();
+      return;
+    }
+    const blocker = spBlocker();
+    if (blocker) { toast(t(blocker === 'noid' ? 'b.sp_noid' : 'b.sp_file')); return; }
+    try { sessionStorage.setItem('lp-sp-return', '1'); } catch (_) {}
+    spConnect();
+  });
+
+  // Photos are re-encoded to a sensible size before upload (GIFs, video and audio are left alone)
+  const SHRINK = { avatar: 512, background: 2560 };
+  async function shrink(blob, name) {
+    const max = name.startsWith('icon-') ? 160 : SHRINK[name];
+    if (!max || !/^image\/(png|jpeg|webp)$/.test(blob.type)) return blob;
+    try {
+      const bmp = await createImageBitmap(blob);
+      const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
+      if (scale === 1 && blob.size < 1.5 * 1024 * 1024) { bmp.close && bmp.close(); return blob; }
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * scale);
+      c.height = Math.round(bmp.height * scale);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      bmp.close && bmp.close();
+      const keepAlpha = blob.type === 'image/png' && name.startsWith('icon-');
+      const out = await new Promise(r => c.toBlob(r, keepAlpha ? 'image/png' : 'image/webp', 0.86));
+      return out && out.size < blob.size ? out : blob;
+    } catch (_) { return blob; }
+  }
+
+  async function publish() {
+    if (!usernameNote()) { fUser.focus(); return; }
+    if (!window.DB) { toast(t('toast.offline')); return; }
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = t('b.publishing');
+    try {
+      const data = currentData();
+      // Only ask the server about the name if it changed
+      const sameName = myPageCache && myPageCache.username === data.username;
+      const owner = sameName ? null : await DB.usernameOwner(data.username);
+      if (owner && owner !== me().id) {
+        takenCache[data.username] = owner;
+        usernameNote();
+        fUser.focus();
+        return;
+      }
+      // Upload every new file at the same time (images are shrunk first); keep stored ones
+      const jobs = [];
+      const queue = (name, blob) => { const job = shrink(blob, name).then(small => DB.upload(name, small)).then(r => r.path); jobs.push(job); return job; };
+      const slot = (kind, name) => {
+        if (draft[kind + 'Blob']) return queue(name, draft[kind + 'Blob']);
+        return Promise.resolve(draft[kind + 'Url'] ? draft[kind + 'Path'] : null);
+      };
+      const avatarP = slot('avatar', 'avatar');
+      const bgP = slot('bg', 'background');
+      const audioP = data.sound === 'file' ? slot('audio', 'audio') : Promise.resolve(draft.audioUrl ? draft.audioPath : null);
+      const cursorP = data.cursor === 'custom' ? slot('cursor', 'cursor') : Promise.resolve(null);
+      const iconJobs = data.links.map(l => {
+        const ic = l.icon === 'custom' ? draft.icons[l.id] : null;
+        if (!ic) return Promise.resolve(null);
+        return ic.blob ? queue('icon-' + l.id, ic.blob) : Promise.resolve(ic.path);
+      });
+      if (jobs.length) {
+        let done = 0;
+        btn.textContent = `${t('b.uploading')} 0/${jobs.length}`;
+        jobs.forEach(j => j.then(() => { btn.textContent = `${t('b.uploading')} ${++done}/${jobs.length}`; }, () => {}));
+      }
+      const [avatarPath, bgPath, audioPath, cursorPath, ...iconPaths] = await Promise.all([avatarP, bgP, audioP, cursorP, ...iconJobs]);
+      btn.textContent = t('b.publishing');
+      const links = data.links.map((l, i) => ({ ...l, iconPath: iconPaths[i] }));
+      const saved = await DB.savePage({ ...data, links, avatarPath, bgPath, bgType: draft.bgType, audioPath, cursorPath }, myPageCache);
+      myPageCache = saved;
+      takenCache[saved.username] = me().id;
+      // Keep showing the local copies (no re-download), but remember where they're stored now
+      const paths = { avatar: avatarPath, bg: bgPath, audio: audioPath, cursor: cursorPath };
+      Object.keys(paths).forEach(kind => { if (draft[kind + 'Blob']) { draft[kind + 'Blob'] = null; draft[kind + 'Path'] = paths[kind]; } });
+      data.links.forEach((l, i) => { const ic = draft.icons[l.id]; if (ic && ic.blob) { ic.blob = null; ic.path = iconPaths[i]; } });
+      $('pb-result-url').textContent = siteHost() + '/@' + saved.username;
+      $('pb-result').hidden = false;
+      update();
+      toast(t('toast.published'));
+      document.dispatchEvent(new CustomEvent('pagepublished', { detail: saved.username }));
+    } catch (e) {
+      const msg = (e && (e.message || '')) + ' ' + (e && e.code || '');
+      toast(/cursor/i.test(msg) ? t('b.cursor_upgrade') : /23505|duplicate/.test(msg) ? t('b.taken_full') : /payload|size|large/i.test(msg) ? t('toast.full') : t('toast.save_fail'));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = t('b.publish');
+    }
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (typeof requireAuth === 'function') requireAuth(publish, t('auth.publish'));
+    else publish();
+  });
+
+  $('pb-copy').addEventListener('click', () => copyLink(cleanUser(fUser.value)));
+  $('pb-open').addEventListener('click', () => { location.hash = '@' + cleanUser(fUser.value); });
+
+  function copyLink(user) {
+    if (!user) return;
+    navigator.clipboard.writeText(pageUrl(user)).then(() => toast(t('toast.copied'))).catch(() => {});
+  }
+
+  // Load a saved page (from the database) into the builder
+  function loadIntoBuilder(page) {
+    if (!page) return false;
+    fUser.value = page.username;
+    fName.value = page.name || '';
+    fBio.value = page.bio || '';
+    fDim.value = page.dim ?? 35;
+    fBlur.value = page.blur ?? 0;
+    fNowPlaying.checked = !!page.nowPlaying;
+    fVolume.value = page.volume ?? 60;
+    fSpotify.value = page.spotify || '';
+    fDiscord.value = page.discordId || '';
+    seg(segSound, page.sound || 'none');
+    seg(segLayout, page.layout || 'buttons');
+    Object.keys(draft.icons).forEach(id => setIcon(id, null));
+    linksBox.textContent = '';
+    const links = (page.links || []).map(l => ({ ...l, id: l.id || uid(), icon: l.icon || 'auto' }));
+    links.forEach(l => {
+      addLink(l);
+      if (l.icon === 'custom' && l.iconUrl) setIcon(l.id, null, { url: l.iconUrl, path: l.iconPath });
+    });
+    if (!links.length) addLink();
+    setBlob('avatar', null, '', page.avatarUrl ? { url: page.avatarUrl, path: page.avatarPath } : null);
+    setBlob('bg', null, page.bgType, page.bgUrl ? { url: page.bgUrl, path: page.bgPath, type: page.bgType } : null);
+    setBlob('audio', null, 'audio', page.audioUrl ? { url: page.audioUrl, path: page.audioPath } : null);
+    setBlob('cursor', null, '', page.cursorUrl ? { url: page.cursorUrl, path: page.cursorPath } : null);
+    seg(segCursor, page.cursor === 'custom' && !page.cursorUrl ? 'default' : (page.cursor || 'default'));
+    seg(segCursorHot, page.cursorHotspot || 'tip');
+    $('pb-result-url').textContent = siteHost() + '/@' + page.username;
+    $('pb-result').hidden = false;
+    update();
+    return true;
+  }
+
+  // ---------- full-screen profile view ----------
+  const view = $('profile-view');
+  const splash = $('pv-enter');
+  const soundBtn = $('pv-sound');
+  let viewAudio = null;
+  let viewPage = null;
+  let discordTimer = null;
+
+  const isMuted = () => { try { return localStorage.getItem(MUTE_KEY) === '1'; } catch (_) { return false; } };
+  const hasSound = page => page && ((page.sound === 'video' && page.bgType === 'video') || (page.sound === 'file' && !!page.audioUrl));
+
+  function applySound(playing) {
+    const muted = isMuted();
+    const vol = Math.max(0, Math.min(1, (viewPage?.volume ?? 60) / 100));
+    const video = view.querySelector('.profile-bg video');
+    if (video) {
+      video.muted = !(playing && !muted && viewPage.sound === 'video');
+      video.volume = vol;
+    }
+    if (viewAudio) {
+      viewAudio.volume = vol;
+      if (playing && !muted) viewAudio.play().catch(() => {});
+      else viewAudio.pause();
+    }
+    soundBtn.classList.toggle('muted', muted);
+    soundBtn.setAttribute('aria-label', muted ? t('p.unmute') : t('p.mute'));
+    soundBtn.title = muted ? t('p.unmute') : t('p.mute');
+  }
+
+  async function openProfile(user) {
+    closeMedia();
+    view.dataset.user = user;
+    let page = null;
+    try { page = window.DB ? await DB.getPage(user) : null; } catch (_) { page = null; }
+    if (location.hash.toLowerCase() !== '#@' + user) return;   // visitor moved on while it loaded
+    viewPage = page;
+    if (!page) {
+      renderProfile(view, { username: user, name: t(window.DB ? 'p.missing' : 'toast.offline'), links: [] }, {});
+    } else {
+      const media = {
+        avatarUrl: page.avatarUrl, bgUrl: page.bgUrl, bgType: page.bgType, cursorUrl: page.cursorUrl,
+        icons: Object.fromEntries((page.links || []).filter(l => l.iconUrl).map(l => [l.id, l.iconUrl])),
+      };
+      if (page.audioUrl && page.sound === 'file') {
+        viewAudio = new Audio(page.audioUrl);
+        viewAudio.loop = true;
+      }
+      // Count the visit (not when the owner looks at their own page)
+      const own = myPageCache && myPageCache.username === user;
+      if (!own) page.views += 1;
+      renderProfile(view, page, media);
+      if (!own) DB.countView(user).then(v => { if (v != null && viewPage === page) { page.views = v; renderProfile(view, page, media); } });
+      if (/^\d{17,20}$/.test(page.discordId || '') || page.nowPlaying) {
+        discordTimer = setInterval(() => renderProfile(view, page, media), 15000);
+      }
+    }
+    const sound = hasSound(page);
+    soundBtn.hidden = !sound;
+    splash.hidden = !sound;
+    view.classList.add('active');
+    setOverlay(true);
+    applySound(false);
+    (sound ? splash : $('pv-close')).focus({ preventScroll: true });
+  }
+
+  function closeMedia() {
+    clearInterval(discordTimer);
+    if (viewAudio) { viewAudio.pause(); viewAudio = null; }
+    const v = view.querySelector('.profile-bg video');
+    if (v) v.pause();
+    const bg = view.querySelector('.profile-bg');
+    bg.textContent = '';
+    bg.dataset.src = '';
+  }
+
+  function closeProfile() {
+    if (!view.classList.contains('active')) return;
+    view.classList.remove('active');
+    reportPanel.hidden = true;
+    closeMedia();
+    setOverlay(false);
+    if (location.hash.startsWith('#@')) history.replaceState(null, '', location.pathname + location.search);
+  }
+
+  splash.addEventListener('click', () => { splash.hidden = true; applySound(true); $('pv-close').focus({ preventScroll: true }); });
+  soundBtn.addEventListener('click', () => {
+    try { localStorage.setItem(MUTE_KEY, isMuted() ? '0' : '1'); } catch (_) {}
+    applySound(splash.hidden);
+  });
+
+  function route() {
+    const m = location.hash.match(/^#@([a-z0-9_.-]{2,20})$/i);
+    if (m) openProfile(m[1].toLowerCase());
+    else closeProfile();
+  }
+
+  $('pv-close').addEventListener('click', closeProfile);
+
+  // Report this page (goes to the staff portal)
+  const reportPanel = $('pv-report-panel');
+  $('pv-report').addEventListener('click', () => {
+    reportPanel.hidden = !reportPanel.hidden;
+    if (!reportPanel.hidden) reportPanel.querySelector('input').focus();
+  });
+  $('pv-report-cancel').addEventListener('click', () => { reportPanel.hidden = true; });
+  reportPanel.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!window.DB || !viewPage) { toast(t('toast.offline')); return; }
+    const f = new FormData(reportPanel);
+    try {
+      await DB.reportPage(view.dataset.user, f.get('reason'), String(f.get('details') || '').trim());
+      reportPanel.reset();
+      reportPanel.hidden = true;
+      toast('Thanks. Our team will review this page.');
+    } catch (_) { toast("Couldn't send the report. Try again."); }
+  });
+  $('pv-copy').addEventListener('click', () => copyLink(view.dataset.user));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeIconMenu(); closeProfile(); } });
+  window.addEventListener('hashchange', route);
+
+  // ---------- landing showcase (static demo profile) ----------
+  const demoPhone = $('demo-phone');
+  const demoData = {
+    username: 'voidwalker', name: 'Void Walker', bio: t('sc.demo_bio'), dim: 0, layout: 'icons',
+    links: [
+      { id: 'd1', icon: 'github', label: 'GitHub', url: 'github.com' },
+      { id: 'd2', icon: 'discord', label: 'Discord', url: 'discord.com' },
+      { id: 'd3', icon: 'spotify', label: 'Spotify', url: 'open.spotify.com' },
+      { id: 'd4', icon: 'instagram', label: 'Instagram', url: 'instagram.com' },
+      { id: 'd5', icon: 'youtube', label: 'YouTube', url: 'youtube.com' },
+    ],
+  };
+  const demoDiscord = {
+    discord_status: 'online', discord_user: { username: 'voidwalker' }, listening_to_spotify: true,
+    spotify: { song: 'Cornfield Chase', artist: 'Hans Zimmer', album_art_url: '' },
+  };
+  function renderDemo() {
+    if (!demoPhone) return;
+    demoData.bio = t('sc.demo_bio');
+    renderProfile(demoPhone, demoData, {}, { discord: demoDiscord });
+  }
+  const demoSeg = $('demo-layout');
+  if (demoSeg) {
+    demoSeg.addEventListener('click', e => {
+      const b = e.target.closest('button[data-v]');
+      if (!b) return;
+      seg(demoSeg, b.dataset.v);
+      demoData.layout = b.dataset.v;
+      renderDemo();
+    });
+  }
+
+  // ---------- claiming a username (hero, showcase, CTA) ----------
+  function claimUsername(raw) {
+    const u = cleanUser(raw);
+    if (!USER_RE.test(u)) { toast(t('b.invalid')); return false; }
+    const go = () => {
+      openDashboard();
+      showDashTab('page');
+      setUsername(u);
+    };
+    if (typeof requireAuth === 'function') requireAuth(go, t('auth.claim').replace('{u}', u));
+    else go();
+    return true;
+  }
+  document.querySelectorAll('form.claim-box').forEach(f => f.addEventListener('submit', e => {
+    e.preventDefault();
+    claimUsername(f.querySelector('input').value);
+  }));
+
+  // ---------- builder placement (lives in the dashboard's "My page" tab) ----------
+  function mountBuilder(slot) {
+    if (slot && builder.parentElement !== slot) slot.appendChild(builder);
+    update();
+  }
+  function unmountBuilder() {
+    closeIconMenu();
+    if (builder.parentElement !== home) home.appendChild(builder);
+  }
+  async function setUsername(u) {
+    await ready;     // let the saved page finish loading first so it can't overwrite this
+    await syncing;
+    if (myPageCache) {
+      // One page per account: claiming a new name renames your existing page
+      loadIntoBuilder(myPageCache);
+      fUser.value = u;
+      $('pb-result').hidden = true;
+      update();
+      return;
+    }
+    resetBuilder();   // a newly claimed name starts from a clean page
+    fUser.value = u;
+    if (me()) fName.value = me().name;
+    $('pb-result').hidden = true;
+    update();
+    fName.focus({ preventScroll: true });
+  }
+  function myPage() {
+    return myPageCache;
+  }
+  async function deletePage() {
+    if (!myPageCache) return;
+    await DB.deletePage(myPageCache);
+    delete takenCache[myPageCache.username];
+    myPageCache = null;
+    resetBuilder();
+  }
+  // Called whenever someone signs in or out: load (or clear) their page
+  function onAuthChange() {
+    syncing = (async () => {
+      try { myPageCache = me() && window.DB ? await DB.getMyPage() : null; } catch (_) { myPageCache = null; }
+      if (myPageCache) loadIntoBuilder(myPageCache);
+      else resetBuilder();
+      if (typeof updateAuthUI === 'function') updateAuthUI();
+    })();
+    return syncing;
+  }
+
+  async function useAvatar(dataUrl) {
+    const blob = await (await fetch(dataUrl)).blob();
+    setBlob('avatar', blob);
+    update();
+  }
+
+  window.LP = { onAuthChange, useAvatar, mountBuilder, unmountBuilder, setUsername, myPage, deletePage, pageUrl, copyLink, claimUsername, resolveLink, iconSvg };
+
+  document.addEventListener('langchange', () => {
+    builder.querySelectorAll('[data-i18n-ph]').forEach(i => { i.placeholder = t(i.dataset.i18nPh); });
+    update();
+    renderDemo();
+  });
+
+  // ---------- start ----------
+  const ready = (async () => {
+    if (await spHandleRedirect()) {
+      let back = false;
+      try { back = sessionStorage.getItem('lp-sp-return') === '1'; sessionStorage.removeItem('lp-sp-return'); } catch (_) {}
+      if (back && me()) setTimeout(() => openDashboard('page'), 300);
+    }
+    resetBuilder();
+    // Wait for Supabase to restore the session before loading "my page"
+    if (window.DB) {
+      const session = await DB.session();
+      if (session && typeof loadCurrentUser === 'function' && !me()) { await loadCurrentUser(session); updateAuthUI(); }
+      await onAuthChange();
+    }
+  })();
+  renderDemo();
+  ready.then(route);
+})();
