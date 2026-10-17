@@ -20,7 +20,7 @@
   const T = {
     en: {
       'nav.features': 'Features', 'nav.pages': 'Pages', 'nav.analytics': 'Analytics', 'nav.how': 'How it works',
-      'nav.login': 'Log in', 'nav.signup': 'Sign up',
+      'nav.login': 'Log in', 'nav.signup': 'Sign up', 'nav.dashboard': 'Dashboard',
       'hero.title': 'Short links.<br><span class="word-dim">Real data.</span>',
       'hero.sub': 'Branded short links, profile pages and live click analytics, in one quiet dashboard.',
       'hero.ph': 'Paste your long URL here...', 'hero.btn': 'Shorten →', 'hero.copy': 'Copy',
@@ -62,7 +62,7 @@
     },
     es: {
       'nav.features': 'Funciones', 'nav.pages': 'Páginas', 'nav.analytics': 'Analíticas', 'nav.how': 'Cómo funciona',
-      'nav.login': 'Entrar', 'nav.signup': 'Registrarse',
+      'nav.login': 'Entrar', 'nav.signup': 'Registrarse', 'nav.dashboard': 'Panel',
       'hero.title': 'Enlaces cortos.<br><span class="word-dim">Datos reales.</span>',
       'hero.sub': 'Enlaces cortos con tu marca, páginas de perfil y analíticas de clics en vivo, en un panel tranquilo.',
       'hero.ph': 'Pega aquí tu URL larga...', 'hero.btn': 'Acortar →', 'hero.copy': 'Copiar',
@@ -104,7 +104,7 @@
     },
     pt: {
       'nav.features': 'Recursos', 'nav.pages': 'Páginas', 'nav.analytics': 'Análises', 'nav.how': 'Como funciona',
-      'nav.login': 'Entrar', 'nav.signup': 'Criar conta',
+      'nav.login': 'Entrar', 'nav.signup': 'Criar conta', 'nav.dashboard': 'Painel',
       'hero.title': 'Links curtos.<br><span class="word-dim">Dados reais.</span>',
       'hero.sub': 'Links curtos com sua marca, páginas de perfil e análise de cliques ao vivo, em um painel tranquilo.',
       'hero.ph': 'Cole sua URL longa aqui...', 'hero.btn': 'Encurtar →', 'hero.copy': 'Copiar',
@@ -146,7 +146,7 @@
     },
     fr: {
       'nav.features': 'Fonctions', 'nav.pages': 'Pages', 'nav.analytics': 'Statistiques', 'nav.how': 'Fonctionnement',
-      'nav.login': 'Connexion', 'nav.signup': "S'inscrire",
+      'nav.login': 'Connexion', 'nav.signup': "S'inscrire", 'nav.dashboard': 'Tableau de bord',
       'hero.title': 'Liens courts.<br><span class="word-dim">Vraies données.</span>',
       'hero.sub': 'Liens courts à votre marque, pages de profil et statistiques de clics en direct, dans un tableau de bord calme.',
       'hero.ph': 'Collez votre longue URL ici...', 'hero.btn': 'Raccourcir →', 'hero.copy': 'Copier',
@@ -188,7 +188,7 @@
     },
     de: {
       'nav.features': 'Funktionen', 'nav.pages': 'Seiten', 'nav.analytics': 'Statistiken', 'nav.how': "So geht's",
-      'nav.login': 'Anmelden', 'nav.signup': 'Registrieren',
+      'nav.login': 'Anmelden', 'nav.signup': 'Registrieren', 'nav.dashboard': 'Dashboard',
       'hero.title': 'Kurze Links.<br><span class="word-dim">Echte Daten.</span>',
       'hero.sub': 'Eigene Kurzlinks, Profilseiten und Live-Klickstatistiken in einem ruhigen Dashboard.',
       'hero.ph': 'Lange URL hier einfügen...', 'hero.btn': 'Kürzen →', 'hero.copy': 'Kopieren',
@@ -230,7 +230,7 @@
     },
     tr: {
       'nav.features': 'Özellikler', 'nav.pages': 'Sayfalar', 'nav.analytics': 'Analiz', 'nav.how': 'Nasıl çalışır',
-      'nav.login': 'Giriş yap', 'nav.signup': 'Kaydol',
+      'nav.login': 'Giriş yap', 'nav.signup': 'Kaydol', 'nav.dashboard': 'Panel',
       'hero.title': 'Kısa linkler.<br><span class="word-dim">Gerçek veriler.</span>',
       'hero.sub': 'Markalı kısa linkler, profil sayfaları ve canlı tıklama analizi, tek bir sade panelde.',
       'hero.ph': 'Uzun URL’ni buraya yapıştır...', 'hero.btn': 'Kısalt →', 'hero.copy': 'Kopyala',
@@ -272,7 +272,7 @@
     },
     hi: {
       'nav.features': 'फ़ीचर्स', 'nav.pages': 'पेज', 'nav.analytics': 'एनालिटिक्स', 'nav.how': 'कैसे काम करता है',
-      'nav.login': 'लॉग इन', 'nav.signup': 'साइन अप',
+      'nav.login': 'लॉग इन', 'nav.signup': 'साइन अप', 'nav.dashboard': 'डैशबोर्ड',
       'hero.title': 'छोटे लिंक।<br><span class="word-dim">असली डेटा।</span>',
       'hero.sub': 'ब्रांडेड छोटे लिंक, प्रोफ़ाइल पेज और लाइव क्लिक एनालिटिक्स, एक शांत डैशबोर्ड में।',
       'hero.ph': 'अपना लंबा URL यहाँ पेस्ट करें...', 'hero.btn': 'छोटा करें →', 'hero.copy': 'कॉपी',

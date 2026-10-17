@@ -2586,6 +2586,39 @@
     .pc-avatar { box-shadow: 0 0 0 2px rgba(255,255,255,0.85), 0 0 0 7px rgba(255,255,255,0.08), 0 12px 40px rgba(0,0,0,0.6); }
     .pc-link { background: rgba(8,8,10,0.58); border-color: rgba(255,255,255,0.14); box-shadow: 0 8px 26px rgba(0,0,0,0.35); }
     .pc-link:hover { transform: translateY(-2px); }
+
+    /* Dashboard entry point in the top bar (signed in) */
+    .nav-auth { position: relative; }
+    #btn-dash { padding: 9px 16px; }
+    #btn-dash svg { flex-shrink: 0; }
+    #user-pill:hover { border-color: rgba(255,255,255,0.3); }
+    .dash-hint {
+      position: absolute; top: calc(100% + 14px); right: 0; z-index: 120;
+      width: 250px; padding: 14px 16px; border-radius: 14px;
+      background: #fff; color: #000; box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+      display: flex; flex-direction: column; gap: 4px; text-align: left;
+      animation: hbPop 0.35s ease both;
+    }
+    .dash-hint[hidden] { display: none; }
+    .dash-hint::before {
+      content: ''; position: absolute; top: -7px; right: 150px; width: 14px; height: 14px;
+      background: #fff; transform: rotate(45deg); border-radius: 2px;
+    }
+    .dash-hint strong { font-family: 'Lexend', sans-serif; font-size: 0.95rem; }
+    .dash-hint span { font-size: 0.85rem; color: rgba(0,0,0,0.7); line-height: 1.45; }
+    .dash-hint-ok {
+      align-self: flex-start; margin-top: 8px; padding: 6px 12px; border-radius: 8px;
+      border: 0; background: #000; color: #fff; font: inherit; font-size: 0.8rem; font-weight: 600;
+    }
+    @keyframes hbPop { from { opacity: 0; transform: translateY(6px) scale(0.96); } to { opacity: 1; transform: none; } }
+    @media (max-width: 520px) {
+      #nav-username { display: none; }
+      #user-pill { padding: 4px; }
+      #btn-dash span { display: none; }
+      #btn-dash { padding: 8px 10px; }
+      .dash-hint { right: -40px; width: 230px; }
+      .dash-hint::before { right: 112px; }
+    }
   </style>
   <link rel="stylesheet" href="helpbot.css">
 </head>
@@ -2613,7 +2646,16 @@
         <a href="#how" data-i18n="nav.how">How it works</a>
       </nav>
       <div class="nav-auth">
-        <div id="user-pill" onclick="openDashboard()">
+        <button type="button" id="btn-dash" class="btn btn-primary" onclick="openDashboard()" style="display:none">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span data-i18n="nav.dashboard">Dashboard</span>
+        </button>
+        <div class="dash-hint" id="dash-hint" role="status" hidden>
+          <strong>Your dashboard</strong>
+          <span>Your links, your page and your stats live here.</span>
+          <button type="button" class="dash-hint-ok" onclick="dismissDashHint()">Got it</button>
+        </div>
+        <div id="user-pill" onclick="openDashboard()" role="button" tabindex="0" title="Open your dashboard" aria-label="Open your dashboard">
           <div class="avatar" id="nav-avatar">A</div>
           <span id="nav-username">Alex</span>
         </div>
@@ -4110,6 +4152,8 @@ function updateAuthUI() {
     btnLogin.style.display = 'none';
     btnSignup.style.display = 'none';
     userPill.style.display = 'flex';
+    document.getElementById('btn-dash').style.display = '';
+    maybeShowDashHint();
     document.getElementById('nav-username').textContent = currentUser.name.split(' ')[0];
     fillAvatar(document.getElementById('nav-avatar'));
     fillAvatar(document.getElementById('dash-avatar'));
@@ -4120,8 +4164,25 @@ function updateAuthUI() {
     btnLogin.style.display = '';
     btnSignup.style.display = '';
     userPill.style.display = 'none';
+    document.getElementById('btn-dash').style.display = 'none';
+    document.getElementById('dash-hint').hidden = true;
   }
 }
+// First time someone is signed in on the site: point at the Dashboard button once
+function maybeShowDashHint() {
+  const key = 'lp-dash-hint-' + (currentUser && currentUser.id);
+  try { if (localStorage.getItem(key)) return; } catch (_) { return; }
+  if (document.getElementById('dashboard-view').classList.contains('active')) return;
+  setTimeout(() => {
+    if (!currentUser || document.getElementById('dashboard-view').classList.contains('active')) return;
+    document.getElementById('dash-hint').hidden = false;
+  }, 900);
+}
+function dismissDashHint() {
+  document.getElementById('dash-hint').hidden = true;
+  try { localStorage.setItem('lp-dash-hint-' + (currentUser && currentUser.id), '1'); } catch (_) {}
+}
+document.getElementById('user-pill').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDashboard(); } });
 async function logoutUser() {
   if (window.DB) await DB.signOut();
   currentUser = null;
@@ -5351,6 +5412,7 @@ function showDashTab(tab) {
 }
 
 function openDashboard(tab = 'overview') {
+  if (currentUser && !document.getElementById('dash-hint').hidden) dismissDashHint();
   if (!currentUser) { openLogin(); return; }
   dash.loaded = false;
   const dv = document.getElementById('dashboard-view');
