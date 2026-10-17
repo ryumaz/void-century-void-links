@@ -8,11 +8,11 @@ window.SUPABASE_CONFIG = {
 
   // Social logins switched on in Supabase → Authentication → Sign In / Providers.
   // Add each one after you set it up, e.g. ['github', 'google', 'discord'].
-  oauth: [],
+  oauth: ['github', 'discord', 'google'],
 
   // Your live address once deployed, e.g. 'https://voidlinks.netlify.app'.
   // Short links, page links and QR codes use it. Leave '' to use the current address.
-  siteUrl: '',
+  siteUrl: 'https://voidlinks.netlify.app',
 
   // Spotify app Client ID (developer.spotify.com/dashboard) for "Connect Spotify".
   // The Client ID is public; the Client Secret is NOT needed and must not go here.

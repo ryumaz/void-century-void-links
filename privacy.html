@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy · Void Links</title>
+  <meta name="description" content="What Void Links collects, why, who processes it, and how to delete it.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --text: #f5f5f7; --muted: rgba(245,245,247,.7); --dim: rgba(245,245,247,.45); --line: rgba(255,255,255,.1); }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #000; color: var(--text); font-family: Inter, -apple-system, 'Segoe UI', sans-serif; line-height: 1.65; }
+    header { position: sticky; top: 0; background: rgba(0,0,0,.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+    .bar { max-width: 760px; margin: 0 auto; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { color: var(--text); text-decoration: none; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.1rem; }
+    .bar nav a { color: var(--muted); text-decoration: none; margin-left: 18px; font-size: .92rem; }
+    .bar nav a:hover { color: #fff; }
+    main { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+    h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(2rem, 6vw, 2.8rem); letter-spacing: -.03em; margin: 0 0 8px; }
+    .updated { color: var(--dim); margin: 0 0 36px; }
+    h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; margin: 40px 0 10px; letter-spacing: -.01em; }
+    p, li { color: var(--muted); }
+    strong { color: var(--text); font-weight: 600; }
+    ul { padding-left: 20px; }
+    li { margin: 6px 0; }
+    a { color: #fff; }
+    .note { padding: 16px 18px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+    footer { max-width: 760px; margin: 0 auto; padding: 0 24px 48px; color: var(--dim); font-size: .88rem; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <a class="brand" href="index.html">Void Links</a>
+    <nav><a href="terms.html">Terms</a><a href="index.html">Home</a></nav>
+  </div>
+</header>
+<main>
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: 17 October 2026</p>
+
+  <p class="note">Void Links is a student project by Void Century, built for a hackathon. It lets you create short links and a personal link-in-bio page. This page explains, in plain words, what we store and why.</p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li><strong>Your account:</strong> your email address and, if you sign in with Google, GitHub or Discord, the name and profile picture that service shares with us. We never see your password for those services.</li>
+    <li><strong>What you create:</strong> your page (username, name, bio, links, settings) and any files you upload to it, such as an avatar, background image or video, audio or a cursor image. Your short links and their settings (destination, optional password, schedule and use limit).</li>
+    <li><strong>Link passwords:</strong> stored only as a one-way bcrypt hash. Nobody, including us, can read the original password.</li>
+    <li><strong>Clicks on short links:</strong> the time, the visitor's country, the type of device (desktop, mobile or tablet) and the website they came from. We do not store visitors' IP addresses in our click records.</li>
+    <li><strong>Page views:</strong> a simple counter of how many times a page was opened.</li>
+    <li><strong>Change history:</strong> an audit log of changes to your links (created, edited, paused, revoked, deleted) so you can see what happened.</li>
+    <li><strong>Support messages:</strong> the name, email and messages you send us through the help chat.</li>
+  </ul>
+
+  <h2>What is public</h2>
+  <p>Your page at <strong>voidlinks.netlify.app/@yourname</strong> is public by design: anyone with the address can see the name, bio, picture, links and media you put on it, and its view count. Your email address, your short links list and your statistics are private to you.</p>
+
+  <h2>Why we use it</h2>
+  <ul>
+    <li>To sign you in and keep your account secure.</li>
+    <li>To show your page and redirect your short links.</li>
+    <li>To show you statistics about your own links and page.</li>
+    <li>To answer support requests and deal with reports of abuse.</li>
+  </ul>
+  <p>We do not sell your data, show ads, or use your data to track you across other websites.</p>
+
+  <h2>Services that process data for us</h2>
+  <ul>
+    <li><strong>Supabase:</strong> database, sign-in and file storage.</li>
+    <li><strong>Netlify:</strong> hosting the website and redirecting short links.</li>
+    <li><strong>Google, GitHub and Discord:</strong> only if you choose to sign in with them.</li>
+    <li><strong>Spotify:</strong> only if you connect it to show what you're listening to. We ask for read-only access to your current and recently played tracks.</li>
+    <li><strong>Lanyard (Discord status):</strong> only if you add your Discord user ID to your page.</li>
+    <li><strong>Google Fonts and jsDelivr:</strong> deliver fonts and code libraries to your browser.</li>
+  </ul>
+
+  <h2>Stored in your browser</h2>
+  <p>We keep a few small preferences in your browser's local storage: your language, whether sound is muted, where you moved the help robot, your sign-in session and, if you connected it, your Spotify connection. We do not use advertising or tracking cookies.</p>
+
+  <h2>Keeping and deleting your data</h2>
+  <ul>
+    <li>You can delete any short link or your page yourself at any time from your dashboard. Uploaded files are removed with them.</li>
+    <li>To delete your whole account, use <strong>Talk to a person</strong> in the help chat on the site and we will remove your account and everything linked to it.</li>
+    <li>If you signed in with Google, GitHub or Discord, you can also remove Void Links' access from that service's settings.</li>
+  </ul>
+
+  <h2>Children</h2>
+  <p>Void Links is not meant for children under 13, and we do not knowingly collect their data.</p>
+
+  <h2>Changes and contact</h2>
+  <p>If we change this policy, we will update the date at the top. For any privacy question or request, use <strong>Talk to a person</strong> in the help chat on <a href="index.html">voidlinks.netlify.app</a>.</p>
+</main>
+<footer>© 2026 Void Links · Void Century</footer>
+</body>
+</html>
