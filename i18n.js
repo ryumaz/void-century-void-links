@@ -21,7 +21,7 @@
     en: {
       'nav.features': 'Features', 'nav.pages': 'Pages', 'nav.analytics': 'Analytics', 'nav.how': 'How it works',
       'nav.login': 'Log in', 'nav.signup': 'Sign up', 'nav.dashboard': 'Dashboard', 'f.privacy': 'Privacy', 'f.terms': 'Terms', 'f.support': 'Support', 'f.beta': 'In beta: features may still change.',
-      'hero.title': 'Share smarter.<br><span class="word-dim">See every click.</span>',
+      'hero.title': 'Short links.<br><span class="word-dim">Real data.</span>',
       'hero.sub': 'For creators, students and small teams: short links you can lock, schedule and track, plus one page for all your links.',
       'hero.ph': 'Paste your long URL here...', 'hero.btn': 'Shorten →', 'hero.copy': 'Copy',
       'hero.points': `Lock or schedule links${S}Your own page${S}Live click stats`, 'hero.scroll': 'Scroll',
@@ -63,7 +63,7 @@
     es: {
       'nav.features': 'Funciones', 'nav.pages': 'Páginas', 'nav.analytics': 'Analíticas', 'nav.how': 'Cómo funciona',
       'nav.login': 'Entrar', 'nav.signup': 'Registrarse', 'nav.dashboard': 'Panel', 'f.privacy': 'Privacidad', 'f.terms': 'Términos', 'f.support': 'Soporte', 'f.beta': 'En beta: las funciones aún pueden cambiar.',
-      'hero.title': 'Comparte mejor.<br><span class="word-dim">Mide cada clic.</span>',
+      'hero.title': 'Enlaces cortos.<br><span class="word-dim">Datos reales.</span>',
       'hero.sub': 'Para creadores, estudiantes y equipos pequeños: enlaces cortos que puedes proteger, programar y medir, y una página para todos tus enlaces.',
       'hero.ph': 'Pega aquí tu URL larga...', 'hero.btn': 'Acortar →', 'hero.copy': 'Copiar',
       'hero.points': `Protege o programa enlaces${S}Tu propia página${S}Clics en vivo`, 'hero.scroll': 'Desliza',
@@ -105,7 +105,7 @@
     pt: {
       'nav.features': 'Recursos', 'nav.pages': 'Páginas', 'nav.analytics': 'Análises', 'nav.how': 'Como funciona',
       'nav.login': 'Entrar', 'nav.signup': 'Criar conta', 'nav.dashboard': 'Painel', 'f.privacy': 'Privacidade', 'f.terms': 'Termos', 'f.support': 'Suporte', 'f.beta': 'Em beta: os recursos ainda podem mudar.',
-      'hero.title': 'Compartilhe melhor.<br><span class="word-dim">Veja cada clique.</span>',
+      'hero.title': 'Links curtos.<br><span class="word-dim">Dados reais.</span>',
       'hero.sub': 'Para criadores, estudantes e pequenas equipes: links curtos que você pode proteger, agendar e acompanhar, e uma página para todos os seus links.',
       'hero.ph': 'Cole sua URL longa aqui...', 'hero.btn': 'Encurtar →', 'hero.copy': 'Copiar',
       'hero.points': `Proteja ou agende links${S}Sua própria página${S}Cliques ao vivo`, 'hero.scroll': 'Role',
@@ -147,7 +147,7 @@
     fr: {
       'nav.features': 'Fonctions', 'nav.pages': 'Pages', 'nav.analytics': 'Statistiques', 'nav.how': 'Fonctionnement',
       'nav.login': 'Connexion', 'nav.signup': "S'inscrire", 'nav.dashboard': 'Tableau de bord', 'f.privacy': 'Confidentialité', 'f.terms': 'Conditions', 'f.support': 'Assistance', 'f.beta': 'En bêta : les fonctionnalités peuvent encore changer.',
-      'hero.title': 'Partagez mieux.<br><span class="word-dim">Voyez chaque clic.</span>',
+      'hero.title': 'Liens courts.<br><span class="word-dim">Vraies données.</span>',
       'hero.sub': 'Pour les créateurs, étudiants et petites équipes : des liens courts à protéger, programmer et suivre, et une page pour tous vos liens.',
       'hero.ph': 'Collez votre longue URL ici...', 'hero.btn': 'Raccourcir →', 'hero.copy': 'Copier',
       'hero.points': `Protégez ou programmez vos liens${S}Votre propre page${S}Clics en direct`, 'hero.scroll': 'Défiler',
@@ -189,7 +189,7 @@
     de: {
       'nav.features': 'Funktionen', 'nav.pages': 'Seiten', 'nav.analytics': 'Statistiken', 'nav.how': "So geht's",
       'nav.login': 'Anmelden', 'nav.signup': 'Registrieren', 'nav.dashboard': 'Dashboard', 'f.privacy': 'Datenschutz', 'f.terms': 'Nutzungsbedingungen', 'f.support': 'Support', 'f.beta': 'Beta: Funktionen können sich noch ändern.',
-      'hero.title': 'Besser teilen.<br><span class="word-dim">Jeden Klick sehen.</span>',
+      'hero.title': 'Kurze Links.<br><span class="word-dim">Echte Daten.</span>',
       'hero.sub': 'Für Creator, Studierende und kleine Teams: Kurzlinks, die du schützen, planen und auswerten kannst, und eine Seite für all deine Links.',
       'hero.ph': 'Lange URL hier einfügen...', 'hero.btn': 'Kürzen →', 'hero.copy': 'Kopieren',
       'hero.points': `Links schützen oder planen${S}Deine eigene Seite${S}Klicks live`, 'hero.scroll': 'Scrollen',
@@ -231,7 +231,7 @@
     tr: {
       'nav.features': 'Özellikler', 'nav.pages': 'Sayfalar', 'nav.analytics': 'Analiz', 'nav.how': 'Nasıl çalışır',
       'nav.login': 'Giriş yap', 'nav.signup': 'Kaydol', 'nav.dashboard': 'Panel', 'f.privacy': 'Gizlilik', 'f.terms': 'Koşullar', 'f.support': 'Destek', 'f.beta': 'Beta sürümünde: özellikler hâlâ değişebilir.',
-      'hero.title': 'Akıllıca paylaş.<br><span class="word-dim">Her tıklamayı gör.</span>',
+      'hero.title': 'Kısa linkler.<br><span class="word-dim">Gerçek veriler.</span>',
       'hero.sub': 'İçerik üreticileri, öğrenciler ve küçük ekipler için: kilitleyebileceğin, zamanlayabileceğin ve takip edebileceğin kısa linkler ve tüm linklerin için tek sayfa.',
       'hero.ph': 'Uzun URL’ni buraya yapıştır...', 'hero.btn': 'Kısalt →', 'hero.copy': 'Kopyala',
       'hero.points': `Linkleri kilitle veya zamanla${S}Kendi sayfan${S}Canlı tıklamalar`, 'hero.scroll': 'Kaydır',
@@ -273,7 +273,7 @@
     hi: {
       'nav.features': 'फ़ीचर्स', 'nav.pages': 'पेज', 'nav.analytics': 'एनालिटिक्स', 'nav.how': 'कैसे काम करता है',
       'nav.login': 'लॉग इन', 'nav.signup': 'साइन अप', 'nav.dashboard': 'डैशबोर्ड', 'f.privacy': 'गोपनीयता', 'f.terms': 'शर्तें', 'f.support': 'सहायता', 'f.beta': 'बीटा में: फ़ीचर अभी बदल सकते हैं।',
-      'hero.title': 'स्मार्ट तरीके से शेयर करें।<br><span class="word-dim">हर क्लिक देखें।</span>',
+      'hero.title': 'छोटे लिंक।<br><span class="word-dim">असली डेटा।</span>',
       'hero.sub': 'क्रिएटर्स, स्टूडेंट्स और छोटी टीमों के लिए: शॉर्ट लिंक जिन्हें आप लॉक, शेड्यूल और ट्रैक कर सकते हैं, और आपके सभी लिंक के लिए एक पेज।',
       'hero.ph': 'अपना लंबा URL यहाँ पेस्ट करें...', 'hero.btn': 'छोटा करें →', 'hero.copy': 'कॉपी',
       'hero.points': `लिंक लॉक या शेड्यूल करें${S}आपका अपना पेज${S}लाइव क्लिक`, 'hero.scroll': 'स्क्रॉल',
