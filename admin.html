@@ -5,9 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>Void Links Staff</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/brand/quasar-192.png">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+  <meta name="theme-color" content="#000000">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800&family=Michroma&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -49,7 +53,9 @@
     /* login */
     #login-view { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .login-card { width: 100%; max-width: 380px; padding: 32px; border-radius: 20px; background: var(--panel); border: 1px solid var(--border); display: grid; gap: 14px; }
-    .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.4rem; letter-spacing: -0.02em; }
+    .brand { display: flex; align-items: center; gap: 10px; font-family: 'Michroma', 'Lexend', sans-serif; font-weight: 400; font-size: 1.1rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .brand::before { content: ''; width: 32px; height: 32px; flex-shrink: 0; border-radius: 50%; background: #000 url("assets/brand/quasar-64.png") center / cover; box-shadow: 0 0 0 1px rgba(255,255,255,.18); }
+    .brand span { font-family: 'Lexend', sans-serif; text-transform: none; letter-spacing: 0; }
     .brand span { color: var(--dim); font-weight: 500; }
 
     /* app shell */
@@ -66,7 +72,7 @@
     .me { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
     .role { padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,0.08); font-size: 0.72rem; font-weight: 600; text-transform: capitalize; }
     main { flex: 1; padding: 24px; max-width: 1280px; width: 100%; margin: 0 auto; }
-    h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; letter-spacing: -0.02em; margin-bottom: 4px; }
+    h1 { font-family: 'Lexend', sans-serif; font-size: 1.5rem; letter-spacing: -0.02em; margin-bottom: 4px; }
     .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 16px 0; }
     .toolbar input { max-width: 280px; }
     .seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 11px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); }

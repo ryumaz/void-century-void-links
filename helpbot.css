@@ -119,7 +119,7 @@
 }
 .hb-avatar svg { width: 30px; height: 30px; }
 .hb-title { flex: 1; min-width: 0; }
-.hb-title strong { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 1.02rem; }
+.hb-title strong { display: block; font-family: 'Lexend', sans-serif; font-size: 1.02rem; }
 .hb-title span { font-size: 0.8rem; color: var(--text-muted, rgba(255,255,255,0.6)); }
 .hb-close {
   width: 34px;

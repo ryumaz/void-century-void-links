@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1000" viewBox="0 0 2400 1000" font-family="Segoe UI, Inter, Arial, sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#9aa0aa"/>
+    </marker>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b1d22"/>
+      <stop offset="1" stop-color="#0e0f12"/>
+    </linearGradient>
+    <style>
+      .col   { fill: url(#glow); stroke: #2c2f36; stroke-width: 2; }
+      .head  { font-size: 26px; font-weight: 700; fill: #ffffff; letter-spacing: 1.5px; }
+      .sub   { font-size: 19px; fill: #8b909a; }
+      .box   { fill: #17191d; stroke: #34373f; stroke-width: 2; }
+      .hot   { fill: #1d2028; stroke: #6f8cff; stroke-width: 2.5; }
+      .t     { font-size: 25px; font-weight: 600; fill: #f2f3f5; }
+      .d     { font-size: 19px; fill: #a3a8b2; }
+      .chip  { fill: #23262d; }
+      .ct    { font-size: 17px; fill: #c9ccd3; }
+      .line  { stroke: #9aa0aa; stroke-width: 2.5; fill: none; marker-end: url(#ar); }
+      .lbl   { font-size: 17px; fill: #c9ccd3; }
+      .lblbg { fill: #0b0c0e; }
+      .n     { font-size: 18px; font-weight: 700; fill: #000; }
+    </style>
+  </defs>
+
+  <rect width="2400" height="1000" rx="28" fill="#0b0c0e"/>
+
+  <!-- Title -->
+  <text x="60" y="72" font-size="38" font-weight="700" fill="#fff">Void Links · system architecture</text>
+  <text x="60" y="108" class="sub">Static frontend on Netlify · Supabase backend (Auth, Postgres with Row Level Security, Storage) · no server of our own to run</text>
+
+  <!-- ================= COLUMN 1: USERS ================= -->
+  <rect class="col" x="40" y="150" width="420" height="700" rx="22"/>
+  <text class="head" x="70" y="200">USERS</text>
+  <text class="sub" x="70" y="228">Any browser, desktop or phone</text>
+
+  <rect class="box" x="70" y="260" width="360" height="150" rx="16"/>
+  <text class="t" x="96" y="306">Visitors</text>
+  <text class="d" x="96" y="340">Open short links (voidlinks/abc)</text>
+  <text class="d" x="96" y="368">and bio pages (voidlinks/@name)</text>
+  <text class="d" x="96" y="396">No account needed</text>
+
+  <rect class="box" x="70" y="430" width="360" height="190" rx="16"/>
+  <text class="t" x="96" y="476">Creators</text>
+  <text class="d" x="96" y="510">Sign up, build a bio page,</text>
+  <text class="d" x="96" y="538">create links with password,</text>
+  <text class="d" x="96" y="566">schedule and use limits,</text>
+  <text class="d" x="96" y="594">read analytics + audit log</text>
+
+  <rect class="box" x="70" y="640" width="360" height="180" rx="16"/>
+  <text class="t" x="96" y="686">Staff</text>
+  <text class="d" x="96" y="720">Admin portal: support tickets,</text>
+  <text class="d" x="96" y="748">reported pages, users,</text>
+  <text class="d" x="96" y="776">staff roles (admin / support)</text>
+
+  <!-- ================= COLUMN 2: NETLIFY ================= -->
+  <rect class="col" x="560" y="150" width="600" height="700" rx="22"/>
+  <text class="head" x="590" y="200">NETLIFY · FRONTEND</text>
+  <text class="sub" x="590" y="228">Global CDN, deployed from GitHub</text>
+
+  <rect class="hot" x="590" y="260" width="540" height="150" rx="16"/>
+  <text class="t" x="616" y="306">Edge Function · shortlink.ts</text>
+  <text class="d" x="616" y="340">Runs at the edge, close to the visitor</text>
+  <text class="d" x="616" y="368">Instant 302 redirect + visitor's country</text>
+  <text class="d" x="616" y="396">Anything else falls through to go.html</text>
+
+  <rect class="box" x="590" y="430" width="540" height="390" rx="16"/>
+  <text class="t" x="616" y="476">Static web app (HTML · CSS · JS)</text>
+  <text class="d" x="616" y="514">index.html · landing, dashboard, page builder</text>
+  <text class="d" x="616" y="544">go.html · password, countdown, link status</text>
+  <text class="d" x="616" y="574">admin.html · staff portal</text>
+  <!-- chips -->
+  <rect class="chip" x="616" y="604" width="220" height="44" rx="22"/><text class="ct" x="726" y="632" text-anchor="middle">WebGL black hole</text>
+  <rect class="chip" x="848" y="604" width="250" height="44" rx="22"/><text class="ct" x="973" y="632" text-anchor="middle">3D help bot (Three.js)</text>
+  <rect class="chip" x="616" y="660" width="170" height="44" rx="22"/><text class="ct" x="701" y="688" text-anchor="middle">7 languages</text>
+  <rect class="chip" x="798" y="660" width="140" height="44" rx="22"/><text class="ct" x="868" y="688" text-anchor="middle">QR codes</text>
+  <rect class="chip" x="950" y="660" width="148" height="44" rx="22"/><text class="ct" x="1024" y="688" text-anchor="middle">Live preview</text>
+  <rect class="chip" x="616" y="716" width="250" height="44" rx="22"/><text class="ct" x="741" y="744" text-anchor="middle">Galaxy terminal demo</text>
+  <rect class="chip" x="878" y="716" width="220" height="44" rx="22"/><text class="ct" x="988" y="744" text-anchor="middle">supabase-js client</text>
+  <text class="d" x="616" y="796">No build step · works on any static host</text>
+
+  <!-- ================= COLUMN 3: SUPABASE ================= -->
+  <rect class="col" x="1260" y="150" width="680" height="700" rx="22"/>
+  <text class="head" x="1290" y="200">SUPABASE · BACKEND</text>
+  <text class="sub" x="1290" y="228">Managed Postgres · every rule enforced on the server</text>
+
+  <rect class="hot" x="1290" y="260" width="620" height="200" rx="16"/>
+  <text class="t" x="1316" y="306">Server functions + triggers</text>
+  <text class="d" x="1316" y="340">open_short_link(): password (bcrypt), schedule,</text>
+  <text class="d" x="1316" y="368">use limit, paused / revoked, then logs the click</text>
+  <text class="d" x="1316" y="402">Triggers write the tamper-proof audit log</text>
+  <text class="d" x="1316" y="436">Edge function admin-staff · page view counter</text>
+
+  <rect class="box" x="1290" y="480" width="620" height="170" rx="16"/>
+  <text class="t" x="1316" y="526">Postgres + Row Level Security</text>
+  <text class="d" x="1316" y="560">profiles · pages · short_links · clicks · link_audit</text>
+  <text class="d" x="1316" y="588">support_tickets · messages · reports · staff</text>
+  <text class="d" x="1316" y="622">Each user can only read and change their own rows</text>
+
+  <rect class="box" x="1290" y="670" width="300" height="150" rx="16"/>
+  <text class="t" x="1316" y="716">Auth</text>
+  <text class="d" x="1316" y="750">Email + password</text>
+  <text class="d" x="1316" y="778">Google · GitHub · Discord</text>
+  <text class="d" x="1316" y="806">(OAuth 2.0)</text>
+
+  <rect class="box" x="1610" y="670" width="300" height="150" rx="16"/>
+  <text class="t" x="1636" y="716">Storage</text>
+  <text class="d" x="1636" y="750">Avatars, backgrounds,</text>
+  <text class="d" x="1636" y="778">video, audio, cursors</text>
+  <text class="d" x="1636" y="806">Users write own folder only</text>
+
+  <!-- ================= COLUMN 4: INTEGRATIONS ================= -->
+  <rect class="col" x="2040" y="150" width="320" height="700" rx="22"/>
+  <text class="head" x="2070" y="200">INTEGRATIONS</text>
+  <text class="sub" x="2070" y="228">Called from the browser</text>
+
+  <rect class="box" x="2070" y="260" width="260" height="170" rx="16"/>
+  <text class="t" x="2096" y="306">Spotify</text>
+  <text class="d" x="2096" y="340">Now playing on</text>
+  <text class="d" x="2096" y="368">bio pages · OAuth</text>
+  <text class="d" x="2096" y="396">PKCE, no secret</text>
+
+  <rect class="box" x="2070" y="450" width="260" height="170" rx="16"/>
+  <text class="t" x="2096" y="496">Discord</text>
+  <text class="d" x="2096" y="530">Live status card</text>
+  <text class="d" x="2096" y="558">via Lanyard API</text>
+  <text class="d" x="2096" y="586">+ Discord login</text>
+
+  <rect class="box" x="2070" y="640" width="260" height="180" rx="16"/>
+  <text class="t" x="2096" y="686">CDNs</text>
+  <text class="d" x="2096" y="720">Google Fonts</text>
+  <text class="d" x="2096" y="748">jsDelivr (libraries)</text>
+  <text class="d" x="2096" y="776">Loaded lazily</text>
+
+  <!-- ================= ARROWS ================= -->
+  <!-- Users -> Netlify -->
+  <path class="line" d="M430 335 H586"/>
+  <rect class="lblbg" x="452" y="300" width="112" height="26" rx="6"/><text class="lbl" x="508" y="319" text-anchor="middle">opens link</text>
+  <path class="line" d="M430 525 H586"/>
+  <rect class="lblbg" x="455" y="490" width="106" height="26" rx="6"/><text class="lbl" x="508" y="509" text-anchor="middle">HTTPS</text>
+  <path class="line" d="M430 730 H586"/>
+  <rect class="lblbg" x="455" y="695" width="106" height="26" rx="6"/><text class="lbl" x="508" y="714" text-anchor="middle">HTTPS</text>
+  <!-- Netlify -> Supabase: three straight lanes -->
+  <path class="line" d="M1130 335 H1286"/>
+  <rect class="lblbg" x="1150" y="276" width="120" height="50" rx="6"/>
+  <text class="lbl" x="1210" y="296" text-anchor="middle">RPC call</text>
+  <text class="lbl" x="1210" y="318" text-anchor="middle">302 back</text>
+  <path class="line" d="M1130 565 H1286"/>
+  <rect class="lblbg" x="1146" y="506" width="128" height="50" rx="6"/>
+  <text class="lbl" x="1210" y="526" text-anchor="middle">supabase-js</text>
+  <text class="lbl" x="1210" y="548" text-anchor="middle">REST + JWT</text>
+  <path class="line" d="M1130 745 H1286"/>
+  <rect class="lblbg" x="1150" y="710" width="120" height="26" rx="6"/><text class="lbl" x="1210" y="729" text-anchor="middle">sign in</text>
+  <!-- Browser -> integrations (Spotify, Lanyard, CDNs) -->
+  <path class="line" d="M1130 800 C1500 905 1950 905 2066 800"/>
+  <rect class="lblbg" x="1450" y="866" width="300" height="26" rx="6"/><text class="lbl" x="1600" y="885" text-anchor="middle">bio page widgets: browser → APIs</text>
+
+  <!-- ================= FOOTER: request flow ================= -->
+  <text x="60" y="935" font-size="22" font-weight="700" fill="#fff">Short-link flow</text>
+  <circle cx="290" cy="928" r="16" fill="#fff"/><text class="n" x="290" y="934" text-anchor="middle">1</text>
+  <text class="d" x="316" y="935">Visitor opens voidlinks/abc</text>
+  <circle cx="580" cy="928" r="16" fill="#fff"/><text class="n" x="580" y="934" text-anchor="middle">2</text>
+  <text class="d" x="606" y="935">Edge Function calls open_short_link()</text>
+  <circle cx="1000" cy="928" r="16" fill="#fff"/><text class="n" x="1000" y="934" text-anchor="middle">3</text>
+  <text class="d" x="1026" y="935">Postgres checks password, schedule, limit, status</text>
+  <circle cx="1520" cy="928" r="16" fill="#fff"/><text class="n" x="1520" y="934" text-anchor="middle">4</text>
+  <text class="d" x="1546" y="935">Click + country logged, audit kept</text>
+  <circle cx="1920" cy="928" r="16" fill="#fff"/><text class="n" x="1920" y="934" text-anchor="middle">5</text>
+  <text class="d" x="1946" y="935">302 redirect in milliseconds</text>
+  <text class="sub" x="60" y="972">Locked, scheduled, paused or expired links go to go.html instead: password form, live countdown or a clear message.</text>
+</svg>

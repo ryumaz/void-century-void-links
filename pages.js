@@ -767,11 +767,11 @@
     if (!USER_RE.test(u)) { note.textContent = t('b.invalid'); note.classList.add('bad'); return false; }
     const mine = !!(myPageCache && myPageCache.username === u);
     if (!mine && takenCache[u] && takenCache[u] !== (me() && me().id)) {
-      note.textContent = `${siteHost()}/@${u} · ${t('b.taken')}`;
+      note.textContent = `${siteHost()}/${u} · ${t('b.taken')}`;
       note.classList.add('bad');
       return false;
     }
-    note.textContent = `${siteHost()}/@${u} · ${mine ? t('b.yours') : (u in takenCache ? t('b.available') : t('b.checking'))}`;
+    note.textContent = `${siteHost()}/${u} · ${mine ? t('b.yours') : (u in takenCache ? t('b.available') : t('b.checking'))}`;
     note.classList.add('good');
     if (!mine && !(u in takenCache)) checkUsername(u);
     return true;
@@ -851,8 +851,18 @@
       bg: file.type.startsWith('image/') || file.type === 'video/mp4' || file.type === 'video/webm',
       audio: file.type.startsWith('audio/'),
     }[kind];
-    if (!ok) return;
-    if (file.size > (kind === 'audio' ? MAX_AUDIO : MAX_MEDIA)) { toast(t('toast.full')); return; }
+    const mb = n => (n / 1048576).toFixed(n < 10485760 ? 1 : 0) + ' MB';
+    if (!ok) {
+      toast(kind === 'audio' ? 'That file type isn’t supported. Use MP3, OGG, WAV or M4A audio.'
+        : kind === 'avatar' ? 'Use a JPG, PNG, GIF or WebP image for your avatar.'
+        : 'That file type isn’t supported. Use JPG, PNG, GIF, WebP, MP4 or WebM (iPhone .mov videos need converting to MP4).');
+      return;
+    }
+    const max = kind === 'audio' ? MAX_AUDIO : MAX_MEDIA;
+    if (file.size > max) {
+      toast(`That file is ${mb(file.size)}. The limit is ${mb(max)} for ${kind === 'audio' ? 'audio' : kind === 'avatar' ? 'avatars' : 'backgrounds'}.`);
+      return;
+    }
     setBlob(kind, file, file.name);
     if (kind === 'bg' && draft.bgType === 'video' && segValue(segSound) === 'none') seg(segSound, 'video');
     update();
@@ -993,7 +1003,7 @@
       const paths = { avatar: avatarPath, bg: bgPath, audio: audioPath, cursor: cursorPath };
       Object.keys(paths).forEach(kind => { if (draft[kind + 'Blob']) { draft[kind + 'Blob'] = null; draft[kind + 'Path'] = paths[kind]; } });
       data.links.forEach((l, i) => { const ic = draft.icons[l.id]; if (ic && ic.blob) { ic.blob = null; ic.path = iconPaths[i]; } });
-      $('pb-result-url').textContent = siteHost() + '/@' + saved.username;
+      $('pb-result-url').textContent = siteHost() + '/' + saved.username;
       $('pb-result').hidden = false;
       update();
       toast(t('toast.published'));
@@ -1049,7 +1059,7 @@
     setBlob('cursor', null, '', page.cursorUrl ? { url: page.cursorUrl, path: page.cursorPath } : null);
     seg(segCursor, page.cursor === 'custom' && !page.cursorUrl ? 'default' : (page.cursor || 'default'));
     seg(segCursorHot, page.cursorHotspot || 'tip');
-    $('pb-result-url').textContent = siteHost() + '/@' + page.username;
+    $('pb-result-url').textContent = siteHost() + '/' + page.username;
     $('pb-result').hidden = false;
     update();
     return true;
@@ -1089,7 +1099,7 @@
     view.dataset.user = user;
     let page = null;
     try { page = window.DB ? await DB.getPage(user) : null; } catch (_) { page = null; }
-    if (location.hash.toLowerCase() !== '#@' + user) return;   // visitor moved on while it loaded
+    if (routeUser() !== user) return;   // visitor moved on while it loaded
     viewPage = page;
     if (!page) {
       renderProfile(view, { username: user, name: t(window.DB ? 'p.missing' : 'toast.offline'), links: [] }, {});
@@ -1137,6 +1147,7 @@
     closeMedia();
     setOverlay(false);
     if (location.hash.startsWith('#@')) history.replaceState(null, '', location.pathname + location.search);
+    else if (pathUser()) history.replaceState(null, '', '/');
   }
 
   splash.addEventListener('click', () => { splash.hidden = true; applySound(true); $('pv-close').focus({ preventScroll: true }); });
@@ -1145,9 +1156,18 @@
     applySound(splash.hidden);
   });
 
-  function route() {
+  // A profile is shown for #@name (inside the app) or a clean address like /name (live site)
+  function pathUser() {
+    const m = location.pathname.match(/^\/([a-z0-9_.-]{2,20})\/?$/i);
+    return m && !/\.(html?|js|css|png|jpe?g|svg|ico|txt|xml|json)$/i.test(m[1]) ? m[1].toLowerCase() : null;
+  }
+  function routeUser() {
     const m = location.hash.match(/^#@([a-z0-9_.-]{2,20})$/i);
-    if (m) openProfile(m[1].toLowerCase());
+    return m ? m[1].toLowerCase() : (!location.hash ? pathUser() : null);
+  }
+  function route() {
+    const u = routeUser();
+    if (u) openProfile(u);
     else closeProfile();
   }
 

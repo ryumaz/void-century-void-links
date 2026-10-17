@@ -4,11 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#000000">
+  
   <title>Opening link…</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/brand/quasar-192.png">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+  <meta name="theme-color" content="#000000">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lexend:wght@400;500;600;700;800&family=Michroma&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <style>
     :root {
       --text: #f5f5f7;
@@ -27,8 +31,8 @@
 
     header { position: fixed; top: 0; left: 0; right: 0; z-index: 3; padding: 22px 28px; }
     .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none;
-      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.15rem; letter-spacing: -.02em; }
-    .brand i { width: 28px; height: 28px; border-radius: 50%; background: #fff; display: grid; place-items: center; }
+      font-family: 'Michroma', 'Lexend', sans-serif; font-weight: 400; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; }
+    .brand i { width: 30px; height: 30px; border-radius: 50%; background: #000 url("assets/brand/quasar-64.png") center / cover; box-shadow: 0 0 0 1px rgba(255,255,255,.18); }
 
     main { position: relative; z-index: 2; min-height: 100%; display: grid; place-items: center; padding: 90px 20px 40px; }
     .card {
@@ -47,7 +51,7 @@
       background: rgba(255,255,255,.07); border: 1px solid var(--line); }
     .badge.pulse { animation: pulse 2.4s ease-in-out infinite; }
     @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,.18); } 50% { box-shadow: 0 0 0 12px rgba(255,255,255,0); } }
-    h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -.03em; margin: 0 0 10px; }
+    h1 { font-family: 'Lexend', sans-serif; font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -.03em; margin: 0 0 10px; }
     p { margin: 0 auto; color: var(--muted); line-height: 1.6; max-width: 400px; }
     .slug { display: inline-block; margin: 16px 0 0; padding: 6px 12px; border-radius: 999px; font-size: .85rem;
       font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--muted); background: rgba(255,255,255,.06); }
@@ -57,7 +61,7 @@
     .cd-unit { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 78px; }
     .cd-num {
       width: 100%; padding: 14px 6px 12px; border-radius: 14px;
-      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(2rem, 7vw, 2.9rem);
+      font-family: 'Lexend', sans-serif; font-weight: 700; font-size: clamp(2rem, 7vw, 2.9rem);
       line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums;
       background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
       border: 1px solid var(--line); position: relative; overflow: hidden;
@@ -66,7 +70,7 @@
     .cd-num.tick span { display: inline-block; animation: tick .45s cubic-bezier(.2,.8,.2,1); }
     @keyframes tick { from { opacity: 0; transform: translateY(-40%); filter: blur(2px); } to { opacity: 1; transform: none; filter: none; } }
     .cd-unit small { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
-    .cd-sep { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; color: var(--dim); padding-top: 14px; }
+    .cd-sep { font-family: 'Lexend', sans-serif; font-size: 2rem; color: var(--dim); padding-top: 14px; }
     .when { margin-top: 18px; color: var(--text); font-weight: 500; }
     .tz { margin-top: 4px; font-size: .82rem; color: var(--dim); }
     .bar { height: 3px; border-radius: 3px; background: rgba(255,255,255,.08); margin: 22px auto 0; max-width: 360px; overflow: hidden; }
@@ -80,6 +84,7 @@
     .btn.ghost { background: rgba(255,255,255,.07); color: var(--text); border: 1px solid var(--line); }
     .btn.ghost:hover { background: rgba(255,255,255,.12); }
     .btn:disabled { opacity: .6; cursor: wait; transform: none; }
+    .btn.ghost.on { background: rgba(184,240,204,.12); border-color: rgba(184,240,204,.35); color: #b8f0cc; }
 
     form { display: flex; flex-direction: column; gap: 10px; width: min(340px, 100%); margin: 22px auto 0; }
     input { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 11px; padding: 13px 14px;
@@ -111,7 +116,7 @@
 <canvas id="bg" aria-hidden="true"></canvas>
 <div class="veil" aria-hidden="true"></div>
 <header>
-  <a class="brand" href="index.html"><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round"><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-20 12 12)"/><circle cx="12" cy="12" r="2.2" fill="#000"/></svg></i>Void Links</a>
+  <a class="brand" href="index.html"><i aria-hidden="true"></i>Void Links</a>
 </header>
 
 <main>
@@ -144,8 +149,13 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
         Add to calendar
       </button>
+      <button type="button" class="btn ghost" id="cd-notify">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span>Notify me</span>
+      </button>
       <button type="button" class="btn ghost" id="cd-copy">Copy link</button>
     </div>
+    <p class="tz" id="cd-notify-note" hidden></p>
   </section>
 
   <!-- Password -->
@@ -180,10 +190,22 @@
   const cfg = window.SUPABASE_CONFIG || {};
   const $ = id => document.getElementById(id);
   const path = decodeURIComponent(location.pathname.replace(/^\/+|\/+$/g, ''));
-  // Profile pages: /@name → the site's page viewer
-  const profile = path.match(/^@([a-z0-9_.-]{2,20})$/i);
-  if (profile) { location.replace('/#@' + profile[1].toLowerCase()); return; }
+  // Old profile addresses /@name → the clean /name
+  const oldProfile = path.match(/^@([a-z0-9_.-]{2,20})$/i);
+  if (oldProfile) { location.replace('/' + oldProfile[1].toLowerCase()); return; }
   const slug = new URLSearchParams(location.search).get('s') || path;
+  // Normally the Netlify edge function opens /name profiles. This is the backup:
+  // ask the database whether a page has this name, and show it.
+  async function showProfileIfAny() {
+    const name = slug.toLowerCase();
+    if (!/^[a-z0-9_.-]{2,20}$/.test(name) || !cfg.url) return false;
+    try {
+      const r = await fetch(cfg.url + '/rest/v1/pages?select=username&username=eq.' + encodeURIComponent(name), { headers: { apikey: cfg.key } });
+      const rows = r.ok ? await r.json() : [];
+      if (rows.length) { location.replace('/index.html#@' + name); return true; }
+    } catch (_) {}
+    return false;
+  }
   const host = (() => { try { return cfg.siteUrl ? new URL(cfg.siteUrl).host : (/^https?:$/.test(location.protocol) ? location.host : 'voidlinks'); } catch (_) { return 'voidlinks'; } })();
   const pretty = host + '/' + slug;
 
@@ -206,7 +228,7 @@
     document.title = title;
     show('stopped');
   }
-  if (!/^[A-Za-z0-9_-]{2,40}$/.test(slug) || !cfg.url) return stop('missing');
+  if (!/^[A-Za-z0-9_-]{2,40}$/.test(slug) || !cfg.url) { if (!(await showProfileIfAny())) stop('missing'); return; }
 
   const ua = navigator.userAgent;
   const device = /iPad|Tablet/i.test(ua) ? 'tablet' : /Mobi|Android|iPhone/i.test(ua) ? 'mobile' : 'desktop';
@@ -244,6 +266,7 @@
   }
 
   // ---------- countdown ----------
+  let unlockedAlert = () => window.unlockedAlert && window.unlockedAlert();
   let cdTimer = null;
   function countdown(at) {
     show('soon');
@@ -268,6 +291,7 @@
         ['cd-d', 'cd-h', 'cd-m', 'cd-s'].forEach(id => set(id, 0));
         $('cd-bar').style.width = '100%';
         // Unlocked: ask the server again (it decides, not this clock)
+        unlockedAlert();
         await new Promise(r => setTimeout(r, 800));
         try { handle(await open()); } catch (_) { stop('error'); }
         return;
@@ -291,6 +315,50 @@
         if (r.status !== 'scheduled') { clearInterval(cdTimer); handle(r); }
       } catch (_) {}
     });
+
+    // ---- Notify me: a system notification + soft chime when it unlocks (tab must stay open) ----
+    let notifyOn = false;
+    const note = $('cd-notify-note');
+    const setNotifyUi = state => {
+      const btn = $('cd-notify');
+      btn.querySelector('span').textContent = state === 'on' ? 'You’ll be notified' : 'Notify me';
+      btn.classList.toggle('on', state === 'on');
+      note.hidden = state === 'off';
+      note.textContent = state === 'on' ? 'Keep this tab open (it can be in the background). We’ll ping you the moment it opens.'
+        : state === 'blocked' ? 'Notifications are blocked for this site. Allow them in your browser’s site settings, or keep this tab open: it still opens by itself.' : '';
+    };
+    $('cd-notify').onclick = async () => {
+      if (notifyOn) { notifyOn = false; setNotifyUi('off'); return; }
+      if (!('Notification' in window)) { notifyOn = true; setNotifyUi('on'); return; }   // still get the chime + title
+      let perm = Notification.permission;
+      if (perm === 'default') { try { perm = await Notification.requestPermission(); } catch (_) {} }
+      if (perm === 'denied') { setNotifyUi('blocked'); return; }
+      notifyOn = true;
+      setNotifyUi('on');
+    };
+    window.unlockedAlert = () => {
+      if (!notifyOn) return;
+      document.title = '● Open now · ' + pretty;
+      try {
+        const ac = new (window.AudioContext || window.webkitAudioContext)();
+        [0, 0.18].forEach((t, i) => {
+          const o = ac.createOscillator(), g = ac.createGain();
+          o.frequency.value = i ? 1046.5 : 784;
+          g.gain.setValueAtTime(0.0001, ac.currentTime + t);
+          g.gain.exponentialRampToValueAtTime(0.18, ac.currentTime + t + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + t + 0.5);
+          o.connect(g).connect(ac.destination);
+          o.start(ac.currentTime + t);
+          o.stop(ac.currentTime + t + 0.55);
+        });
+      } catch (_) {}
+      try {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          const n = new Notification('Your link is open', { body: pretty + ' just unlocked. Opening it now.', icon: 'assets/brand/quasar-192.png', tag: 'vl-' + slug });
+          n.onclick = () => { window.focus(); n.close(); };
+        }
+      } catch (_) {}
+    };
 
     $('cd-copy').onclick = () => {
       navigator.clipboard.writeText(location.href).then(() => { $('cd-copy').textContent = 'Copied'; setTimeout(() => { $('cd-copy').textContent = 'Copy link'; }, 1600); }).catch(() => {});
@@ -350,7 +418,11 @@
     $('pw-go').textContent = 'Unlock link';
   });
 
-  try { handle(await open()); } catch (_) { stop('error'); }
+  try {
+    const first = await open();
+    if (first.status === 'missing' && await showProfileIfAny()) return;
+    handle(first);
+  } catch (_) { stop('error'); }
 })();
 </script>
 </body>

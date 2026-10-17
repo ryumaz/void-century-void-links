@@ -185,9 +185,13 @@ window.siteHost = () => {
       fail(error);
       return fromRow(data);
     },
+    // Who has this name: a page owner's id, 'taken' if a short link or reserved word uses it, or null if free
     async usernameOwner(username) {
       const { data } = await sb.from('pages').select('owner').eq('username', username).maybeSingle();
-      return data ? data.owner : null;
+      if (data) return data.owner;
+      const free = await sb.rpc('name_is_free', { p_name: username });
+      if (!free.error && free.data === false) return 'taken';
+      return null;
     },
     // `previous` is the page as it was before, so replaced files can be cleaned up
     async savePage(page, previous) {
@@ -219,16 +223,17 @@ window.siteHost = () => {
 
     // ---------- addresses ----------
     siteBase,
-    // With siteUrl set (Netlify): clean addresses like site/abc and site/@name.
+    // With siteUrl set (Netlify): clean addresses like site/abc and site/name.
     // Without it they still work anywhere: site/go.html?s=abc and index.html#@name.
+    // ("@name" means a profile page; on the live site the @ is dropped.)
     shortUrl: slug => {
-      if (cfg.siteUrl) return siteBase() + slug;
+      if (cfg.siteUrl) return siteBase() + slug.replace(/^@/, '');
       const base = siteBase();
       if (!base) return slug.startsWith('@') ? location.href.split('#')[0] + '#' + slug : location.href.split('#')[0].replace(/[^/]*$/, '') + 'go.html?s=' + slug;
       return slug.startsWith('@') ? location.href.split('#')[0] + '#' + slug : base + 'go.html?s=' + slug;
     },
     shortHost: () => (cfg.siteUrl ? siteBase() : siteBase() ? siteBase() + 'go.html?s=' : 'go.html?s=').replace(/^https?:\/\//, ''),
-    pageUrl: username => (cfg.siteUrl ? siteBase() + '@' + username : location.href.split('#')[0] + '#@' + username),
+    pageUrl: username => (cfg.siteUrl ? siteBase() + username : location.href.split('#')[0] + '#@' + username),
 
     // ---------- short links ----------
     slugError(slug) {

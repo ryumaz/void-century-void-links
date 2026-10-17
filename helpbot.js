@@ -123,20 +123,23 @@
       y: Math.min(Math.max(EDGE, y), window.innerHeight - h - EDGE),
     };
   }
+  // The chat panel always fits on screen: above or below the robot when there's room,
+  // otherwise beside it. It uses fixed coordinates so it never gets squashed.
   function placePanel() {
     const r = launch.getBoundingClientRect();
-    const left = r.left + r.width / 2 < window.innerWidth / 2;
+    const vw = window.innerWidth, vh = window.innerHeight, gap = 8;
+    const w = Math.min(380, vw - 16);
+    const h = Math.min(600, vh - 32);
+    const left = r.left + r.width / 2 < vw / 2;
     root.classList.toggle('hb-left', left);
-    const above = r.top, below = window.innerHeight - r.bottom;
-    const up = above >= below;
-    Object.assign(panel.style, {
-      left: left ? '6px' : 'auto',
-      right: left ? 'auto' : '6px',
-      bottom: up ? (r.height - 2) + 'px' : 'auto',
-      top: up ? 'auto' : (r.height - 2) + 'px',
-      height: Math.max(320, Math.min(600, (up ? above : below) - 16)) + 'px',
-    });
-    root.classList.toggle('hb-below', !up);
+    let x, y;
+    if (r.top - gap >= h) { y = r.top - gap - h; x = left ? r.left : r.right - w; }            // above
+    else if (vh - r.bottom - gap >= h) { y = r.bottom + gap; x = left ? r.left : r.right - w; }  // below
+    else { y = (vh - h) / 2; x = left ? r.right + gap : r.left - gap - w; }                     // beside
+    x = Math.min(Math.max(8, x), vw - w - 8);
+    y = Math.min(Math.max(8, y), vh - h - 8);
+    Object.assign(panel.style, { position: 'fixed', left: x + 'px', top: y + 'px', right: 'auto', bottom: 'auto', width: w + 'px', height: h + 'px' });
+    root.classList.toggle('hb-below', y > r.top);
   }
   function setPos(x, y) {
     const p = clampPos(x, y);

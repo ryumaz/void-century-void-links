@@ -4,10 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Void Links · Short links and pages by Void Century</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/brand/quasar-192.png">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+  <meta name="theme-color" content="#000000">
   <meta name="description" content="Void Links by Void Century: short links with live analytics, QR codes and link-in-bio pages.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Lexend:wght@400;500;600;700;800&family=Michroma&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -141,20 +145,33 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 700;
       font-size: 1.2rem;
       letter-spacing: -0.02em;
       color: var(--text);
       flex-shrink: 0;
     }
+    /* Logo: the quasar mark in a round badge, wordmark in Michroma */
     .logo-icon {
-      width: 30px; height: 30px;
-      background: var(--accent);
+      width: 32px; height: 32px;
+      flex-shrink: 0;
       border-radius: 50%;
+      background: #000 url("assets/brand/quasar-64.png") center / cover no-repeat;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.18);
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    .logo-icon svg { display: none; }
+    .logo > span { white-space: nowrap; }
+    .dash-sidebar .logo > span { font-size: 0.78em; }
+    .logo > span, .modal-logo .logo {
+      font-family: 'Michroma', 'Lexend', sans-serif;
+      font-weight: 400;
+      font-size: 0.92em;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
     .nav-links {
       display: flex;
@@ -272,7 +289,7 @@
       50% { opacity: 0.7; box-shadow: 0 0 0 5px rgba(255,255,255,0); }
     }
     .hero-title {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-size: clamp(3rem, 8vw, 6.5rem);
       font-weight: 800;
       line-height: 1.0;
@@ -337,7 +354,7 @@
       gap: 12px;
     }
     #shortened-result .short-link {
-      font-family: 'Space Grotesk', monospace;
+      font-family: 'Lexend', monospace;
       font-weight: 600;
       color: var(--green);
       font-size: 1rem;
@@ -386,7 +403,7 @@
       margin-bottom: 16px;
     }
     .section-title {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-size: clamp(2rem, 5vw, 3.2rem);
       font-weight: 800;
       letter-spacing: -0.035em;
@@ -435,14 +452,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 800;
       font-size: 1rem;
       color: var(--accent);
       flex-shrink: 0;
     }
     .step-content h3 {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 700;
       font-size: 1.1rem;
       color: var(--text);
@@ -502,7 +519,7 @@
     .feat-icon.purple { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: var(--purple); }
     .feat-icon.green { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: var(--green); }
     .feature-card h3 {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 700;
       font-size: 1.1rem;
       letter-spacing: -0.02em;
@@ -563,7 +580,7 @@
     }
     .metric-label { font-size: 0.85rem; color: var(--text-muted); flex: 1; }
     .metric-val {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 700;
       font-size: 1.1rem;
       color: var(--text);
@@ -594,7 +611,7 @@
       justify-content: space-between;
     }
     .dash-title-row {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 600;
       font-size: 0.92rem;
       color: var(--text);
@@ -628,7 +645,7 @@
     }
     .kpi-label { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
     .kpi-val {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 800;
       font-size: 1.5rem;
       letter-spacing: -0.04em;
@@ -750,11 +767,12 @@
     .footer-links a:hover, .footer-up:hover { color: var(--text); }
     /* The name returns at full width as the close */
     .footer-word {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: clamp(4rem, 17vw, 15rem);
-      letter-spacing: -0.06em;
-      line-height: 0.9;
+      font-family: 'Michroma', 'Lexend', sans-serif;
+      font-weight: 400;
+      font-size: clamp(1.9rem, 8.2vw, 8.4rem);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1;
       color: rgba(255,255,255,0.92);
       margin: 56px 0 28px;
       white-space: nowrap;
@@ -864,7 +882,7 @@
     }
     .metric-icon { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
     .country-flag { font-size: 0.72rem !important; font-weight: 600; color: var(--text-muted); width: 24px !important; }
-    .favicon-wrap { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.8rem !important; color: var(--text-muted); }
+    .favicon-wrap { font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 0.8rem !important; color: var(--text-muted); }
     /* === MODALS === */
     .modal-overlay {
       position: fixed;
@@ -915,7 +933,7 @@
       margin-bottom: 28px;
     }
     .modal-title {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 700;
       font-size: 1.5rem;
       letter-spacing: -0.03em;
@@ -1052,7 +1070,7 @@
     .dash-main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
     .dash-page-title {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.03em;
@@ -1075,7 +1093,7 @@
     }
     .kpi-big-label { font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
     .kpi-big-val {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-size: 2rem;
       font-weight: 800;
       letter-spacing: -0.05em;
@@ -1094,7 +1112,7 @@
       padding: 20px;
     }
     .dash-panel-title {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 600;
       font-size: 0.92rem;
       color: var(--text);
@@ -1134,7 +1152,7 @@
       flex-shrink: 0;
     }
     .link-row .slug {
-      font-family: 'Space Grotesk', monospace;
+      font-family: 'Lexend', monospace;
       font-weight: 600;
       color: var(--accent);
       min-width: 90px;
@@ -1148,7 +1166,7 @@
       font-size: 0.8rem;
     }
     .link-row .clicks {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 700;
       color: var(--text);
       min-width: 48px;
@@ -1345,7 +1363,7 @@
       background: rgba(255,255,255,0.06);
     }
     .publish-result[hidden] { display: none; }
-    .publish-url { flex: 1; font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+    .publish-url { flex: 1; font-family: 'Lexend', sans-serif; font-weight: 600; }
 
     .builder-preview {
       position: sticky;
@@ -1395,13 +1413,13 @@
       justify-content: center;
       background: rgba(255,255,255,0.08);
       border: 2px solid rgba(255,255,255,0.28);
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-size: 2rem;
       font-weight: 700;
     }
     .pc-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .pc-name {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.02em;
@@ -1454,7 +1472,7 @@
       align-items: center;
       justify-content: center;
       background: rgba(255,255,255,0.1);
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-weight: 700;
       font-size: 0.8rem;
     }
@@ -1664,7 +1682,7 @@
       background: rgba(255,255,255,0.06);
       color: #fff;
     }
-    .showcase-points strong { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; margin-bottom: 2px; }
+    .showcase-points strong { display: block; font-family: 'Lexend', sans-serif; font-size: 1.05rem; margin-bottom: 2px; }
     .showcase-points span { color: var(--text-muted); font-size: 0.95rem; line-height: 1.55; }
     .claim-box.claim-left { margin: 0; }
     .showcase-demo { display: flex; flex-direction: column; align-items: center; gap: 16px; }
@@ -1682,7 +1700,7 @@
     .builder-form legend {
       padding: 0;
       margin-bottom: 14px;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-size: 1.05rem;
       font-weight: 600;
       color: #fff;
@@ -1836,7 +1854,7 @@
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       color: #fff;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-size: 1.4rem;
       font-weight: 600;
       letter-spacing: -0.01em;
@@ -1911,7 +1929,7 @@
       border: 1px solid var(--border);
     }
     .page-card-info { flex: 1; min-width: 180px; }
-    .page-card-info strong { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; }
+    .page-card-info strong { display: block; font-family: 'Lexend', sans-serif; font-size: 1.1rem; }
     .page-card-info span { font-size: 0.85rem; color: var(--text-muted); }
     .page-card-actions { display: flex; gap: 8px; }
     #dash-content .builder { margin-top: 8px; }
@@ -1929,7 +1947,7 @@
       justify-content: center;
       background: #fff;
       color: #000;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Lexend', sans-serif;
       font-size: 1.5rem;
       font-weight: 700;
     }
@@ -2102,7 +2120,7 @@
     .auth-resend[hidden] { display: none; }
     .auth-sent { text-align: center; padding: 8px 0 4px; }
     .auth-sent[hidden] { display: none; }
-    .auth-sent h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; margin-bottom: 8px; }
+    .auth-sent h3 { font-family: 'Lexend', sans-serif; font-size: 1.2rem; margin-bottom: 8px; }
     .auth-sent p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.55; margin-bottom: 12px; }
     .auth-sent strong { color: #fff; }
     .auth-small { font-size: 0.82rem !important; margin-bottom: 8px !important; }
@@ -2172,7 +2190,7 @@
     }
     .qr-box canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
     .qr-box.qr-offline { background: rgba(255,255,255,0.06); }
-    .qr-url { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1rem; }
+    .qr-url { font-family: 'Lexend', sans-serif; font-weight: 600; font-size: 1rem; }
     .qr-meta { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 12px; }
     .qr-actions { display: flex; gap: 8px; width: 100%; }
     .qr-actions .btn-primary { flex: 1; min-width: 0; justify-content: center; padding: 10px 12px; }
@@ -2315,7 +2333,7 @@
     .lm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 4px; padding-top: 18px; border-top: 1px solid var(--border); }
     .btn.danger { color: var(--red); }
     .btn.danger:hover { border-color: rgba(244,180,180,0.4); color: var(--red); }
-    .lm-h { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; margin: 22px 0 10px; }
+    .lm-h { font-family: 'Lexend', sans-serif; font-size: 0.95rem; margin: 22px 0 10px; }
     @media (max-width: 560px) { .lm-box { padding: 26px 18px; } .lm-box .adv-grid { grid-template-columns: 1fr; } }
 
     .audit-filter select {
@@ -2448,6 +2466,92 @@
     .picker-menu [role="option"][aria-selected="true"] { color: #fff; background: rgba(255,255,255,0.1); }
     .picker-menu [role="option"] > span:first-of-type { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .picker-count { font-size: 0.75rem; color: var(--text-dim); }
+
+    /* Choose-username modal */
+    .ob-box .claim-field input { min-width: 0; }
+    .ob-box .claim-prefix { max-width: 55%; overflow: hidden; text-overflow: ellipsis; }
+    .ob-suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; font-size: 0.8rem; color: var(--text-dim); }
+    .ob-suggest:empty { display: none; }
+    .ob-chip {
+      padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05); color: var(--text-muted); font: inherit; font-size: 0.8rem;
+    }
+    .ob-chip:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+    .ob-opt { color: var(--text-dim); font-weight: 400; margin-left: 4px; }
+    .ob-go { width: 100%; justify-content: center; margin-top: 4px; }
+    .ob-later { display: block; margin: 14px auto 0; color: var(--text-dim); }
+
+    /* Landing analytics: features + an unlabeled preview (no made-up numbers) */
+    .analytics-metrics .metric-label { display: flex; flex-direction: column; gap: 2px; }
+    .analytics-metrics .metric-label b { color: var(--text); font-weight: 600; font-size: 0.98rem; }
+    .analytics-metrics .metric-label small { color: var(--text-muted); font-size: 0.86rem; }
+    .preview-bars .chart-bar { background: linear-gradient(to top, rgba(255,255,255,0.32), rgba(255,255,255,0.08)); }
+    .preview-list .skel { width: 26px; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.12); flex-shrink: 0; }
+    .preview-list .country-bar { background: rgba(255,255,255,0.35); }
+    .preview-note { font-size: 0.82rem; color: var(--text-dim); margin: 14px 2px 0; }
+
+    /* Date & time picker */
+    .dtp { position: relative; display: flex; align-items: center; }
+    .dtp-btn {
+      flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
+      padding: 11px 36px 11px 12px; border-radius: 9px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      color: var(--text-dim); font: inherit; font-size: 0.88rem; text-align: left;
+      transition: border-color 0.2s;
+    }
+    .dtp-btn:hover, .dtp-btn[aria-expanded="true"] { border-color: rgba(255,255,255,0.3); }
+    .dtp-btn.has-value { color: var(--text); }
+    .dtp-btn svg { flex-shrink: 0; color: var(--text-muted); }
+    .dtp-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dtp-clear {
+      position: absolute; right: 6px; width: 26px; height: 26px; border-radius: 7px;
+      border: 0; background: transparent; color: var(--text-dim); font-size: 1.1rem; line-height: 1;
+    }
+    .dtp-clear:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .dtp-pop {
+      position: fixed; z-index: 700; width: 312px; max-width: calc(100vw - 16px);
+      padding: 14px; border-radius: 16px;
+      background: #0c0c0f; border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      animation: pickIn 0.14s ease both;
+    }
+    .dtp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .dtp-head strong { font-family: 'Lexend', sans-serif; font-weight: 600; font-size: 0.98rem; }
+    .dtp-nav {
+      width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04); color: var(--text); font-size: 1.2rem; line-height: 1;
+    }
+    .dtp-nav:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+    .dtp-nav:disabled { opacity: 0.25; cursor: not-allowed; }
+    .dtp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
+    .dtp-dow { font-size: 0.7rem; font-weight: 600; color: var(--text-dim); padding: 4px 0 6px; text-transform: uppercase; }
+    .dtp-day {
+      aspect-ratio: 1; border-radius: 9px; border: 0; background: transparent;
+      color: var(--text); font: inherit; font-size: 0.86rem;
+    }
+    .dtp-day:hover:not(:disabled) { background: rgba(255,255,255,0.08); }
+    .dtp-day.today { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3); }
+    .dtp-day.sel { background: #fff; color: #000; font-weight: 600; }
+    .dtp-day:disabled { color: rgba(255,255,255,0.18); cursor: not-allowed; }
+    .dtp-time { display: flex; align-items: center; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted); }
+    .dtp-time > span { margin-right: auto; }
+    .dtp-time select {
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font: inherit; padding: 6px 6px;
+    }
+    .dtp-ampm { display: inline-flex; margin-left: 4px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+    .dtp-ampm button { border: 0; background: transparent; color: var(--text-muted); font: inherit; font-size: 0.78rem; padding: 6px 9px; }
+    .dtp-ampm button[aria-pressed="true"] { background: #fff; color: #000; font-weight: 600; }
+    .dtp-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .dtp-quick button {
+      padding: 5px 10px; border-radius: 999px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04); color: var(--text-muted); font: inherit; font-size: 0.76rem;
+    }
+    .dtp-quick button:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+    .dtp-msg { font-size: 0.8rem; color: var(--text-dim); margin: 12px 0 0; min-height: 1.2em; }
+    .dtp-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+    .dtp-foot .btn { padding: 8px 14px; font-size: 0.85rem; }
+    .dtp-foot .btn:disabled { opacity: 0.4; cursor: not-allowed; }
   </style>
   <link rel="stylesheet" href="helpbot.css">
 </head>
@@ -2501,7 +2605,7 @@
         <button type="button" role="tab" data-mode="claim" aria-selected="false" data-i18n="hero.tab2">Claim your page</button>
       </div>
       <div class="shortener-wrap">
-        <span class="claim-prefix hero-prefix" data-site-prefix>voidlinks/@</span>
+        <span class="claim-prefix hero-prefix" data-site-prefix>voidlinks/</span>
         <input type="url" id="hero-url-input" placeholder="Paste your long URL here..." data-i18n-ph="hero.ph" aria-label="Long URL" autocomplete="off">
         <button class="btn btn-primary" id="hero-go" onclick="heroGo()" data-i18n="hero.btn">Shorten →</button>
       </div>
@@ -2675,7 +2779,7 @@
         </ul>
         <form class="claim-box claim-left reveal" autocomplete="off">
           <label class="claim-field">
-            <span class="claim-prefix" data-site-prefix>voidlinks/@</span>
+            <span class="claim-prefix" data-site-prefix>voidlinks/</span>
             <input type="text" maxlength="20" placeholder="username" data-i18n-ph="cta.ph" aria-label="Username" spellcheck="false">
           </label>
           <button class="btn btn-primary btn-lg" type="submit" data-i18n="cta.btn">Claim now</button>
@@ -2706,98 +2810,47 @@
         <p class="section-sub reveal" data-i18n="an.sub">Stop guessing. See exactly who's clicking your links, from which country, on which device, and at what time — all updated live.</p>
         <div class="analytics-metrics reveal" style="margin-top:28px;">
           <div class="metric-row">
-            <div class="metric-icon" style="background:var(--accent-dim);color:var(--accent);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            </div>
-            <span class="metric-label" data-i18n="m.clicks">Total clicks today</span>
-            <span class="metric-val">27,104</span>
-            <span class="metric-change up">↑ 18%</span>
+            <div class="metric-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <span class="metric-label"><b>Clicks by day</b><small>Every open is counted the moment it happens</small></span>
           </div>
           <div class="metric-row">
-            <div class="metric-icon" style="background:var(--warm-dim);color:var(--warm);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            </div>
-            <span class="metric-label" data-i18n="m.country">Top country</span>
-            <span class="metric-val" data-i18n="m.us">United States</span>
-            <span class="metric-change up">42%</span>
+            <div class="metric-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+            <span class="metric-label"><b>Countries</b><small>Where your visitors are, from the network edge</small></span>
           </div>
           <div class="metric-row">
-            <div class="metric-icon" style="background:rgba(255,255,255,0.1);color:var(--purple);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-            </div>
-            <span class="metric-label" data-i18n="m.device">Top device</span>
-            <span class="metric-val" data-i18n="m.mobile">Mobile</span>
-            <span class="metric-change up">67%</span>
+            <div class="metric-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+            <span class="metric-label"><b>Devices</b><small>Phone, desktop or tablet</small></span>
           </div>
           <div class="metric-row">
-            <div class="metric-icon" style="background:rgba(255,255,255,0.1);color:var(--green);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <span class="metric-label" data-i18n="m.visitors">Unique visitors</span>
-            <span class="metric-val">19,832</span>
-            <span class="metric-change up">↑ 9%</span>
+            <div class="metric-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+            <span class="metric-label"><b>Sources</b><small>Which site or app sent them to you</small></span>
           </div>
         </div>
-        <p class="example-note reveal">Example numbers, to show what your dashboard looks like.</p>
       </div>
 
-      <div class="dashboard-mock reveal">
+      <div class="dashboard-mock reveal" aria-label="Preview of the analytics dashboard">
         <div class="dash-header">
-          <div class="dash-title-row"><span data-i18n="ch.title">Click volume, last 7 days</span> <span class="example-tag">Example</span></div>
-          <div class="dash-live"><div class="dot"></div> <span data-i18n="ch.live">Live</span></div>
+          <div class="dash-title-row">Your dashboard</div>
+          <span class="example-tag">Preview</span>
         </div>
         <div class="dash-body">
           <div class="mini-chart">
-            <div class="mini-chart-label" data-i18n="ch.daily">Daily clicks</div>
-            <div class="chart-bars" id="chart-bars">
-              <div class="chart-bar" style="height:45%;background:linear-gradient(to top,rgba(255,255,255,0.4),rgba(255,255,255,0.15));"></div>
-              <div class="chart-bar" style="height:65%;background:linear-gradient(to top,rgba(255,255,255,0.6),rgba(255,255,255,0.2));"></div>
-              <div class="chart-bar" style="height:40%;background:linear-gradient(to top,rgba(255,255,255,0.4),rgba(255,255,255,0.15));"></div>
-              <div class="chart-bar" style="height:80%;background:linear-gradient(to top,rgba(255,255,255,0.8),rgba(255,255,255,0.3));"></div>
-              <div class="chart-bar" style="height:55%;background:linear-gradient(to top,rgba(255,255,255,0.55),rgba(255,255,255,0.2));"></div>
-              <div class="chart-bar" style="height:90%;background:linear-gradient(to top,var(--accent),rgba(255,255,255,0.4));"></div>
-              <div class="chart-bar" style="height:70%;background:linear-gradient(to top,rgba(255,255,255,0.7),rgba(255,255,255,0.25));"></div>
-            </div>
-            <div class="chart-days">
-              <div class="chart-day">Mon</div>
-              <div class="chart-day">Tue</div>
-              <div class="chart-day">Wed</div>
-              <div class="chart-day">Thu</div>
-              <div class="chart-day">Fri</div>
-              <div class="chart-day">Sat</div>
-              <div class="chart-day">Sun</div>
+            <div class="mini-chart-label">Clicks, last 7 days</div>
+            <div class="chart-bars preview-bars" aria-hidden="true">
+              <div class="chart-bar" style="height:38%"></div><div class="chart-bar" style="height:56%"></div><div class="chart-bar" style="height:44%"></div>
+              <div class="chart-bar" style="height:72%"></div><div class="chart-bar" style="height:60%"></div><div class="chart-bar" style="height:86%"></div><div class="chart-bar" style="height:66%"></div>
             </div>
           </div>
           <div class="mini-chart">
-            <div class="mini-chart-label" data-i18n="ch.countries">Top countries</div>
-            <div class="country-list" id="country-list">
-              <div class="country-row">
-                <span class="country-flag">US</span>
-                <div class="country-bar-wrap"><div class="country-bar" style="width:0%" data-w="42%"></div></div>
-                <span class="country-pct">42%</span>
-              </div>
-              <div class="country-row">
-                <span class="country-flag">GB</span>
-                <div class="country-bar-wrap"><div class="country-bar" style="width:0%" data-w="18%"></div></div>
-                <span class="country-pct">18%</span>
-              </div>
-              <div class="country-row">
-                <span class="country-flag">IN</span>
-                <div class="country-bar-wrap"><div class="country-bar" style="width:0%" data-w="14%"></div></div>
-                <span class="country-pct">14%</span>
-              </div>
-              <div class="country-row">
-                <span class="country-flag">DE</span>
-                <div class="country-bar-wrap"><div class="country-bar" style="width:0%" data-w="9%"></div></div>
-                <span class="country-pct">9%</span>
-              </div>
-              <div class="country-row">
-                <span class="country-flag">JP</span>
-                <div class="country-bar-wrap"><div class="country-bar" style="width:0%" data-w="7%"></div></div>
-                <span class="country-pct">7%</span>
-              </div>
+            <div class="mini-chart-label">Where clicks come from</div>
+            <div class="country-list preview-list" id="country-list" aria-hidden="true">
+              <div class="country-row"><span class="skel"></span><div class="country-bar-wrap"><div class="country-bar" style="width:0%" data-w="78%"></div></div></div>
+              <div class="country-row"><span class="skel"></span><div class="country-bar-wrap"><div class="country-bar" style="width:0%" data-w="52%"></div></div></div>
+              <div class="country-row"><span class="skel"></span><div class="country-bar-wrap"><div class="country-bar" style="width:0%" data-w="34%"></div></div></div>
+              <div class="country-row"><span class="skel"></span><div class="country-bar-wrap"><div class="country-bar" style="width:0%" data-w="20%"></div></div></div>
             </div>
           </div>
+          <p class="preview-note">Your real numbers show up here once people open your links.</p>
         </div>
       </div>
     </div>
@@ -2813,7 +2866,7 @@
       <p class="reveal" data-i18n="cta.p">Pick a username and build your page in under a minute.</p>
       <form class="claim-box reveal" id="cta-claim" autocomplete="off">
         <label class="claim-field">
-          <span class="claim-prefix" data-site-prefix>voidlinks/@</span>
+          <span class="claim-prefix" data-site-prefix>voidlinks/</span>
           <input type="text" id="cta-username" maxlength="20" placeholder="username" data-i18n-ph="cta.ph" aria-label="Username" spellcheck="false">
         </label>
         <button class="btn btn-primary btn-lg" type="submit" data-i18n="cta.btn">Claim now</button>
@@ -2911,6 +2964,10 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
       Sign up with GitHub
     </a>
+    <a href="#" class="oauth-btn" onclick="oauthLogin('discord');return false;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.079.11 18.1.128 18.11a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      Sign up with Discord
+    </a>
     <div class="divider"><span>or</span></div>
     <form id="signup-form" novalidate onsubmit="emailSignup(event)">
       <div class="input-group">
@@ -2990,7 +3047,7 @@
         <div class="field">
           <label for="pb-username" data-i18n="b.username">Username</label>
           <div class="claim-field">
-            <span class="claim-prefix" data-site-prefix>voidlinks/@</span>
+            <span class="claim-prefix" data-site-prefix>voidlinks/</span>
             <input id="pb-username" type="text" maxlength="20" spellcheck="false" placeholder="you">
           </div>
           <p class="field-note" id="pb-username-note" aria-live="polite"></p>
@@ -3150,7 +3207,7 @@
   </div>
 </div>
 
-<!-- === PROFILE VIEW (yoursite/@username) === -->
+<!-- === PROFILE VIEW (yoursite/username) === -->
 <div id="profile-view" role="dialog" aria-modal="true" aria-label="Profile page">
   <div class="profile-bg" aria-hidden="true"></div>
   <div class="profile-dim" aria-hidden="true"></div>
@@ -3182,6 +3239,33 @@
   <button type="button" class="enter-splash" id="pv-enter" hidden><span data-i18n="p.enter">Click to enter</span></button>
   <div class="profile-card" id="pv-card"></div>
   <p class="profile-made" data-i18n="p.made">Made with Void Links</p>
+</div>
+
+<!-- === CHOOSE USERNAME (first sign-in) === -->
+<div class="modal-overlay" id="onboard-modal">
+  <div class="modal-box ob-box" role="dialog" aria-modal="true" aria-labelledby="ob-title">
+    <div class="modal-logo">
+      <div class="logo-icon"></div>
+      <span class="logo" style="font-size:1rem;">Void Links</span>
+    </div>
+    <h2 class="modal-title" id="ob-title">Choose your username</h2>
+    <p class="modal-sub">This is your address on Void Links. Pick something that's you, not your email. You can change it later.</p>
+    <form id="ob-form" novalidate>
+      <div class="input-group">
+        <label for="ob-user">Username</label>
+        <div class="claim-field"><span class="claim-prefix" id="ob-prefix">@</span><input id="ob-user" type="text" maxlength="20" autocomplete="off" spellcheck="false" placeholder="yourname"></div>
+        <p class="field-note" id="ob-note" aria-live="polite"></p>
+        <div class="ob-suggest" id="ob-suggest"></div>
+      </div>
+      <div class="input-group">
+        <label for="ob-name">Display name <span class="ob-opt">optional</span></label>
+        <input id="ob-name" type="text" maxlength="32" autocomplete="off" placeholder="How your name shows on your page">
+      </div>
+      <p class="acct-error" id="ob-error" aria-live="polite"></p>
+      <button type="submit" class="btn btn-primary ob-go">Claim username</button>
+      <button type="button" class="link-btn ob-later" id="ob-later">Do this later</button>
+    </form>
+  </div>
 </div>
 
 <!-- === MANAGE LINK === -->
@@ -3557,8 +3641,8 @@ document.querySelectorAll('.feature-card').forEach((card, i) => {
 });
 
 // ===== SITE ADDRESS IN THE UI =====
-// Input prefixes like "voidlinks.netlify.app/@" show the real address of the site
-document.querySelectorAll('[data-site-prefix]').forEach(el => { el.textContent = siteHost() + '/@'; });
+// Input prefixes like "voidlinks.netlify.app/" show the real address of the site
+document.querySelectorAll('[data-site-prefix]').forEach(el => { el.textContent = siteHost() + '/'; });
 
 // ===== HERO: SHORTEN A LINK / CLAIM A PAGE =====
 const tr = key => (window.i18n ? i18n.t(key) : key);
@@ -3718,6 +3802,8 @@ async function loadCurrentUser(session) {
     initials: initialsOf(name),
     avatar: (profile && profile.avatar_url) || '',
     provider: PROVIDER_NAMES[(u.app_metadata && u.app_metadata.provider) || 'email'] || 'Email',
+    // Handles from GitHub/Discord/Google, used only to suggest a username
+    hints: [meta.user_name, meta.preferred_username, meta.custom_claims && meta.custom_claims.global_name, meta.full_name || meta.name, (u.email || '').split('@')[0]].filter(Boolean),
   };
 }
 
@@ -3733,8 +3819,112 @@ async function finishLogin(session) {
   setAuthReason('');
   document.getElementById('login-form').reset();
   document.getElementById('signup-form').reset();
-  setTimeout(next || (() => openDashboard()), 200);
+  setTimeout(() => {
+    (next || (() => openDashboard()))();
+    if (!next) maybeOnboard();
+  }, 200);
 }
+
+// ===== CHOOSE A USERNAME (first sign-in) =====
+// Signing up with Google/GitHub/Discord gives us their real name. Instead of using
+// that, new accounts pick their own @username (and optional display name) first.
+// Their page is created right away so the name is reserved.
+const OB_RE = /^[a-z0-9_.-]{2,20}$/;
+const obClean = v => (v || '').toLowerCase().replace(/[^a-z0-9_.-]/g, '').slice(0, 20);
+const obSkipKey = () => 'lp-ob-later-' + (currentUser && currentUser.id);
+let obTimer = null;
+const obOwners = {};
+function maybeOnboard() {
+  if (!currentUser || !window.DB || !window.LP || LP.myPage()) return;
+  if (document.querySelector('.modal-overlay.active')) return;
+  try { if (sessionStorage.getItem(obSkipKey())) return; } catch (_) {}
+  openOnboard();
+}
+function openOnboard() {
+  const m = document.getElementById('onboard-modal');
+  document.getElementById('ob-prefix').textContent = siteHost() + '/';
+  document.getElementById('ob-user').value = '';
+  document.getElementById('ob-name').value = '';
+  document.getElementById('ob-error').textContent = '';
+  obNote('', '');
+  // Suggestions from the provider's handle, but nothing is filled in for them
+  const seen = new Set();
+  const tips = (currentUser.hints || []).map(h => obClean(String(h).replace(/\s+/g, ''))).filter(h => OB_RE.test(h) && !seen.has(h) && seen.add(h)).slice(0, 3);
+  document.getElementById('ob-suggest').innerHTML = tips.length
+    ? '<span>Ideas:</span>' + tips.map(t => `<button type="button" class="ob-chip" data-u="${esc(t)}">@${esc(t)}</button>`).join('')
+    : '';
+  m.classList.add('active');
+  setOverlay(true);
+  // Closing it any way counts as "later" for this visit
+  try { sessionStorage.setItem(obSkipKey(), '1'); } catch (_) {}
+  setTimeout(() => document.getElementById('ob-user').focus(), 60);
+}
+function obNote(text, tone) {
+  const n = document.getElementById('ob-note');
+  n.textContent = text;
+  n.className = 'field-note' + (tone ? ' ' + tone : '');
+}
+function obCheck() {
+  const input = document.getElementById('ob-user');
+  const u = obClean(input.value);
+  if (input.value !== u) input.value = u;
+  clearTimeout(obTimer);
+  if (!u) { obNote('', ''); return false; }
+  if (!OB_RE.test(u)) { obNote('Use 2 to 20 letters, numbers, dots, dashes or underscores.', 'bad'); return false; }
+  if (u in obOwners) {
+    const free = !obOwners[u] || obOwners[u] === currentUser.id;
+    obNote(free ? `@${u} is available` : `@${u} is taken. Try another.`, free ? 'good' : 'bad');
+    return free;
+  }
+  obNote('Checking…', '');
+  obTimer = setTimeout(async () => {
+    obOwners[u] = await DB.usernameOwner(u).catch(() => null);
+    if (obClean(input.value) === u) obCheck();
+  }, 350);
+  return null;
+}
+document.getElementById('ob-user').addEventListener('input', obCheck);
+document.getElementById('ob-suggest').addEventListener('click', e => {
+  const b = e.target.closest('[data-u]');
+  if (!b) return;
+  document.getElementById('ob-user').value = b.dataset.u;
+  obCheck();
+  document.getElementById('ob-name').focus();
+});
+document.getElementById('ob-later').addEventListener('click', () => closeModal('onboard-modal'));
+document.getElementById('ob-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = document.getElementById('ob-error');
+  err.textContent = '';
+  const u = obClean(document.getElementById('ob-user').value);
+  const name = document.getElementById('ob-name').value.trim().slice(0, 32);
+  if (!OB_RE.test(u)) { obCheck(); document.getElementById('ob-user').focus(); return; }
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = 'Claiming…';
+  try {
+    const owner = await DB.usernameOwner(u);
+    if (owner && owner !== currentUser.id) { obOwners[u] = owner; obCheck(); return; }
+    const shown = name || u;
+    await DB.savePage({
+      username: u, name: shown, bio: '', dim: 35, blur: 0, layout: 'buttons', sound: 'none', volume: 60,
+      spotify: '', discordId: '', nowPlaying: false, links: [],
+    }, null);
+    await DB.updateProfile({ display_name: shown }).catch(() => {});
+    currentUser = { ...currentUser, name: shown, initials: initialsOf(shown) };
+    if (window.LP) await LP.onAuthChange();
+    updateAuthUI();
+    closeModal('onboard-modal');
+    showToast(`Welcome to Void Links, @${u}`);
+    if (document.getElementById('dashboard-view').classList.contains('active')) showDashTab(currentTab);
+  } catch (e2) {
+    const msg = ((e2 && e2.message) || '') + ' ' + ((e2 && e2.code) || '');
+    err.textContent = /23505|duplicate/.test(msg) ? 'That username was just taken. Try another.' : "Couldn't save. Check your connection and try again.";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Claim username';
+  }
+});
 
 function authBusy(form, busy, label) {
   const btn = form.querySelector('button[type="submit"]');
@@ -3891,7 +4081,7 @@ function updateAuthUI() {
     fillAvatar(document.getElementById('dash-avatar'));
     document.getElementById('dash-user-name').textContent = currentUser.name;
     const page = window.LP && LP.myPage();
-    document.getElementById('dash-user-handle').textContent = page ? siteHost() + '/@' + page.username : (currentUser.email || 'Account');
+    document.getElementById('dash-user-handle').textContent = page ? siteHost() + '/' + page.username : (currentUser.email || 'Account');
   } else {
     btnLogin.style.display = '';
     btnSignup.style.display = '';
@@ -3915,7 +4105,7 @@ if (window.DB) {
     if (event !== 'INITIAL_SESSION' && id === (currentUser && currentUser.id)) return;
     await loadCurrentUser(session);
     updateAuthUI();
-    if (window.LP) LP.onAuthChange();
+    if (window.LP) LP.onAuthChange().then(maybeOnboard);
   });
 }
 updateAuthUI();
@@ -4022,7 +4212,7 @@ function pageCard() {
     </div>`;
   }
   return `<div class="page-card">
-    <div class="page-card-info"><strong>${esc(DB.shortHost() + '@' + page.username)}</strong><span>${fmt(page.views)} ${page.views === 1 ? 'view' : 'views'} · ${(page.links || []).length} links</span></div>
+    <div class="page-card-info"><strong>${esc(DB.shortHost() + page.username)}</strong><span>${fmt(page.views)} ${page.views === 1 ? 'view' : 'views'} · ${(page.links || []).length} links</span></div>
     <div class="page-card-actions">
       <button class="btn btn-ghost" onclick="LP.copyLink('${page.username}')">Copy link</button>
       <button class="btn btn-ghost" onclick="showDashTab('page')">Edit</button>
@@ -4049,7 +4239,7 @@ const dashPages = {
     <div class="kpi-grid">
       ${kpi('Clicks, last 7 days', fmt(last7), delta === null ? (last7 ? 'Your first week of data' : 'No clicks yet') : `${delta >= 0 ? '↑' : '↓'} ${Math.abs(delta)}% vs the week before`, delta === null ? '' : (delta >= 0 ? 'pos' : 'neg'))}
       ${kpi('Short links', fmt(dash.links.length), dash.links.length ? `${fmt(dash.links.reduce((a, l) => a + Number(l.clicks || 0), 0))} clicks all time` : 'Create your first one')}
-      ${kpi('Page views', page ? fmt(page.views) : '—', page ? DB.shortHost() + '@' + page.username : 'No page yet')}
+      ${kpi('Page views', page ? fmt(page.views) : '—', page ? DB.shortHost() + page.username : 'No page yet')}
       ${kpi('Top link, 30 days', top ? fmt(top[1]) : '—', top ? DB.shortHost() + top[0] : 'No clicks yet')}
     </div>
     <div class="dash-row">
@@ -4158,8 +4348,8 @@ const dashPages = {
       ${items.map(i => `
       <div class="dash-panel qr-card">
         <span class="qr-kind">${i.kind}</span>
-        <div class="qr-box"><canvas data-qr="${i.slug}" width="232" height="232" role="img" aria-label="QR code for ${esc(DB.shortHost() + i.slug)}"></canvas></div>
-        <div class="qr-url">${esc(DB.shortHost() + i.slug)}</div>
+        <div class="qr-box"><canvas data-qr="${i.slug}" width="232" height="232" role="img" aria-label="QR code for ${esc(DB.shortHost() + i.slug.replace(/^@/, ''))}"></canvas></div>
+        <div class="qr-url">${esc(DB.shortHost() + i.slug.replace(/^@/, ''))}</div>
         <div class="qr-meta">${i.meta}</div>
         <div class="qr-actions">
           <button class="btn btn-primary" onclick="qrDownload('${i.slug}')" title="Download PNG">Download</button>
@@ -4414,7 +4604,8 @@ async function qrShare(slug) {
   try {
     const file = new File([await qrBlob(slug)], `qr-${slug.replace('@', 'page-')}.png`, { type: 'image/png' });
     const withFile = navigator.canShare && navigator.canShare({ files: [file] });
-    await navigator.share(withFile ? { title: DB.shortHost() + slug, text: url, url, files: [file] } : { title: DB.shortHost() + slug, url });
+    const title = DB.shortHost() + slug.replace(/^@/, '');
+    await navigator.share(withFile ? { title, text: url, url, files: [file] } : { title, url });
   } catch (e) {
     if (e && e.name !== 'AbortError') qrCopy(slug);
   }
@@ -4510,11 +4701,11 @@ function advancedOptionsHtml(prefix, l) {
         </div>
         <div class="input-group">
           <label for="${prefix}-start">Opens at</label>
-          <input id="${prefix}-start" type="datetime-local" value="${editing ? toLocalInput(l.starts_at) : ''}">
+          ${dtpHtml(prefix + '-start', editing ? toLocalInput(l.starts_at) : '', { placeholder: 'Right away' })}
         </div>
         <div class="input-group">
           <label for="${prefix}-end">Stops working at</label>
-          <input id="${prefix}-end" type="datetime-local" value="${editing ? toLocalInput(l.expires_at) : ''}">
+          ${dtpHtml(prefix + '-end', editing ? toLocalInput(l.expires_at) : '', { after: prefix + '-start', placeholder: 'Never' })}
         </div>
         <div class="input-group">
           <label for="${prefix}-max">Number of uses</label>
@@ -4539,6 +4730,8 @@ function readLinkOptions(prefix, l) {
   if (end && isNaN(new Date(end))) return { error: 'Check the end time.' };
   if (start && end && new Date(end) <= new Date(start)) return { error: 'The end time must be after the opening time.' };
   const changedEnd = !l || toLocalInput(l.expires_at) !== end;
+  const changedStart = !l || toLocalInput(l.starts_at) !== start;
+  if (start && changedStart && new Date(start) <= Date.now()) return { error: 'The opening time is already in the past. Pick a future time, or leave it empty to open right away.' };
   if (end && changedEnd && new Date(end) <= Date.now()) return { error: 'The end time is already in the past.' };
   if (max && !(/^\d+$/.test(max) && +max >= 1 && +max <= 1e9)) return { error: 'Number of uses must be a whole number of 1 or more.' };
   if (l && max && +max <= l.clicks) return { error: `This link already has ${fmt(l.clicks)} uses. Pick a higher number, or leave it empty.` };
@@ -4569,6 +4762,196 @@ document.addEventListener('click', e => {
   eye.textContent = show ? 'Hide' : 'Show';
   eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
 });
+
+// ----- Date & time picker (replaces the browser's datetime field) -----
+// Markup: dtpHtml(id, value) → a button plus a hidden <input id> holding "YYYY-MM-DDTHH:MM"
+// (local time), so the rest of the code reads it like a datetime-local field.
+// Past times can't be picked; an end picker can't go before its start picker.
+const DTP_MONTHS = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleString(undefined, { month: 'long' }));
+const DTP_DAYS = Array.from({ length: 7 }, (_, i) => new Date(2023, 0, 1 + i).toLocaleString(undefined, { weekday: 'short' }).slice(0, 2));
+const pad2 = n => String(n).padStart(2, '0');
+const dtpToValue = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+const dtpLabel = v => (v ? new Date(v).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '');
+const CAL_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
+function dtpHtml(id, value, opts = {}) {
+  return `<div class="dtp" data-dtp="${id}"${opts.after ? ` data-after="${opts.after}"` : ''}>
+    <input type="hidden" id="${id}" value="${esc(value || '')}">
+    <button type="button" class="dtp-btn${value ? ' has-value' : ''}" aria-haspopup="dialog">
+      ${CAL_ICON}<span class="dtp-text">${esc(value ? dtpLabel(value) : (opts.placeholder || 'Not set'))}</span>
+    </button>
+    <button type="button" class="dtp-clear" aria-label="Clear"${value ? '' : ' hidden'}>×</button>
+  </div>`;
+}
+function dtpSet(id, value) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  input.value = value || '';
+  const box = input.closest('.dtp');
+  const btn = box.querySelector('.dtp-btn');
+  btn.classList.toggle('has-value', !!value);
+  btn.querySelector('.dtp-text').textContent = value ? dtpLabel(value) : 'Not set';
+  box.querySelector('.dtp-clear').hidden = !value;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+let dtpPop = null, dtpState = null;
+function dtpMin(box) {
+  // Never in the past (a minute of slack), and an end time comes after its start
+  let min = new Date(Date.now() + 60000);
+  const after = box.dataset.after && document.getElementById(box.dataset.after);
+  if (after && after.value) {
+    const a = new Date(new Date(after.value).getTime() + 60000);
+    if (a > min) min = a;
+  }
+  return min;
+}
+function dtpOpen(box) {
+  dtpClose();
+  const input = box.querySelector('input');
+  const min = dtpMin(box);
+  let sel = input.value ? new Date(input.value) : null;
+  if (!sel) {
+    sel = new Date(min.getTime() + 3600000);   // default: an hour from now, on the next 5 minutes
+    sel.setMinutes(Math.ceil(sel.getMinutes() / 5) * 5, 0, 0);
+  }
+  dtpState = { box, min, sel, view: new Date(sel.getFullYear(), sel.getMonth(), 1) };
+  dtpPop = document.createElement('div');
+  dtpPop.className = 'dtp-pop';
+  dtpPop.setAttribute('role', 'dialog');
+  dtpPop.setAttribute('aria-label', 'Pick a date and time');
+  document.body.appendChild(dtpPop);
+  dtpRender();
+  dtpPlace();
+  box.querySelector('.dtp-btn').setAttribute('aria-expanded', 'true');
+  setTimeout(() => (dtpPop.querySelector('.dtp-day.sel') || dtpPop.querySelector('.dtp-day:not(:disabled)'))?.focus(), 30);
+}
+function dtpClose() {
+  if (!dtpPop) return;
+  dtpState.box.querySelector('.dtp-btn').setAttribute('aria-expanded', 'false');
+  dtpPop.remove();
+  dtpPop = null;
+  dtpState = null;
+}
+function dtpPlace() {
+  if (!dtpPop) return;
+  const r = dtpState.box.getBoundingClientRect();
+  const w = dtpPop.offsetWidth, h = dtpPop.offsetHeight;
+  let left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+  let top = r.bottom + 8;
+  if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 8);
+  dtpPop.style.left = left + 'px';
+  dtpPop.style.top = top + 'px';
+}
+function dtpRender() {
+  const { min, sel, view } = dtpState;
+  const y = view.getFullYear(), m = view.getMonth();
+  const first = new Date(y, m, 1).getDay();
+  const days = new Date(y, m + 1, 0).getDate();
+  const minDay = new Date(min.getFullYear(), min.getMonth(), min.getDate());
+  const prevOk = new Date(y, m, 0) >= minDay;   // last day of the previous month is still allowed
+  let cells = '';
+  for (let i = 0; i < first; i++) cells += '<span></span>';
+  for (let d = 1; d <= days; d++) {
+    const date = new Date(y, m, d);
+    const past = date < minDay;
+    const isSel = sel && date.toDateString() === sel.toDateString();
+    const today = date.toDateString() === new Date().toDateString();
+    cells += `<button type="button" class="dtp-day${isSel ? ' sel' : ''}${today ? ' today' : ''}" data-d="${d}"${past ? ' disabled' : ''}>${d}</button>`;
+  }
+  const h24 = sel.getHours(), h12 = h24 % 12 || 12, pm = h24 >= 12, mins = sel.getMinutes();
+  const minuteOpts = [...new Set([...Array.from({ length: 12 }, (_, i) => i * 5), mins])].sort((a, b) => a - b);
+  const tooEarly = sel < min;
+  dtpPop.innerHTML = `
+    <div class="dtp-head">
+      <button type="button" class="dtp-nav" data-nav="-1" aria-label="Previous month"${prevOk ? '' : ' disabled'}>‹</button>
+      <strong>${esc(DTP_MONTHS[m])} ${y}</strong>
+      <button type="button" class="dtp-nav" data-nav="1" aria-label="Next month">›</button>
+    </div>
+    <div class="dtp-grid">${DTP_DAYS.map(d => `<span class="dtp-dow">${esc(d)}</span>`).join('')}${cells}</div>
+    <div class="dtp-time">
+      <span>Time</span>
+      <select class="dtp-h" aria-label="Hour">${Array.from({ length: 12 }, (_, i) => i + 1).map(h => `<option${h === h12 ? ' selected' : ''}>${h}</option>`).join('')}</select>
+      <b>:</b>
+      <select class="dtp-m" aria-label="Minute">${minuteOpts.map(x => `<option value="${x}"${x === mins ? ' selected' : ''}>${pad2(x)}</option>`).join('')}</select>
+      <div class="dtp-ampm" role="group" aria-label="AM or PM">
+        <button type="button" data-ap="am" aria-pressed="${!pm}">AM</button><button type="button" data-ap="pm" aria-pressed="${pm}">PM</button>
+      </div>
+    </div>
+    <div class="dtp-quick">
+      <button type="button" data-q="1h">In 1 hour</button>
+      <button type="button" data-q="tonight">Tonight 9 PM</button>
+      <button type="button" data-q="tomorrow">Tomorrow 9 AM</button>
+      <button type="button" data-q="week">In 1 week</button>
+    </div>
+    <p class="dtp-msg" aria-live="polite">${tooEarly ? 'Pick a time after ' + esc(dtpLabel(dtpToValue(min))) : esc(dtpLabel(dtpToValue(sel)))}</p>
+    <div class="dtp-foot">
+      <button type="button" class="btn btn-ghost" data-act-dtp="cancel">Cancel</button>
+      <button type="button" class="btn btn-primary" data-act-dtp="done"${tooEarly ? ' disabled' : ''}>Set time</button>
+    </div>`;
+}
+function dtpSetTime() {
+  const h = +dtpPop.querySelector('.dtp-h').value;
+  const mi = +dtpPop.querySelector('.dtp-m').value;
+  const pm = dtpPop.querySelector('[data-ap="pm"]').getAttribute('aria-pressed') === 'true';
+  dtpState.sel.setHours((h % 12) + (pm ? 12 : 0), mi, 0, 0);
+}
+document.addEventListener('click', e => {
+  const clear = e.target.closest('.dtp-clear');
+  if (clear) { dtpSet(clear.closest('.dtp').dataset.dtp, ''); return; }
+  const btn = e.target.closest('.dtp-btn');
+  if (btn) { const box = btn.closest('.dtp'); if (dtpState && dtpState.box === box) dtpClose(); else dtpOpen(box); return; }
+  if (!dtpPop) return;
+  if (!dtpPop.contains(e.target)) { dtpClose(); return; }
+  const s = dtpState;
+  const nav = e.target.closest('[data-nav]');
+  if (nav) { s.view = new Date(s.view.getFullYear(), s.view.getMonth() + +nav.dataset.nav, 1); dtpRender(); return; }
+  const day = e.target.closest('.dtp-day');
+  if (day) {
+    s.sel = new Date(s.view.getFullYear(), s.view.getMonth(), +day.dataset.d, s.sel.getHours(), s.sel.getMinutes());
+    if (s.sel < s.min && s.sel.toDateString() === s.min.toDateString()) {
+      s.sel = new Date(s.min); s.sel.setMinutes(Math.ceil(s.sel.getMinutes() / 5) * 5, 0, 0);
+    }
+    dtpRender();
+    return;
+  }
+  const ap = e.target.closest('[data-ap]');
+  if (ap) {
+    dtpPop.querySelectorAll('[data-ap]').forEach(b => b.setAttribute('aria-pressed', b === ap));
+    dtpSetTime(); dtpRender(); return;
+  }
+  const q = e.target.closest('[data-q]');
+  if (q) {
+    const d = new Date();
+    if (q.dataset.q === '1h') { d.setTime(d.getTime() + 3600000); d.setMinutes(Math.ceil(d.getMinutes() / 5) * 5, 0, 0); }
+    if (q.dataset.q === 'tonight') { d.setHours(21, 0, 0, 0); if (d < s.min) d.setDate(d.getDate() + 1); }
+    if (q.dataset.q === 'tomorrow') { d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0); }
+    if (q.dataset.q === 'week') { d.setDate(d.getDate() + 7); d.setSeconds(0, 0); }
+    if (d < s.min) d.setTime(s.min.getTime());
+    s.sel = d;
+    s.view = new Date(d.getFullYear(), d.getMonth(), 1);
+    dtpRender();
+    return;
+  }
+  const act = e.target.closest('[data-act-dtp]');
+  if (act) {
+    if (act.dataset.actDtp === 'done') {
+      dtpSetTime();
+      if (s.sel < s.min) { dtpRender(); return; }
+      const id = s.box.dataset.dtp;
+      const value = dtpToValue(s.sel);
+      dtpClose();
+      dtpSet(id, value);
+    } else dtpClose();
+  }
+});
+document.addEventListener('change', e => {
+  if (dtpPop && e.target.closest('.dtp-time select')) { dtpSetTime(); dtpRender(); }
+});
+window.addEventListener('keydown', e => {
+  if (dtpPop && e.key === 'Escape') { e.stopImmediatePropagation(); const b = dtpState.box.querySelector('.dtp-btn'); dtpClose(); b.focus(); }
+}, true);
+window.addEventListener('resize', dtpPlace);
+document.addEventListener('scroll', dtpPlace, true);
 
 // ----- Manage panel -----
 let managing = null;
