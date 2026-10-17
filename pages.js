@@ -754,6 +754,7 @@
     pick.addEventListener('click', e => { e.stopPropagation(); openMenu && openMenu.parentElement === row ? closeIconMenu() : showIconMenu(row); });
     const file = el('input', 'icon-file');
     Object.assign(file, { type: 'file', accept: 'image/*', hidden: true });
+    file.setAttribute('aria-label', 'Upload a custom icon for this link');
     file.addEventListener('change', () => {
       const f = file.files[0];
       if (!f || !f.type.startsWith('image/')) return;

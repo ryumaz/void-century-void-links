@@ -201,6 +201,8 @@
     if (e.key === 'Escape') { openPanel(false); launch.focus(); e.stopPropagation(); }
   });
 
+  // Other parts of the site can open the chat, e.g. the footer's "Support" link
+  window.HelpBot = { open(m) { if (m) setMode(m); openPanel(true); } };
   function setMode(m) {
     mode = m;
     root.querySelectorAll('.hb-modes button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));

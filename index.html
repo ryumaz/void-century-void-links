@@ -2619,6 +2619,30 @@
       .dash-hint { right: -40px; width: 230px; }
       .dash-hint::before { right: 112px; }
     }
+
+    /* Compact language picker in the top bar (inside the ☰ menu on phones) */
+    .nav-links { align-items: center; }
+    .lang-compact .lang-btn { padding: 6px 10px; gap: 7px; font-size: 0.82rem; font-weight: 600; border-radius: 9px; }
+    .lang-compact .lang-chev { margin-left: 0; transform: none; }
+    .lang-compact.open .lang-chev { transform: rotate(180deg); }
+    .lang-compact .lang-list { top: calc(100% + 10px); bottom: auto; left: auto; right: 0; transform: translateY(-6px); z-index: 130; }
+    .lang-compact.open .lang-list { transform: none; }
+    @media (max-width: 900px) {
+      #nav.menu-open .lang-compact { padding: 8px 14px; }
+      #nav.menu-open .lang-compact .lang-list { left: 0; right: auto; }
+    }
+
+    /* Beta tag next to the wordmark */
+    .logo > .beta-tag {
+      font-style: normal; font-family: 'Inter', sans-serif; font-size: 0.58rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 3px 7px; border-radius: 999px; margin-left: -2px;
+      color: #000; background: rgba(255,255,255,0.85); align-self: center;
+    }
+    @media (max-width: 380px) { #nav .logo > .beta-tag { display: none; } }
+
+    /* Phones: each half of the headline on one line */
+    @media (max-width: 520px) { .hero-title { font-size: clamp(1.8rem, 9vw, 2.6rem); letter-spacing: -0.03em; } }
   </style>
   <link rel="stylesheet" href="helpbot.css">
 </head>
@@ -2637,13 +2661,22 @@
             <ellipse cx="8" cy="8" rx="6.6" ry="2.5" fill="none" stroke="#000" stroke-width="1.6" transform="rotate(-24 8 8)"/><circle cx="8" cy="8" r="2.4" fill="#000"/>
           </svg>
         </div>
-        <span>Void Links</span>
+        <span>Void Links</span><em class="beta-tag" title="Void Links is in beta: features may still change">Beta</em>
       </a>
       <nav class="nav-links">
         <a href="#features" data-i18n="nav.features">Features</a>
         <a href="#pages" data-i18n="nav.pages">Pages</a>
         <a href="#analytics" data-i18n="nav.analytics">Analytics</a>
         <a href="#how" data-i18n="nav.how">How it works</a>
+        <div class="lang-picker lang-compact" title="Language">
+          <ul class="lang-list" role="listbox" aria-label="Language"></ul>
+          <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Change language">
+            <img width="20" height="14" alt="">
+            <span class="lang-code">EN</span>
+            <span class="lang-name sr-only">English</span><span class="lang-region sr-only"></span>
+            <svg class="lang-chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 15 12 9 18 15"/></svg>
+          </button>
+        </div>
       </nav>
       <div class="nav-auth">
         <button type="button" id="btn-dash" class="btn btn-primary" onclick="openDashboard()" style="display:none">
@@ -2672,8 +2705,8 @@
 <!-- === HERO === -->
 <section id="hero">
   <div class="container" style="position:relative;z-index:2;">
-    <h1 class="hero-title" data-i18n-html="hero.title">Short links.<br><span class="word-dim">Real data.</span></h1>
-    <p class="hero-sub" data-i18n="hero.sub">Branded short links, profile pages and live click analytics, in one quiet dashboard.</p>
+    <h1 class="hero-title" data-i18n-html="hero.title">Share smarter.<br><span class="word-dim">See every click.</span></h1>
+    <p class="hero-sub" data-i18n="hero.sub">For creators, students and small teams: short links you can lock, schedule and track, plus one page for all your links.</p>
 
     <div class="hero-shortener" data-mode="shorten">
       <div class="hero-modes" role="tablist" aria-label="What do you want to do?">
@@ -2961,6 +2994,9 @@
         <a href="#pages" data-i18n="nav.pages">Pages</a>
         <a href="#analytics" data-i18n="nav.analytics">Analytics</a>
         <a href="#" onclick="openLogin();return false;" data-i18n="nav.login">Log in</a>
+        <a href="privacy.html" data-i18n="f.privacy">Privacy</a>
+        <a href="terms.html" data-i18n="f.terms">Terms</a>
+        <a href="#" onclick="window.HelpBot ? HelpBot.open('human') : null; return false;" data-i18n="f.support">Support</a>
       </nav>
       <a href="#hero" class="footer-up" data-i18n="f.up">Back to the void ↑</a>
     </div>
@@ -2974,7 +3010,7 @@
           <svg class="lang-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
         </button>
       </div>
-      <p class="made-with"><span data-i18n="f.tag">Short links with long memories.</span> © 2026 Void Century</p>
+      <p class="made-with"><span data-i18n="f.tag">Short links with long memories.</span> © 2026 Void Century · <span data-i18n="f.beta">In beta: features may still change.</span></p>
     </div>
   </div>
 </footer>
@@ -3361,7 +3397,7 @@
   <aside class="dash-sidebar">
     <a href="#" class="logo" onclick="closeDashboard();return false;">
       <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="8" rx="6.6" ry="2.5" fill="none" stroke="#000" stroke-width="1.6" transform="rotate(-24 8 8)"/><circle cx="8" cy="8" r="2.4" fill="#000"/></svg></div>
-      <span>Void Links</span>
+      <span>Void Links</span><em class="beta-tag" title="Void Links is in beta: features may still change">Beta</em>
     </a>
     <nav class="dash-nav">
       <a class="dash-nav-item active" href="#" onclick="showDashTab('overview');return false;">
@@ -3606,14 +3642,26 @@ const sectionObs = new IntersectionObserver(entries => {
     if (!window.getSelection().toString()) input.focus({ preventScroll: true });
   });
   // Hint chips under the terminal run their command (delegated: the hint is re-rendered on language change)
-  document.querySelector('.term-hint').addEventListener('click', e => {
-    const k = e.target.closest('kbd');
-    if (!k) return;
+  const hintEl = document.querySelector('.term-hint');
+  const runChip = k => {
     userTookOver = true;
     echo(k.textContent);
     run(k.textContent);
     input.focus({ preventScroll: true });
+  };
+  hintEl.addEventListener('click', e => { const k = e.target.closest('kbd'); if (k) runChip(k); });
+  // Keyboard users: the chips are buttons too (re-marked whenever the language changes)
+  hintEl.addEventListener('keydown', e => {
+    const k = e.target.closest('kbd');
+    if (k && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); runChip(k); }
   });
+  const markChips = () => hintEl.querySelectorAll('kbd:not([tabindex])').forEach(k => {
+    k.tabIndex = 0;
+    k.setAttribute('role', 'button');
+    k.setAttribute('aria-label', 'Run the command ' + k.textContent + ' in the terminal');
+  });
+  markChips();
+  new MutationObserver(markChips).observe(hintEl, { childList: true });
 
   // ---- Starfield inside the terminal ----
   const cv = term.querySelector('.term-stars');
@@ -4546,7 +4594,7 @@ const dashPages = {
         </div>
       </div>
       <div style="display:flex;gap:8px;">
-        <input type="text" id="ai-input" placeholder="Ask me anything about your links..." style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-size:0.9rem;outline:none;" onkeydown="if(event.key==='Enter')askAI(this.value)">
+        <input type="text" id="ai-input" aria-label="Ask the AI assistant about your links" placeholder="Ask me anything about your links..." style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-size:0.9rem;outline:none;" onkeydown="if(event.key==='Enter')askAI(this.value)">
         <button class="btn btn-primary" onclick="askAI(document.getElementById('ai-input').value)">Ask →</button>
       </div>
     </div>

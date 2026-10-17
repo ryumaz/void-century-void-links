@@ -20,11 +20,11 @@
   const T = {
     en: {
       'nav.features': 'Features', 'nav.pages': 'Pages', 'nav.analytics': 'Analytics', 'nav.how': 'How it works',
-      'nav.login': 'Log in', 'nav.signup': 'Sign up', 'nav.dashboard': 'Dashboard',
-      'hero.title': 'Short links.<br><span class="word-dim">Real data.</span>',
-      'hero.sub': 'Branded short links, profile pages and live click analytics, in one quiet dashboard.',
+      'nav.login': 'Log in', 'nav.signup': 'Sign up', 'nav.dashboard': 'Dashboard', 'f.privacy': 'Privacy', 'f.terms': 'Terms', 'f.support': 'Support', 'f.beta': 'In beta: features may still change.',
+      'hero.title': 'Share smarter.<br><span class="word-dim">See every click.</span>',
+      'hero.sub': 'For creators, students and small teams: short links you can lock, schedule and track, plus one page for all your links.',
       'hero.ph': 'Paste your long URL here...', 'hero.btn': 'Shorten →', 'hero.copy': 'Copy',
-      'hero.points': `Custom slugs${S}Profile pages${S}Live analytics`, 'hero.scroll': 'Scroll',
+      'hero.points': `Lock or schedule links${S}Your own page${S}Live click stats`, 'hero.scroll': 'Scroll',
       'how.eyebrow': 'How it works', 'how.title': 'From URL to insight<br>in seconds',
       'how.s1t': 'Paste your long URL', 'how.s1p': 'Drop in any link, from Google Docs to YouTube videos. No signup needed to try it.',
       'how.s2t': 'Get your custom short link', 'how.s2p': 'We give you a clean link like <code>{site}/launch</code> you can share anywhere.',
@@ -62,11 +62,11 @@
     },
     es: {
       'nav.features': 'Funciones', 'nav.pages': 'Páginas', 'nav.analytics': 'Analíticas', 'nav.how': 'Cómo funciona',
-      'nav.login': 'Entrar', 'nav.signup': 'Registrarse', 'nav.dashboard': 'Panel',
-      'hero.title': 'Enlaces cortos.<br><span class="word-dim">Datos reales.</span>',
-      'hero.sub': 'Enlaces cortos con tu marca, páginas de perfil y analíticas de clics en vivo, en un panel tranquilo.',
+      'nav.login': 'Entrar', 'nav.signup': 'Registrarse', 'nav.dashboard': 'Panel', 'f.privacy': 'Privacidad', 'f.terms': 'Términos', 'f.support': 'Soporte', 'f.beta': 'En beta: las funciones aún pueden cambiar.',
+      'hero.title': 'Comparte mejor.<br><span class="word-dim">Mide cada clic.</span>',
+      'hero.sub': 'Para creadores, estudiantes y equipos pequeños: enlaces cortos que puedes proteger, programar y medir, y una página para todos tus enlaces.',
       'hero.ph': 'Pega aquí tu URL larga...', 'hero.btn': 'Acortar →', 'hero.copy': 'Copiar',
-      'hero.points': `Slugs personalizados${S}Páginas de perfil${S}Analíticas en vivo`, 'hero.scroll': 'Desliza',
+      'hero.points': `Protege o programa enlaces${S}Tu propia página${S}Clics en vivo`, 'hero.scroll': 'Desliza',
       'how.eyebrow': 'Cómo funciona', 'how.title': 'De la URL al dato<br>en segundos',
       'how.s1t': 'Pega tu URL larga', 'how.s1p': 'Cualquier enlace, de Google Docs a YouTube. No hace falta registrarse para probarlo.',
       'how.s2t': 'Obtén tu enlace corto', 'how.s2p': 'Te damos un enlace limpio como <code>{site}/launch</code> para compartir donde quieras.',
@@ -104,11 +104,11 @@
     },
     pt: {
       'nav.features': 'Recursos', 'nav.pages': 'Páginas', 'nav.analytics': 'Análises', 'nav.how': 'Como funciona',
-      'nav.login': 'Entrar', 'nav.signup': 'Criar conta', 'nav.dashboard': 'Painel',
-      'hero.title': 'Links curtos.<br><span class="word-dim">Dados reais.</span>',
-      'hero.sub': 'Links curtos com sua marca, páginas de perfil e análise de cliques ao vivo, em um painel tranquilo.',
+      'nav.login': 'Entrar', 'nav.signup': 'Criar conta', 'nav.dashboard': 'Painel', 'f.privacy': 'Privacidade', 'f.terms': 'Termos', 'f.support': 'Suporte', 'f.beta': 'Em beta: os recursos ainda podem mudar.',
+      'hero.title': 'Compartilhe melhor.<br><span class="word-dim">Veja cada clique.</span>',
+      'hero.sub': 'Para criadores, estudantes e pequenas equipes: links curtos que você pode proteger, agendar e acompanhar, e uma página para todos os seus links.',
       'hero.ph': 'Cole sua URL longa aqui...', 'hero.btn': 'Encurtar →', 'hero.copy': 'Copiar',
-      'hero.points': `Slugs personalizados${S}Páginas de perfil${S}Análise ao vivo`, 'hero.scroll': 'Role',
+      'hero.points': `Proteja ou agende links${S}Sua própria página${S}Cliques ao vivo`, 'hero.scroll': 'Role',
       'how.eyebrow': 'Como funciona', 'how.title': 'Da URL ao insight<br>em segundos',
       'how.s1t': 'Cole sua URL longa', 'how.s1p': 'Qualquer link, do Google Docs ao YouTube. Não precisa de conta para testar.',
       'how.s2t': 'Receba seu link curto', 'how.s2p': 'Você ganha um link limpo como <code>{site}/launch</code> para compartilhar onde quiser.',
@@ -146,11 +146,11 @@
     },
     fr: {
       'nav.features': 'Fonctions', 'nav.pages': 'Pages', 'nav.analytics': 'Statistiques', 'nav.how': 'Fonctionnement',
-      'nav.login': 'Connexion', 'nav.signup': "S'inscrire", 'nav.dashboard': 'Tableau de bord',
-      'hero.title': 'Liens courts.<br><span class="word-dim">Vraies données.</span>',
-      'hero.sub': 'Liens courts à votre marque, pages de profil et statistiques de clics en direct, dans un tableau de bord calme.',
+      'nav.login': 'Connexion', 'nav.signup': "S'inscrire", 'nav.dashboard': 'Tableau de bord', 'f.privacy': 'Confidentialité', 'f.terms': 'Conditions', 'f.support': 'Assistance', 'f.beta': 'En bêta : les fonctionnalités peuvent encore changer.',
+      'hero.title': 'Partagez mieux.<br><span class="word-dim">Voyez chaque clic.</span>',
+      'hero.sub': 'Pour les créateurs, étudiants et petites équipes : des liens courts à protéger, programmer et suivre, et une page pour tous vos liens.',
       'hero.ph': 'Collez votre longue URL ici...', 'hero.btn': 'Raccourcir →', 'hero.copy': 'Copier',
-      'hero.points': `Slugs personnalisés${S}Pages de profil${S}Stats en direct`, 'hero.scroll': 'Défiler',
+      'hero.points': `Protégez ou programmez vos liens${S}Votre propre page${S}Clics en direct`, 'hero.scroll': 'Défiler',
       'how.eyebrow': 'Fonctionnement', 'how.title': "De l'URL à l'analyse<br>en secondes",
       'how.s1t': 'Collez votre longue URL', 'how.s1p': "N'importe quel lien, de Google Docs à YouTube. Pas besoin de compte pour essayer.",
       'how.s2t': 'Obtenez votre lien court', 'how.s2p': 'Un lien propre comme <code>{site}/launch</code>, à partager partout.',
@@ -188,11 +188,11 @@
     },
     de: {
       'nav.features': 'Funktionen', 'nav.pages': 'Seiten', 'nav.analytics': 'Statistiken', 'nav.how': "So geht's",
-      'nav.login': 'Anmelden', 'nav.signup': 'Registrieren', 'nav.dashboard': 'Dashboard',
-      'hero.title': 'Kurze Links.<br><span class="word-dim">Echte Daten.</span>',
-      'hero.sub': 'Eigene Kurzlinks, Profilseiten und Live-Klickstatistiken in einem ruhigen Dashboard.',
+      'nav.login': 'Anmelden', 'nav.signup': 'Registrieren', 'nav.dashboard': 'Dashboard', 'f.privacy': 'Datenschutz', 'f.terms': 'Nutzungsbedingungen', 'f.support': 'Support', 'f.beta': 'Beta: Funktionen können sich noch ändern.',
+      'hero.title': 'Besser teilen.<br><span class="word-dim">Jeden Klick sehen.</span>',
+      'hero.sub': 'Für Creator, Studierende und kleine Teams: Kurzlinks, die du schützen, planen und auswerten kannst, und eine Seite für all deine Links.',
       'hero.ph': 'Lange URL hier einfügen...', 'hero.btn': 'Kürzen →', 'hero.copy': 'Kopieren',
-      'hero.points': `Eigene Slugs${S}Profilseiten${S}Live-Statistiken`, 'hero.scroll': 'Scrollen',
+      'hero.points': `Links schützen oder planen${S}Deine eigene Seite${S}Klicks live`, 'hero.scroll': 'Scrollen',
       'how.eyebrow': "So geht's", 'how.title': 'Von der URL zur Erkenntnis<br>in Sekunden',
       'how.s1t': 'Lange URL einfügen', 'how.s1p': 'Jeder Link, von Google Docs bis YouTube. Zum Ausprobieren kein Konto nötig.',
       'how.s2t': 'Eigenen Kurzlink erhalten', 'how.s2p': 'Du bekommst einen sauberen Link wie <code>{site}/launch</code> zum Teilen.',
@@ -230,11 +230,11 @@
     },
     tr: {
       'nav.features': 'Özellikler', 'nav.pages': 'Sayfalar', 'nav.analytics': 'Analiz', 'nav.how': 'Nasıl çalışır',
-      'nav.login': 'Giriş yap', 'nav.signup': 'Kaydol', 'nav.dashboard': 'Panel',
-      'hero.title': 'Kısa linkler.<br><span class="word-dim">Gerçek veriler.</span>',
-      'hero.sub': 'Markalı kısa linkler, profil sayfaları ve canlı tıklama analizi, tek bir sade panelde.',
+      'nav.login': 'Giriş yap', 'nav.signup': 'Kaydol', 'nav.dashboard': 'Panel', 'f.privacy': 'Gizlilik', 'f.terms': 'Koşullar', 'f.support': 'Destek', 'f.beta': 'Beta sürümünde: özellikler hâlâ değişebilir.',
+      'hero.title': 'Akıllıca paylaş.<br><span class="word-dim">Her tıklamayı gör.</span>',
+      'hero.sub': 'İçerik üreticileri, öğrenciler ve küçük ekipler için: kilitleyebileceğin, zamanlayabileceğin ve takip edebileceğin kısa linkler ve tüm linklerin için tek sayfa.',
       'hero.ph': 'Uzun URL’ni buraya yapıştır...', 'hero.btn': 'Kısalt →', 'hero.copy': 'Kopyala',
-      'hero.points': `Özel slug${S}Profil sayfaları${S}Canlı analiz`, 'hero.scroll': 'Kaydır',
+      'hero.points': `Linkleri kilitle veya zamanla${S}Kendi sayfan${S}Canlı tıklamalar`, 'hero.scroll': 'Kaydır',
       'how.eyebrow': 'Nasıl çalışır', 'how.title': 'URL’den içgörüye<br>saniyeler içinde',
       'how.s1t': 'Uzun URL’ni yapıştır', 'how.s1p': 'Google Docs’tan YouTube’a her link. Denemek için kayıt gerekmez.',
       'how.s2t': 'Kısa linkini al', 'how.s2p': 'Her yerde paylaşabileceğin <code>{site}/launch</code> gibi temiz bir link.',
@@ -272,11 +272,11 @@
     },
     hi: {
       'nav.features': 'फ़ीचर्स', 'nav.pages': 'पेज', 'nav.analytics': 'एनालिटिक्स', 'nav.how': 'कैसे काम करता है',
-      'nav.login': 'लॉग इन', 'nav.signup': 'साइन अप', 'nav.dashboard': 'डैशबोर्ड',
-      'hero.title': 'छोटे लिंक।<br><span class="word-dim">असली डेटा।</span>',
-      'hero.sub': 'ब्रांडेड छोटे लिंक, प्रोफ़ाइल पेज और लाइव क्लिक एनालिटिक्स, एक शांत डैशबोर्ड में।',
+      'nav.login': 'लॉग इन', 'nav.signup': 'साइन अप', 'nav.dashboard': 'डैशबोर्ड', 'f.privacy': 'गोपनीयता', 'f.terms': 'शर्तें', 'f.support': 'सहायता', 'f.beta': 'बीटा में: फ़ीचर अभी बदल सकते हैं।',
+      'hero.title': 'स्मार्ट तरीके से शेयर करें।<br><span class="word-dim">हर क्लिक देखें।</span>',
+      'hero.sub': 'क्रिएटर्स, स्टूडेंट्स और छोटी टीमों के लिए: शॉर्ट लिंक जिन्हें आप लॉक, शेड्यूल और ट्रैक कर सकते हैं, और आपके सभी लिंक के लिए एक पेज।',
       'hero.ph': 'अपना लंबा URL यहाँ पेस्ट करें...', 'hero.btn': 'छोटा करें →', 'hero.copy': 'कॉपी',
-      'hero.points': `कस्टम स्लग${S}प्रोफ़ाइल पेज${S}लाइव एनालिटिक्स`, 'hero.scroll': 'स्क्रॉल',
+      'hero.points': `लिंक लॉक या शेड्यूल करें${S}आपका अपना पेज${S}लाइव क्लिक`, 'hero.scroll': 'स्क्रॉल',
       'how.eyebrow': 'कैसे काम करता है', 'how.title': 'URL से जानकारी तक<br>कुछ ही सेकंड में',
       'how.s1t': 'अपना लंबा URL डालें', 'how.s1p': 'Google Docs से YouTube तक कोई भी लिंक। आज़माने के लिए साइन अप की ज़रूरत नहीं।',
       'how.s2t': 'अपना छोटा लिंक पाएँ', 'how.s2p': '<code>{site}/launch</code> जैसा साफ़ लिंक, जिसे कहीं भी शेयर करें।',
@@ -327,7 +327,7 @@
       'how.p3t': 'Connect Discord and Spotify', 'how.p3p': 'Show your live status and what you are listening to.',
       'how.p4t': 'Share one link everywhere', 'how.p4p': 'Put it in every bio and watch the views add up.',
       'feat.1t': 'Profile pages', 'feat.1p': 'One link for everything you are: a page with your own background, sound, icons, and live Discord and Spotify status.', 'feat.1tag': '→ See a page',
-      'feat.6t': 'Smart link builder', 'feat.6p': 'Short links with custom slugs, UTM parameters, redirects and expiry dates, with a live preview as you type.',
+      'feat.6t': 'Smart link builder', 'feat.6p': 'Custom endings, passwords, open and close times and use limits, all set from one form.',
       'sc.1t': 'Backgrounds that move', 'sc.1p': 'Images, GIFs or video, with sound visitors can mute.',
       'sc.2t': 'Your icons, your links', 'sc.2p': 'GitHub, Discord, Spotify and more, or upload your own icon.',
       'sc.3t': 'Live Discord and Spotify', 'sc.3p': "Show your status and what you're listening to right now.",
@@ -385,7 +385,7 @@
       'how.p3t': 'Conecta Discord y Spotify', 'how.p3p': 'Muestra tu estado en vivo y lo que estás escuchando.',
       'how.p4t': 'Un enlace para todo', 'how.p4p': 'Ponlo en cada bio y mira cómo suben las visitas.',
       'feat.1t': 'Páginas de perfil', 'feat.1p': 'Un enlace para todo lo que eres: una página con tu fondo, sonido, iconos y estado de Discord y Spotify en vivo.', 'feat.1tag': '→ Ver una página',
-      'feat.6t': 'Creador de enlaces', 'feat.6p': 'Slugs propios, parámetros UTM, redirecciones y caducidad, con vista previa mientras escribes.',
+      'feat.6t': 'Creador de enlaces', 'feat.6p': 'Finales personalizados, contraseñas, horarios de apertura y cierre y límites de uso, todo desde un formulario.',
       'sc.1t': 'Fondos con movimiento', 'sc.1p': 'Imágenes, GIF o vídeo, con sonido que los visitantes pueden silenciar.',
       'sc.2t': 'Tus iconos, tus enlaces', 'sc.2p': 'GitHub, Discord, Spotify y más, o sube tu propio icono.',
       'sc.3t': 'Discord y Spotify en vivo', 'sc.3p': 'Muestra tu estado y lo que escuchas ahora mismo.',
@@ -406,7 +406,7 @@
       'how.p3t': 'Conecte Discord e Spotify', 'how.p3p': 'Mostre seu status ao vivo e o que você está ouvindo.',
       'how.p4t': 'Um link para tudo', 'how.p4p': 'Coloque em todas as bios e veja as visitas crescerem.',
       'feat.1t': 'Páginas de perfil', 'feat.1p': 'Um link para tudo o que você é: uma página com seu fundo, som, ícones e status ao vivo do Discord e Spotify.', 'feat.1tag': '→ Ver uma página',
-      'feat.6t': 'Criador de links', 'feat.6p': 'Slugs próprios, parâmetros UTM, redirecionamentos e validade, com prévia enquanto você digita.',
+      'feat.6t': 'Criador de links', 'feat.6p': 'Finais personalizados, senhas, horários de abertura e fechamento e limites de uso, tudo em um formulário.',
       'sc.1t': 'Fundos que se movem', 'sc.1p': 'Imagens, GIFs ou vídeo, com som que o visitante pode silenciar.',
       'sc.2t': 'Seus ícones, seus links', 'sc.2p': 'GitHub, Discord, Spotify e mais, ou envie seu próprio ícone.',
       'sc.3t': 'Discord e Spotify ao vivo', 'sc.3p': 'Mostre seu status e o que você está ouvindo agora.',
@@ -427,7 +427,7 @@
       'how.p3t': 'Connectez Discord et Spotify', 'how.p3p': 'Affichez votre statut en direct et ce que vous écoutez.',
       'how.p4t': 'Un seul lien partout', 'how.p4p': 'Mettez-le dans chaque bio et regardez les vues grimper.',
       'feat.1t': 'Pages de profil', 'feat.1p': 'Un lien pour tout ce que vous êtes : une page avec votre fond, du son, vos icônes et votre statut Discord et Spotify en direct.', 'feat.1tag': '→ Voir une page',
-      'feat.6t': 'Créateur de liens', 'feat.6p': 'Slugs, paramètres UTM, redirections et dates d’expiration, avec aperçu en direct.',
+      'feat.6t': 'Créateur de liens', 'feat.6p': 'Fins personnalisées, mots de passe, horaires d’ouverture et de fermeture et limites d’utilisation, depuis un seul formulaire.',
       'sc.1t': 'Des fonds qui bougent', 'sc.1p': 'Images, GIF ou vidéo, avec un son que le visiteur peut couper.',
       'sc.2t': 'Vos icônes, vos liens', 'sc.2p': 'GitHub, Discord, Spotify et plus, ou votre propre icône.',
       'sc.3t': 'Discord et Spotify en direct', 'sc.3p': 'Montrez votre statut et ce que vous écoutez en ce moment.',
@@ -448,7 +448,7 @@
       'how.p3t': 'Discord und Spotify verbinden', 'how.p3p': 'Zeig deinen Live-Status und was du gerade hörst.',
       'how.p4t': 'Ein Link für alles', 'how.p4p': 'Pack ihn in jede Bio und sieh zu, wie die Aufrufe steigen.',
       'feat.1t': 'Profilseiten', 'feat.1p': 'Ein Link für alles, was du bist: eine Seite mit eigenem Hintergrund, Sound, Icons und Live-Status von Discord und Spotify.', 'feat.1tag': '→ Seite ansehen',
-      'feat.6t': 'Link-Builder', 'feat.6p': 'Eigene Slugs, UTM-Parameter, Weiterleitungen und Ablaufdaten mit Live-Vorschau.',
+      'feat.6t': 'Link-Builder', 'feat.6p': 'Eigene Endungen, Passwörter, Start- und Endzeiten und Nutzungslimits, alles in einem Formular.',
       'sc.1t': 'Hintergründe in Bewegung', 'sc.1p': 'Bilder, GIFs oder Video, mit Sound, den Besucher stummschalten können.',
       'sc.2t': 'Deine Icons, deine Links', 'sc.2p': 'GitHub, Discord, Spotify und mehr, oder dein eigenes Icon.',
       'sc.3t': 'Discord und Spotify live', 'sc.3p': 'Zeig deinen Status und was du gerade hörst.',
@@ -469,7 +469,7 @@
       'how.p3t': 'Discord ve Spotify’ı bağla', 'how.p3p': 'Canlı durumunu ve ne dinlediğini göster.',
       'how.p4t': 'Her yerde tek link', 'how.p4p': 'Her biyografine koy ve görüntülenmelerin artışını izle.',
       'feat.1t': 'Profil sayfaları', 'feat.1p': 'Sen olan her şey için tek link: kendi arka planın, sesin, ikonların ve canlı Discord ve Spotify durumunla bir sayfa.', 'feat.1tag': '→ Bir sayfa gör',
-      'feat.6t': 'Akıllı link oluşturucu', 'feat.6p': 'Özel slug, UTM parametreleri, yönlendirme ve bitiş tarihi, yazarken canlı önizleme.',
+      'feat.6t': 'Akıllı link oluşturucu', 'feat.6p': 'Özel uzantılar, şifreler, açılış ve kapanış saatleri ve kullanım limitleri, hepsi tek formdan.',
       'sc.1t': 'Hareketli arka planlar', 'sc.1p': 'Görsel, GIF veya video; ziyaretçinin kısabileceği sesle.',
       'sc.2t': 'Senin ikonların, senin linklerin', 'sc.2p': 'GitHub, Discord, Spotify ve fazlası, ya da kendi ikonunu yükle.',
       'sc.3t': 'Canlı Discord ve Spotify', 'sc.3p': 'Durumunu ve şu an ne dinlediğini göster.',
@@ -490,7 +490,7 @@
       'how.p3t': 'Discord और Spotify जोड़ें', 'how.p3p': 'अपना लाइव स्टेटस और जो आप सुन रहे हैं, दिखाएँ।',
       'how.p4t': 'हर जगह एक ही लिंक', 'how.p4p': 'इसे हर बायो में लगाएँ और व्यूज़ बढ़ते देखें।',
       'feat.1t': 'प्रोफ़ाइल पेज', 'feat.1p': 'आपकी हर चीज़ के लिए एक लिंक: अपने बैकग्राउंड, साउंड, आइकन और लाइव Discord व Spotify स्टेटस वाला पेज।', 'feat.1tag': '→ एक पेज देखें',
-      'feat.6t': 'स्मार्ट लिंक बिल्डर', 'feat.6p': 'कस्टम स्लग, UTM पैरामीटर, रीडायरेक्ट और एक्सपायरी डेट, लाइव प्रीव्यू के साथ।',
+      'feat.6t': 'स्मार्ट लिंक बिल्डर', 'feat.6p': 'कस्टम एंडिंग, पासवर्ड, खुलने और बंद होने का समय और इस्तेमाल की सीमा, सब एक ही फ़ॉर्म से।',
       'sc.1t': 'चलते-फिरते बैकग्राउंड', 'sc.1p': 'इमेज, GIF या वीडियो, ऐसे साउंड के साथ जिसे विज़िटर म्यूट कर सकें।',
       'sc.2t': 'आपके आइकन, आपके लिंक', 'sc.2p': 'GitHub, Discord, Spotify और भी, या अपना आइकन अपलोड करें।',
       'sc.3t': 'लाइव Discord और Spotify', 'sc.3p': 'अपना स्टेटस और अभी आप क्या सुन रहे हैं, दिखाएँ।',
@@ -540,10 +540,14 @@
   // ---- Picker (footer) ----
   const flagSrc = f => `https://flagcdn.com/w40/${f}.png`;
 
+  // There can be several pickers (top bar + footer); they all stay in sync
   function renderPicker() {
-    const root = document.getElementById('lang-picker');
-    if (!root) return;
+    document.querySelectorAll('.lang-picker').forEach(renderOnePicker);
+  }
+  function renderOnePicker(root) {
     const lang = LANGS.find(l => l.code === current);
+    const code = root.querySelector('.lang-code');
+    if (code) code.textContent = lang.code.toUpperCase();
     const btn = root.querySelector('.lang-btn');
     btn.querySelector('img').src = flagSrc(lang.flag);
     btn.querySelector('img').alt = lang.flag.toUpperCase();
@@ -575,8 +579,9 @@
   }
 
   function initPicker() {
-    const root = document.getElementById('lang-picker');
-    if (!root) return;
+    document.querySelectorAll('.lang-picker').forEach(initOnePicker);
+  }
+  function initOnePicker(root) {
     const btn = root.querySelector('.lang-btn');
     const list = root.querySelector('.lang-list');
     const open = on => {
