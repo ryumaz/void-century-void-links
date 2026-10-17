@@ -151,17 +151,42 @@
   const spSave = v => { try { v ? localStorage.setItem(SP_KEY, JSON.stringify(v)) : localStorage.removeItem(SP_KEY); } catch (_) {} };
   const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
+  // Spotify login opens in its own small window (like Discord does), so the editor
+  // and anything not yet published stay exactly as they are in this tab.
+  const SP_PKCE = 'lp-sp-pkce';
+  const spChannel = 'BroadcastChannel' in window ? new BroadcastChannel('vl-spotify') : null;
   async function spConnect() {
+    // Open the window during the click (or browsers block it), then point it at Spotify
+    const pw = 480, ph = 720;
+    const left = Math.max(0, Math.round((screen.availWidth - pw) / 2)), top = Math.max(0, Math.round((screen.availHeight - ph) / 2));
+    const win = window.open('', 'vl-spotify', `popup=yes,width=${pw},height=${ph},left=${left},top=${top}`);
+    if (!win) { toast(t('b.sp_popup')); return; }
+    try {
+      win.document.title = 'Connecting to Spotify…';
+      win.document.body.style.cssText = 'margin:0;height:100vh;display:grid;place-items:center;background:#000;color:#fff;font:500 16px Inter,Segoe UI,sans-serif';
+      win.document.body.textContent = 'Connecting to Spotify…';
+    } catch (_) {}
     const verifier = b64url(crypto.getRandomValues(new Uint8Array(64)));
     const challenge = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
     const state = b64url(crypto.getRandomValues(new Uint8Array(16)));
-    sessionStorage.setItem('lp-sp-pkce', JSON.stringify({ verifier, state }));
+    // localStorage, so the Spotify window (a different tab) can read it when it comes back
+    localStorage.setItem(SP_PKCE, JSON.stringify({ verifier, state, popup: true, at: Date.now() }));
     const q = new URLSearchParams({
       client_id: SPOTIFY_CLIENT_ID, response_type: 'code', redirect_uri: spRedirect(),
       code_challenge_method: 'S256', code_challenge: challenge, scope: SP_SCOPES, state,
     });
-    location.href = 'https://accounts.spotify.com/authorize?' + q;
+    win.location.href = 'https://accounts.spotify.com/authorize?' + q;
+    win.focus();
   }
+  // The editor tab hears back from the Spotify window
+  function spConnected(ok) {
+    npCache = { at: 0, data: null };
+    try { if (ok && !fNowPlaying.checked) fNowPlaying.checked = true; } catch (_) {}
+    toast(t(ok ? 'toast.sp_ok' : 'toast.sp_fail'));
+    update();
+  }
+  if (spChannel) spChannel.onmessage = e => { if (e.data && e.data.type === 'spotify') spConnected(e.data.ok); };
+  window.addEventListener('storage', e => { if (e.key === SP_KEY && e.newValue && !spChannel) spConnected(true); });
   async function spToken(body) {
     const res = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
@@ -181,15 +206,27 @@
     const code = params.get('code'), state = params.get('state'), err = params.get('error');
     if (!code && !err) return false;
     let pkce = null;
-    try { pkce = JSON.parse(sessionStorage.getItem('lp-sp-pkce')); } catch (_) {}
+    try { pkce = JSON.parse(localStorage.getItem(SP_PKCE) || sessionStorage.getItem(SP_PKCE)); } catch (_) {}
+    if (!pkce || state !== pkce.state) return false;   // not ours (e.g. a social-login return)
     history.replaceState(null, '', location.pathname + location.hash);
-    if (!pkce || state !== pkce.state) return false;
-    sessionStorage.removeItem('lp-sp-pkce');
-    if (err) { toast(t('toast.sp_fail')); return true; }
-    try {
-      await spToken({ grant_type: 'authorization_code', code, redirect_uri: spRedirect(), code_verifier: pkce.verifier });
-      toast(t('toast.sp_ok'));
-    } catch (_) { toast(t('toast.sp_fail')); }
+    try { localStorage.removeItem(SP_PKCE); sessionStorage.removeItem(SP_PKCE); } catch (_) {}
+    let ok = false;
+    if (!err) {
+      try {
+        await spToken({ grant_type: 'authorization_code', code, redirect_uri: spRedirect(), code_verifier: pkce.verifier });
+        ok = true;
+      } catch (_) {}
+    }
+    if (pkce.popup) {
+      // This is the Spotify window: tell the editor tab, then close
+      if (spChannel) spChannel.postMessage({ type: 'spotify', ok });
+      document.body.innerHTML = '';
+      document.body.style.cssText = 'margin:0;height:100vh;display:grid;place-items:center;background:#000;color:#fff;font:500 17px Inter,Segoe UI,sans-serif;text-align:center;padding:24px';
+      document.body.textContent = ok ? 'Spotify connected. You can close this window.' : "Couldn't connect Spotify. Close this window and try again.";
+      setTimeout(() => window.close(), 600);
+      return 'popup';
+    }
+    toast(t(ok ? 'toast.sp_ok' : 'toast.sp_fail'));
     return true;
   }
   async function spAccess() {
@@ -975,7 +1012,6 @@
     }
     const blocker = spBlocker();
     if (blocker) { toast(t(blocker === 'noid' ? 'b.sp_noid' : 'b.sp_file')); return; }
-    try { sessionStorage.setItem('lp-sp-return', '1'); } catch (_) {}
     spConnect();
   });
 
@@ -1246,7 +1282,7 @@
   // ---------- landing showcase (static demo profile) ----------
   const demoPhone = $('demo-phone');
   const demoData = {
-    username: 'voidwalker', name: 'Void Walker', bio: t('sc.demo_bio'), dim: 0, layout: 'icons',
+    username: 'voidwalker', name: 'Void Walker', bio: t('sc.demo_bio'), dim: 18, layout: 'icons',
     links: [
       { id: 'd1', icon: 'github', label: 'GitHub', url: 'github.com' },
       { id: 'd2', icon: 'discord', label: 'Discord', url: 'discord.com' },
@@ -1259,10 +1295,11 @@
     discord_status: 'online', discord_user: { username: 'voidwalker' }, listening_to_spotify: true,
     spotify: { song: 'Cornfield Chase', artist: 'Hans Zimmer', album_art_url: '' },
   };
+  const DEMO_MEDIA = { avatarUrl: 'assets/demo/voidwalker-avatar.webp', bgUrl: 'assets/demo/voidwalker-bg.webp', bgType: 'image' };
   function renderDemo() {
     if (!demoPhone) return;
     demoData.bio = t('sc.demo_bio');
-    renderProfile(demoPhone, demoData, {}, { discord: demoDiscord });
+    renderProfile(demoPhone, demoData, DEMO_MEDIA, { discord: demoDiscord });
   }
   const demoSeg = $('demo-layout');
   if (demoSeg) {
@@ -1357,7 +1394,9 @@
 
   // ---------- start ----------
   const ready = (async () => {
-    if (await spHandleRedirect()) {
+    const sp = await spHandleRedirect();
+    if (sp === 'popup') return;   // the Spotify window: nothing else to load
+    if (sp) {
       let back = false;
       try { back = sessionStorage.getItem('lp-sp-return') === '1'; sessionStorage.removeItem('lp-sp-return'); } catch (_) {}
       if (back && me()) setTimeout(() => openDashboard('page'), 300);

@@ -1985,7 +1985,19 @@
     .btn-danger:hover { background: rgba(244,180,180,0.1); }
 
     @media (max-width: 900px) {
-      .showcase { grid-template-columns: 1fr; gap: 40px; }
+      .showcase { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+    }
+    /* Phones: nothing may be wider than the screen (otherwise the page zooms out and drifts sideways) */
+    .claim-field { min-width: 0; }
+    .claim-field input { min-width: 0; width: 100%; }
+    @media (max-width: 520px) {
+      #nav .nav-inner { gap: 10px; }
+      #nav .logo { gap: 8px; min-width: 0; }
+      #nav .logo > span { font-size: 0.78em; letter-spacing: 0.02em; }
+      .nav-auth { gap: 6px; flex-shrink: 0; }
+      .nav-auth .btn { padding: 8px 12px; }
+      .claim-prefix { min-width: 0; max-width: 58%; overflow: hidden; text-overflow: ellipsis; }
+      .showcase-copy, .showcase-demo { min-width: 0; }
     }
     @media (max-width: 640px) {
       .link-row-edit { grid-template-columns: 42px minmax(0, 1fr) 42px !important; }
@@ -2558,6 +2570,22 @@
     .dtp-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
     .dtp-foot .btn { padding: 8px 14px; font-size: 0.85rem; }
     .dtp-foot .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Text over the black hole: a dark halo hugging the letters keeps every line readable
+       without covering the background. Buttons keep their crisp text. */
+    :root { --halo: 0 0 1px rgba(0,0,0,0.95), 0 0 4px rgba(0,0,0,0.85), 0 1px 14px rgba(0,0,0,0.9), 0 0 34px rgba(0,0,0,0.6); }
+    #hero :is(h1, h2, p, span, small, a):not(.btn):not(.btn *),
+    section :is(h1, h2, h3, p, li, span, small, b, strong, label, time):not(.btn):not(.btn *):not(input),
+    footer :is(a, p, span) { text-shadow: var(--halo); }
+    .hero-sub, .section-sub, .showcase-points span, #cta p, .analytics-metrics .metric-label small,
+    .how-step p, .feature-card p, .footer-links a, .footer-up { color: rgba(245,245,247,0.88); }
+
+    /* Profile card polish */
+    .show-void .profile-bg { background-color: transparent; }   /* let the black hole show through */
+    .phone.show-void { background: #000 url("assets/demo/void-preview.webp") center / cover no-repeat; }
+    .pc-avatar { box-shadow: 0 0 0 2px rgba(255,255,255,0.85), 0 0 0 7px rgba(255,255,255,0.08), 0 12px 40px rgba(0,0,0,0.6); }
+    .pc-link { background: rgba(8,8,10,0.58); border-color: rgba(255,255,255,0.14); box-shadow: 0 8px 26px rgba(0,0,0,0.35); }
+    .pc-link:hover { transform: translateY(-2px); }
   </style>
   <link rel="stylesheet" href="helpbot.css">
 </head>
@@ -2868,7 +2896,7 @@
   <div class="container">
     <div class="cta-box">
       <span class="section-eyebrow reveal" data-i18n="cta.eyebrow">Claim your name</span>
-      <h2 class="section-title reveal" data-i18n-html="cta.title">Your name,<br>in the void</h2>
+      <h2 class="section-title reveal" data-i18n-html="cta.title">Leave your mark<br>on the void</h2>
       <p class="reveal" data-i18n="cta.p">Pick a username and build your page in under a minute.</p>
       <form class="claim-box reveal" id="cta-claim" autocomplete="off">
         <label class="claim-field">
