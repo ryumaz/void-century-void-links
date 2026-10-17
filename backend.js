@@ -57,6 +57,7 @@ window.siteHost = () => {
       avatarPath: r.avatar_path, bgPath: r.bg_path, audioPath: r.audio_path,
       avatarUrl: publicUrl(r.avatar_path), bgUrl: publicUrl(r.bg_path), audioUrl: publicUrl(r.audio_path),
       links: (r.links || []).map(l => ({ ...l, iconUrl: publicUrl(l.iconPath) })),
+      bgPosterPath: r.bg_poster || null, bgPosterUrl: publicUrl(r.bg_poster),
       cursor: r.cursor || 'default', cursorHotspot: r.cursor_hotspot || 'tip',
       cursorPath: r.cursor_path || null, cursorUrl: publicUrl(r.cursor_path),
     };
@@ -82,9 +83,11 @@ window.siteHost = () => {
       row.cursor_path = custom ? p.cursorPath : null;
       row.cursor_hotspot = p.cursorHotspot === 'center' ? 'center' : 'tip';
     }
+    // Still frame for video backgrounds (column from upgrade-clean-urls.sql); only sent when used
+    if (p.bgPosterPath || p.hadPoster) row.bg_poster = p.bgPath && p.bgType === 'video' ? (p.bgPosterPath || null) : null;
     return row;
   }
-  const filesOf = p => (p ? [p.avatarPath, p.bgPath, p.audioPath, p.cursorPath, ...(p.links || []).map(l => l.iconPath)].filter(Boolean) : []);
+  const filesOf = p => (p ? [p.avatarPath, p.bgPath, p.bgPosterPath, p.audioPath, p.cursorPath, ...(p.links || []).map(l => l.iconPath)].filter(Boolean) : []);
 
   // Public address of the site, used for short links and page links.
   // Set `siteUrl` in supabase-config.js once the site is on Netlify.
@@ -198,9 +201,15 @@ window.siteHost = () => {
       const id = await userId();
       if (!id) throw new Error('Not signed in');
       const row = toRow(page, id);
-      const res = previous
-        ? await sb.from('pages').update(row).eq('owner', id).select().single()
-        : await sb.from('pages').insert(row).select().single();
+      const write = r => (previous
+        ? sb.from('pages').update(r).eq('owner', id).select().single()
+        : sb.from('pages').insert(r).select().single());
+      let res = await write(row);
+      // Database not upgraded yet (no bg_poster column): save without the still frame
+      if (res.error && 'bg_poster' in row && /bg_poster|PGRST204|42703/.test(res.error.code + ' ' + res.error.message)) {
+        delete row.bg_poster;
+        res = await write(row);
+      }
       fail(res.error);
       const saved = fromRow(res.data);
       const keep = new Set(filesOf(saved));

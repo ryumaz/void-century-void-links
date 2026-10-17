@@ -302,9 +302,12 @@
     if (bg.dataset.src !== src) {
       bg.dataset.src = src;
       bg.textContent = '';
+      bg.style.backgroundImage = src && media.bgType === 'video' && media.bgPosterUrl ? `url("${media.bgPosterUrl}")` : '';
       if (src && media.bgType === 'video') {
         const v = el('video');
-        Object.assign(v, { src, muted: true, loop: true, autoplay: true, playsInline: true });
+        Object.assign(v, { src, muted: true, loop: true, autoplay: true, playsInline: true, preload: 'auto' });
+        if (media.bgPosterUrl) v.poster = media.bgPosterUrl;
+        v.disablePictureInPicture = true;
         v.setAttribute('muted', '');
         v.setAttribute('playsinline', '');
         bg.appendChild(v);
@@ -323,8 +326,11 @@
     if (mediaEl) {
       const scale = root.id === 'profile-view' ? 1 : Math.max(0.25, root.clientWidth / Math.max(window.innerWidth, 1));
       const b = (blurPx || 0) * scale;
-      mediaEl.style.filter = b ? `blur(${b.toFixed(1)}px)` : '';
-      mediaEl.style.transform = b ? 'scale(1.08)' : '';   // hides the soft edge blur creates
+      // A blurred picture has no fine detail, so the blur is drawn at half width and height
+      // (a quarter of the pixels) and scaled back up: it looks the same, and phones keep up
+      // even with a full-screen video. The 108% size hides the soft edge blur creates.
+      mediaEl.classList.toggle('bg-soft', !!b);
+      mediaEl.style.filter = b ? `blur(${(b / 2).toFixed(1)}px)` : '';
     }
   }
 
@@ -577,6 +583,7 @@
   const draft = {
     avatarBlob: null, avatarUrl: '', avatarPath: null,
     bgBlob: null, bgUrl: '', bgPath: null, bgType: '', bgName: '',
+    bgPosterBlob: null, bgPosterUrl: '', bgPosterPath: null,   // still frame of a video background
     audioBlob: null, audioUrl: '', audioPath: null, audioName: '',
     cursorBlob: null, cursorUrl: '', cursorPath: null,
     icons: {},          // linkId → { blob, url, path }
@@ -592,8 +599,44 @@
     if (kind === 'bg') {
       draft.bgType = blob ? (blob.type.startsWith('video/') ? 'video' : 'image') : (remote ? remote.type || 'image' : '');
       draft.bgName = has ? (name || draft.bgType) : '';
+      // A new background replaces its still frame; a stored one brings its own back
+      revoke(draft.bgPosterUrl);
+      draft.bgPosterBlob = null;
+      draft.bgPosterUrl = remote && remote.posterUrl ? remote.posterUrl : '';
+      draft.bgPosterPath = remote && remote.posterPath ? remote.posterPath : null;
+      if (blob && draft.bgType === 'video') {
+        const forBlob = blob;
+        makePoster(blob).then(p => {
+          if (!p || draft.bgBlob !== forBlob) return;
+          draft.bgPosterBlob = p;
+          draft.bgPosterUrl = URL.createObjectURL(p);
+        });
+      }
     }
     if (kind === 'audio') draft.audioName = has ? (name || 'audio') : '';
+  }
+  // First frame of a video (max 1280px, WebP), shown while the video itself downloads
+  function makePoster(blob) {
+    return new Promise(resolve => {
+      const url = URL.createObjectURL(blob);
+      const v = document.createElement('video');
+      let finished = false;
+      const done = b => { if (finished) return; finished = true; URL.revokeObjectURL(url); v.removeAttribute('src'); resolve(b || null); };
+      Object.assign(v, { muted: true, playsInline: true, preload: 'auto', src: url });
+      v.onloadeddata = () => { try { v.currentTime = Math.min(0.3, (v.duration || 1) / 2); } catch (_) { done(null); } };
+      v.onseeked = () => {
+        try {
+          const k = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight, 1));
+          const c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(v.videoWidth * k));
+          c.height = Math.max(1, Math.round(v.videoHeight * k));
+          c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+          c.toBlob(done, 'image/webp', 0.82);
+        } catch (_) { done(null); }
+      };
+      v.onerror = () => done(null);
+      setTimeout(() => done(null), 10000);
+    });
   }
   function setIcon(id, blob, remote) {
     if (draft.icons[id]) revoke(draft.icons[id].url);
@@ -983,6 +1026,9 @@
       const bgP = slot('bg', 'background');
       const audioP = data.sound === 'file' ? slot('audio', 'audio') : Promise.resolve(draft.audioUrl ? draft.audioPath : null);
       const cursorP = data.cursor === 'custom' ? slot('cursor', 'cursor') : Promise.resolve(null);
+      const posterP = draft.bgType !== 'video' || !draft.bgUrl ? Promise.resolve(null)
+        : draft.bgPosterBlob ? queue('background-poster', draft.bgPosterBlob)
+        : Promise.resolve(draft.bgPosterUrl ? draft.bgPosterPath : null);
       const iconJobs = data.links.map(l => {
         const ic = l.icon === 'custom' ? draft.icons[l.id] : null;
         if (!ic) return Promise.resolve(null);
@@ -993,10 +1039,11 @@
         btn.textContent = `${t('b.uploading')} 0/${jobs.length}`;
         jobs.forEach(j => j.then(() => { btn.textContent = `${t('b.uploading')} ${++done}/${jobs.length}`; }, () => {}));
       }
-      const [avatarPath, bgPath, audioPath, cursorPath, ...iconPaths] = await Promise.all([avatarP, bgP, audioP, cursorP, ...iconJobs]);
+      const [avatarPath, bgPath, audioPath, cursorPath, bgPosterPath, ...iconPaths] = await Promise.all([avatarP, bgP, audioP, cursorP, posterP, ...iconJobs]);
       btn.textContent = t('b.publishing');
       const links = data.links.map((l, i) => ({ ...l, iconPath: iconPaths[i] }));
-      const saved = await DB.savePage({ ...data, links, avatarPath, bgPath, bgType: draft.bgType, audioPath, cursorPath }, myPageCache);
+      const saved = await DB.savePage({ ...data, links, avatarPath, bgPath, bgType: draft.bgType, audioPath, cursorPath, bgPosterPath, hadPoster: !!(myPageCache && myPageCache.bgPosterPath) }, myPageCache);
+      if (draft.bgPosterBlob) { draft.bgPosterBlob = null; draft.bgPosterPath = bgPosterPath; }
       myPageCache = saved;
       takenCache[saved.username] = me().id;
       // Keep showing the local copies (no re-download), but remember where they're stored now
@@ -1054,7 +1101,7 @@
     });
     if (!links.length) addLink();
     setBlob('avatar', null, '', page.avatarUrl ? { url: page.avatarUrl, path: page.avatarPath } : null);
-    setBlob('bg', null, page.bgType, page.bgUrl ? { url: page.bgUrl, path: page.bgPath, type: page.bgType } : null);
+    setBlob('bg', null, page.bgType, page.bgUrl ? { url: page.bgUrl, path: page.bgPath, type: page.bgType, posterUrl: page.bgPosterUrl, posterPath: page.bgPosterPath } : null);
     setBlob('audio', null, 'audio', page.audioUrl ? { url: page.audioUrl, path: page.audioPath } : null);
     setBlob('cursor', null, '', page.cursorUrl ? { url: page.cursorUrl, path: page.cursorPath } : null);
     seg(segCursor, page.cursor === 'custom' && !page.cursorUrl ? 'default' : (page.cursor || 'default'));
@@ -1105,7 +1152,7 @@
       renderProfile(view, { username: user, name: t(window.DB ? 'p.missing' : 'toast.offline'), links: [] }, {});
     } else {
       const media = {
-        avatarUrl: page.avatarUrl, bgUrl: page.bgUrl, bgType: page.bgType, cursorUrl: page.cursorUrl,
+        avatarUrl: page.avatarUrl, bgUrl: page.bgUrl, bgType: page.bgType, bgPosterUrl: page.bgPosterUrl, cursorUrl: page.cursorUrl,
         icons: Object.fromEntries((page.links || []).filter(l => l.iconUrl).map(l => [l.id, l.iconUrl])),
       };
       if (page.audioUrl && page.sound === 'file') {

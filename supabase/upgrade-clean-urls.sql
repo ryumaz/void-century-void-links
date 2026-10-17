@@ -56,4 +56,7 @@ $$;
 revoke execute on function public.name_is_free(text) from public;
 grant execute on function public.name_is_free(text) to anon, authenticated;
 
+-- Still frame shown instantly while a video background downloads
+alter table public.pages add column if not exists bg_poster text;
+
 notify pgrst, 'reload schema';
