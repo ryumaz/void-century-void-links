@@ -481,8 +481,8 @@
     btn.disabled = true;
     try {
       await supportApi.create(name, email, $('hb-t-topic').value, msg);
-    } catch (_) {
-      err.textContent = "Couldn't send. Check your connection and try again.";
+    } catch (e) {
+      err.textContent = /too many/i.test((e && e.message) || '') ? 'You’ve sent a lot of requests. Please wait a bit and try again.' : "Couldn't send. Check your connection and try again.";
       return;
     } finally {
       btn.disabled = false;
@@ -498,7 +498,7 @@
     const text = input.value.trim();
     const t = ticket();
     if (!text || !t) return;
-    try { await supportApi.send(t, text); } catch (_) { toast("Couldn't send. Try again."); return; }
+    try { await supportApi.send(t, text); } catch (e) { toast(/too many/i.test((e && e.message) || '') ? 'Too many messages. Please wait a bit.' : "Couldn't send. Try again."); return; }
     input.value = '';
     renderHuman();
   });

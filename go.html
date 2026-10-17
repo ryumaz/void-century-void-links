@@ -401,7 +401,9 @@
     $('pw-err').textContent = '';
     try {
       const r = await open(pw);
-      if (r.status === 'wrong_password') {
+      if (r.status === 'rate_limited') {
+        $('pw-err').textContent = 'Too many tries. Wait about 10 minutes, then try again.';
+      } else if (r.status === 'wrong_password') {
         $('pw-err').textContent = 'That password isn’t right.';
         const card = $('locked');
         card.classList.remove('shake');

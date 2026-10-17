@@ -1236,7 +1236,7 @@
       reportPanel.reset();
       reportPanel.hidden = true;
       toast('Thanks. Our team will review this page.');
-    } catch (_) { toast("Couldn't send the report. Try again."); }
+    } catch (e) { toast(/too many/i.test((e && e.message) || '') ? 'Too many reports from you. Please wait a bit.' : "Couldn't send the report. Try again."); }
   });
   $('pv-copy').addEventListener('click', () => copyLink(view.dataset.user));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeIconMenu(); closeProfile(); } });
