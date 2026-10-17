@@ -8,7 +8,7 @@
 (function () {
   const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js';
   const GLTF_URL = 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js';
-  const MODEL_URL = 'assets/help-robot.glb.js';
+  const MODEL_URL = 'assets/help-robot.glb.js?v=2';   // bump ?v= when the file changes (assets are cached 7 days)
   const SUPPORT_KEY = 'lp-support';
   const SEEN_KEY = 'lp-hb-seen';
   const me = () => (typeof currentUser !== 'undefined' ? currentUser : null);

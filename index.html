@@ -4530,7 +4530,7 @@ function askAI(question) {
 // ===== QR CODES =====
 // Real QR codes (qrcode-generator, shipped in assets/vendor). They point at the
 // site's own address (DB.shortUrl): "abc" → short link, "@name" → profile page.
-const QR_LIB = 'assets/vendor/qrcode.min.js';
+const QR_LIB = 'assets/vendor/qrcode.min.js?v=2';   // bump ?v= when the file changes (assets are cached 7 days)
 let qrLib = null;
 function loadQrLib() {
   if (!qrLib) {
