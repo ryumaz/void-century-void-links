@@ -144,7 +144,8 @@
   const SPOTIFY_CLIENT_ID = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.spotifyClientId) || '';
   const SP_KEY = 'lp-spotify';
   const SP_SCOPES = 'user-read-currently-playing user-read-playback-state';
-  const spRedirect = () => location.origin + location.pathname;
+  // Must match a Redirect URI in the Spotify app exactly: the site root (or /index.html)
+  const spRedirect = () => location.origin + (/\/index\.html$/.test(location.pathname) ? location.pathname : '/');
   const spBlocker = () => (!SPOTIFY_CLIENT_ID ? 'noid' : (!/^https?:$/.test(location.protocol) ? 'file' : ''));
   const spLoad = () => { try { return JSON.parse(localStorage.getItem(SP_KEY)); } catch (_) { return null; } };
   const spSave = v => { try { v ? localStorage.setItem(SP_KEY, JSON.stringify(v)) : localStorage.removeItem(SP_KEY); } catch (_) {} };

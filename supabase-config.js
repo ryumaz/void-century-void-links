@@ -16,5 +16,5 @@ window.SUPABASE_CONFIG = {
 
   // Spotify app Client ID (developer.spotify.com/dashboard) for "Connect Spotify".
   // The Client ID is public; the Client Secret is NOT needed and must not go here.
-  spotifyClientId: '',
+  spotifyClientId: 'c1b1bea7907f4afb87adcb1ea48b5652',
 };
