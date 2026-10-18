@@ -562,6 +562,97 @@
     return card;
   }
 
+  // ---------- background trim: black bars inside the file itself ----------
+  // Some clips and pictures have letterbox bars baked in, so even a full-screen "cover" shows
+  // black strips. Look at a few frames, find the edges that stay black, and zoom in just
+  // enough to hide them. Only small bars are trimmed, so real content never gets cut off.
+  const TRIM_MAX = 1.35;               // never zoom in more than this
+  const trimCanvas = document.createElement('canvas');
+  function measureBars(src) {
+    const sw = src.videoWidth || src.naturalWidth, sh = src.videoHeight || src.naturalHeight;
+    if (!sw || !sh) return null;
+    const w = 96, h = Math.max(8, Math.round(w * sh / sw));
+    trimCanvas.width = w; trimCanvas.height = h;
+    const ctx = trimCanvas.getContext('2d', { willReadFrequently: true });
+    let px;
+    try { ctx.drawImage(src, 0, 0, w, h); px = ctx.getImageData(0, 0, w, h).data; } catch (e) { return null; }
+    // Is this row (or column) black? Allow a few noisy pixels from video compression
+    const dark = (x, y, dx, dy, n) => {
+      let sum = 0, bright = 0;
+      for (let i = 0; i < n; i++) {
+        const o = ((y + dy * i) * w + x + dx * i) * 4;
+        const l = px[o] * 0.3 + px[o + 1] * 0.59 + px[o + 2] * 0.11;
+        sum += l;
+        if (l > 30) bright++;
+      }
+      return sum / n < 14 && bright <= n * 0.03;
+    };
+    let t = 0, b = 0, l = 0, r = 0;
+    while (t < h && dark(0, t, 1, 0, w)) t++;
+    if (t === h) return null;          // an all-black frame (a fade, or not drawn yet)
+    while (b < h - t && dark(0, h - 1 - b, 1, 0, w)) b++;
+    while (l < w && dark(l, 0, 0, 1, h)) l++;
+    while (r < w - l && dark(w - 1 - r, 0, 0, 1, h)) r++;
+    // The row where a bar ends is half black: take one more so no thin line is left
+    const edge = (n, of) => (n ? Math.min(n + 1, of) / of : 0);
+    return { t: edge(t, h), b: edge(b, h), l: edge(l, w), r: edge(r, w), w: sw, h: sh };
+  }
+  function applyTrim(bg) {
+    const wrap = bg.querySelector('.bg-trim'), m = bg._bars;
+    if (!wrap) return;
+    let tf = '';
+    const W = bg.clientWidth, H = bg.clientHeight;
+    if (m && W && H) {
+      // Where the picture (without its bars) lands once "cover" has sized it
+      const s0 = Math.max(W / m.w, H / m.h), vw = m.w * s0, vh = m.h * s0;
+      const ox = (W - vw) / 2, oy = (H - vh) / 2;
+      const x0 = ox + m.l * vw, x1 = ox + (1 - m.r) * vw, y0 = oy + m.t * vh, y1 = oy + (1 - m.b) * vh;
+      const k = Math.max(1, W / (x1 - x0), H / (y1 - y0));
+      if (k > 1.004 && k <= TRIM_MAX) {
+        const tx = W / 2 - k * (x0 + x1) / 2, ty = H / 2 - k * (y0 + y1) / 2;
+        tf = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${k.toFixed(4)})`;
+      }
+    }
+    wrap.style.transform = tf;
+  }
+  const trimObserver = typeof ResizeObserver === 'function' ? new ResizeObserver(es => es.forEach(e => applyTrim(e.target))) : null;
+  function watchBars(bg, media) {
+    bg._bars = null;
+    const take = () => {
+      if (!media.isConnected) return;
+      const m = measureBars(media), p = bg._bars;
+      if (!m) return;
+      // Keep the smallest bars seen: real bars are on every frame, a dark scene is not
+      bg._bars = p ? { ...m, t: Math.min(p.t, m.t), b: Math.min(p.b, m.b), l: Math.min(p.l, m.l), r: Math.min(p.r, m.r) } : m;
+      applyTrim(bg);
+    };
+    if (trimObserver) trimObserver.observe(bg);
+    if (media.tagName !== 'VIDEO') {
+      if (media.complete && media.naturalWidth) take(); else media.addEventListener('load', take, { once: true });
+      return;
+    }
+    media.addEventListener('loadeddata', take, { once: true });
+    const marks = [0.7, 2, 4.5];
+    let next = 0;
+    const onTime = () => {
+      if (media.currentTime < marks[next]) return;
+      next++;
+      take();
+      if (next >= marks.length) media.removeEventListener('timeupdate', onTime);
+    };
+    media.addEventListener('timeupdate', onTime);
+  }
+  // Reading pixels needs CORS (storage allows it); if a file is ever served without it, load it plainly
+  function corsFallback(m, src) {
+    m.addEventListener('error', () => {
+      if (!m.crossOrigin || m._plain) return;
+      m._plain = true;
+      m.removeAttribute('crossorigin');
+      m.src = src;
+      if (m.tagName === 'VIDEO') m.play().catch(() => {});
+    });
+  }
+
   function renderBackground(root, media, dimPct, blurPx) {
     const bg = root.querySelector('.profile-bg');
     const dim = root.querySelector('.profile-dim');
@@ -570,27 +661,36 @@
     if (bg.dataset.src !== src) {
       bg.dataset.src = src;
       bg.textContent = '';
+      bg._bars = null;
+      const wrap = el('div', 'bg-trim');
+      bg.appendChild(wrap);
       bg.style.backgroundImage = src && media.bgType === 'video' && media.bgPosterUrl ? `url("${media.bgPosterUrl}")` : '';
       if (src && media.bgType === 'video') {
         const v = el('video');
+        v.crossOrigin = 'anonymous';
+        corsFallback(v, src);
         Object.assign(v, { src, muted: true, loop: true, autoplay: true, playsInline: true, preload: 'auto' });
         if (media.bgPosterUrl) v.poster = media.bgPosterUrl;
         v.disablePictureInPicture = true;
         v.setAttribute('muted', '');
         v.setAttribute('playsinline', '');
-        bg.appendChild(v);
+        wrap.appendChild(v);
+        watchBars(bg, v);
         v.play().catch(() => {});
       } else if (src) {
         const img = el('img');
+        img.crossOrigin = 'anonymous';
+        corsFallback(img, src);
         img.src = src;
         img.alt = '';
-        bg.appendChild(img);
+        wrap.appendChild(img);
+        watchBars(bg, img);
       }
     }
     root.classList.toggle('show-void', !src);
     dim.style.opacity = src ? ((dimPct ?? 35) / 100).toFixed(2) : '0';
     // Blur is set for the full screen; the small preview phone scales it down to match
-    const mediaEl = bg.firstElementChild;
+    const mediaEl = bg.querySelector('video, img');
     if (mediaEl) {
       const scale = root.id === 'profile-view' ? 1 : Math.max(0.25, root.clientWidth / Math.max(window.innerWidth, 1));
       const b = (blurPx || 0) * scale;
@@ -1338,8 +1438,8 @@
       });
       if (jobs.length) {
         let done = 0;
-        btn.textContent = `${t('b.uploading')} 0/${jobs.length}`;
-        jobs.forEach(j => j.then(() => { btn.textContent = `${t('b.uploading')} ${++done}/${jobs.length}`; }, () => {}));
+        btn.textContent = `${t(wasLive ? 'b.updating' : 'b.uploading')} 0/${jobs.length}`;
+        jobs.forEach(j => j.then(() => { btn.textContent = `${t(wasLive ? 'b.updating' : 'b.uploading')} ${++done}/${jobs.length}`; }, () => {}));
       }
       const [avatarPath, bgPath, audioPath, cursorPath, bgPosterPath, ...iconPaths] = await Promise.all([avatarP, bgP, audioP, cursorP, posterP, ...iconJobs]);
       btn.textContent = working();
