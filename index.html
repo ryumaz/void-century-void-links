@@ -1477,23 +1477,6 @@
     /* Blurred backgrounds: half-size layer scaled 2.16x (= 108% of the screen), see renderBackground */
     .profile-bg .bg-soft { position: absolute; left: -4%; top: -4%; width: 50%; height: 50%; transform-origin: 0 0; transform: scale(2.16); will-change: transform; }
     .profile-dim { position: absolute; inset: 0; background: #000; transition: opacity 0.25s; }
-    /* Decoration: sits behind the card (never covers links), gently floats */
-    .pc-deco { position: absolute; z-index: 1; height: calc(var(--deco-size, 30) * 1%); width: auto; max-width: 48%; object-fit: contain; pointer-events: none; user-select: none;
-      filter: drop-shadow(0 12px 30px rgba(0,0,0,0.45)); animation: decoFloat 6s ease-in-out infinite; }
-    .pc-deco.pos-left { left: 0; bottom: 16%; }
-    .pc-deco.pos-right { right: 0; bottom: 16%; scale: -1 1; }
-    .pc-deco.pos-bottom-left { left: 2%; bottom: 0; }
-    .pc-deco.pos-bottom-right { right: 2%; bottom: 0; scale: -1 1; }
-    @keyframes decoFloat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
-    .deco-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-    .deco-grid button { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 6px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.75); cursor: pointer; font: inherit; transition: border-color .15s, background .15s; }
-    .deco-grid button:hover { border-color: rgba(255,255,255,0.35); }
-    .deco-grid button[aria-pressed="true"] { border-color: #fff; background: rgba(255,255,255,0.1); color: #fff; }
-    .deco-grid img, .deco-grid .deco-none, .deco-grid .deco-up { width: 44px; height: 44px; object-fit: contain; display: grid; place-items: center; font-size: 1.3rem; color: rgba(255,255,255,0.6); background: center / contain no-repeat; }
-    .deco-grid .deco-up { border: 1px dashed rgba(255,255,255,0.3); border-radius: 10px; }
-    .deco-grid small { font-size: 0.7rem; line-height: 1.2; text-align: center; }
-    @media (max-width: 520px) { .deco-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; } .deco-grid img, .deco-grid .deco-none, .deco-grid .deco-up { width: 34px; height: 34px; } }
-    @media (prefers-reduced-motion: reduce) { .pc-deco { animation: none; } }
     .profile-card {
       position: relative;
       z-index: 1;
@@ -2141,12 +2124,6 @@
     .np-head { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.75); margin: 0; }
     .np-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .np-top .np-head { flex: 1; min-width: 0; }
-    .np-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
-    .np-eq i { width: 3px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.55); }
-    .np-eq.on i { animation: npEq 1s ease-in-out infinite; }
-    .np-eq.on i:nth-child(2) { animation-delay: -.4s; } .np-eq.on i:nth-child(3) { animation-delay: -.2s; }
-    .np-eq.on i:nth-child(4) { animation-delay: -.7s; } .np-eq.on i:nth-child(5) { animation-delay: -.55s; }
-    @keyframes npEq { 0%, 100% { height: 3px; } 50% { height: 14px; } }
     .np-btn { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); cursor: pointer; text-decoration: none; transition: background .15s, color .15s; flex-shrink: 0; }
     .np-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
     .np-album { font-size: 0.74rem; color: rgba(255,255,255,0.5); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2176,13 +2153,6 @@
     .lyr.max .lyr-stage { width: 100vw; height: 100vh; }
     .lyr.max .lyr-box { border-radius: 0; border: 0; background: linear-gradient(160deg, rgba(40,30,70,0.35), rgba(5,5,12,0.55)); }
     .lyr.max .lyr-bg { opacity: 1; }
-    .lyr-deco { position: absolute; z-index: 1; height: 58%; bottom: 10%; pointer-events: none; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5)); animation: decoFloat 6s ease-in-out infinite; transition: all .45s; }
-    /* offset with transform: the float animation uses the separate translate property */
-    .lyr-deco.side-left { left: 0; transform: translateX(-64%); }
-    .lyr-deco.side-right { right: 0; transform: translateX(64%) scaleX(-1); }
-    .lyr.max .lyr-deco { z-index: 3; height: 34vh; bottom: 64px; }
-    .lyr.max .lyr-deco.side-left { left: 2vw; transform: none; }
-    .lyr.max .lyr-deco.side-right { right: 2vw; transform: scaleX(-1); }
     .lyr-head { display: flex; align-items: center; gap: 10px; padding: 18px 20px 6px; position: relative; z-index: 2; }
     .lyr-title { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 12px; }
     .lyr-mini .np-disc-wrap { width: 46px; height: 46px; cursor: default; }
@@ -2213,11 +2183,9 @@
       .lyr { padding: 0; }
       .lyr-stage { width: 100%; height: 100%; }
       .lyr-box { border-radius: 0; }
-      .lyr-deco { display: none; }
-      .lyr.max .lyr-deco { display: block; height: 24vh; }
       .lyr-lines { padding: 26vh 6%; }
     }
-    @media (prefers-reduced-motion: reduce) { .np-disc.spin, .np-eq.on i { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .np-disc.spin { animation: none; } }
     .np-row { display: flex; gap: 12px; align-items: center; }
     .np-art {
       width: 56px; height: 56px;
@@ -3420,7 +3388,6 @@
           <div class="seg" id="pb-cursor">
             <button type="button" data-v="default" aria-pressed="true" data-i18n="b.cursor_default">Normal</button>
             <button type="button" data-v="crosshair" aria-pressed="false" data-i18n="b.cursor_cross">Crosshair</button>
-            <button type="button" data-v="dot" aria-pressed="false" data-i18n="b.cursor_dot">Dot</button>
             <button type="button" data-v="custom" aria-pressed="false" data-i18n="b.cursor_custom">Your image</button>
           </div>
         </div>
@@ -3437,36 +3404,6 @@
           </div>
         </div>
         <p class="field-note" id="pb-cursor-note" aria-live="polite"></p>
-      </fieldset>
-
-      <fieldset>
-        <legend data-i18n="b.deco">Decoration</legend>
-        <div class="field">
-          <span class="label" data-i18n="b.deco_label">Add a figure or sticker to your page</span>
-          <div class="deco-grid" id="pb-deco"></div>
-        </div>
-        <div class="field" id="pb-deco-custom" hidden>
-          <label class="dropzone dropzone-small" id="pb-deco-drop" for="pb-deco-file">
-            <input id="pb-deco-file" type="file" accept="image/png,image/gif,image/webp,image/jpeg" hidden>
-            <span data-i18n="b.deco_upload">Upload a PNG, GIF or WebP with a see-through background (up to 4 MB)</span>
-          </label>
-        </div>
-        <div id="pb-deco-opts" hidden>
-          <div class="field">
-            <span class="label" data-i18n="b.deco_pos">Position</span>
-            <div class="seg" id="pb-deco-pos">
-              <button type="button" data-v="left" aria-pressed="true" data-i18n="b.deco_left">Left</button>
-              <button type="button" data-v="right" aria-pressed="false" data-i18n="b.deco_right">Right</button>
-              <button type="button" data-v="bottom-left" aria-pressed="false" data-i18n="b.deco_bl">Bottom left</button>
-              <button type="button" data-v="bottom-right" aria-pressed="false" data-i18n="b.deco_br">Bottom right</button>
-            </div>
-          </div>
-          <div class="field">
-            <label for="pb-deco-size"><span data-i18n="b.deco_size">Size</span> <span class="range-val" id="pb-deco-size-val">30%</span></label>
-            <input id="pb-deco-size" type="range" min="15" max="60" step="1" value="30">
-          </div>
-        </div>
-        <p class="field-note" id="pb-deco-note" aria-live="polite"></p>
       </fieldset>
 
       <fieldset>

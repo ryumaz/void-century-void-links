@@ -274,7 +274,8 @@
       progress: ts.start ? Date.now() - ts.start : 0, duration: ts.start && ts.end ? ts.end - ts.start : 0, playing: true, at: Date.now(),
     };
   };
-  const SVG_MIC = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/></svg>';
+  // Lyrics: lines of text with a music note (karaoke), not a microphone
+  const SVG_LYRICS = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h11M3 11h11M3 16h6"/><path d="M17 18V8l4-1.5"/><circle cx="15" cy="18" r="2"/></svg>';
   const SVG_OPEN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>';
   // A CD with the album art printed on it; spins while the song plays
   function discEl(np, big) {
@@ -294,14 +295,11 @@
     const label = el('p', 'np-head');
     label.innerHTML = iconSvg('spotify', 14);
     label.appendChild(document.createTextNode(' ' + t(example ? 'np.example' : 'np.listening')));
-    const eq = el('span', 'np-eq' + (np.playing ? ' on' : ''));
-    eq.innerHTML = '<i></i><i></i><i></i><i></i><i></i>';
-    eq.setAttribute('aria-hidden', 'true');
-    top.append(label, eq);
+    top.append(label);
     if (!example) {
       const lyr = el('button', 'np-btn');
       lyr.type = 'button';
-      lyr.innerHTML = SVG_MIC;
+      lyr.innerHTML = SVG_LYRICS;
       lyr.title = 'Lyrics';
       lyr.setAttribute('aria-label', 'Show lyrics');
       lyr.addEventListener('click', () => openLyrics(box));
@@ -388,7 +386,6 @@
     v.setAttribute('aria-label', 'Lyrics');
     v.innerHTML = `<div class="lyr-bg"></div>
       <div class="lyr-stage">
-        <img class="lyr-deco" alt="" aria-hidden="true" hidden>
         <div class="lyr-box">
           <div class="lyr-head">
             <button type="button" class="lyr-icon" data-act="zoom" title="Full screen" aria-label="Full screen">${SVG_ZOOM_IN}</button>
@@ -452,11 +449,6 @@
     document.body.classList.add('lyr-open');
     if (lyr) { cancelAnimationFrame(lyr.raf); clearInterval(lyr.poll); }
     lyr = { box, np, key: '', lines: null, idx: -2 };
-    // The page's figure peeks out from behind the lyrics
-    const deco = v.querySelector('.lyr-deco');
-    const d = box._deco;
-    deco.hidden = !d;
-    if (d) { deco.src = d.src; deco.className = 'lyr-deco ' + (/right/.test(d.pos) ? 'side-right' : 'side-left'); }
     await showTrack(np);
     const loop = () => { if (!lyr) return; tickLyrics(); lyr.raf = requestAnimationFrame(loop); };
     lyr.raf = requestAnimationFrame(loop);
@@ -674,45 +666,11 @@
     box.appendChild(row);
   }
 
-  // ---------- decorations: a figure or sticker on the page ----------
-  // Built-in templates are small original SVGs (white line art, works on any background).
-  const DECOS = {
-    cat: { name: 'Peeking cat', svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 190 240'><g stroke='#fff' stroke-width='4' stroke-linejoin='round' stroke-linecap='round'><path d='M22 92 L36 22 L86 70 Z' fill='#0d0d12'/><path d='M96 66 L146 24 L150 104 Z' fill='#0d0d12'/><ellipse cx='70' cy='138' rx='88' ry='74' fill='#0d0d12'/><ellipse cx='50' cy='214' rx='26' ry='16' fill='#0d0d12'/><ellipse cx='112' cy='214' rx='26' ry='16' fill='#0d0d12'/><path d='M40 210v8M50 208v10M60 210v8M102 210v8M112 208v10M122 210v8' stroke-width='2.5'/><path d='M84 156l-7 7h14z' fill='#fff' stroke-width='2'/><path d='M84 163c0 8-10 12-16 6M84 163c0 8 10 12 16 6' fill='none' stroke-width='3'/><path d='M20 150h40M24 162l36-4M110 150h44M108 158l42 6' stroke-width='2' fill='none' opacity='.8'/></g><ellipse cx='58' cy='128' rx='11' ry='15' fill='#fff'/><ellipse cx='112' cy='128' rx='11' ry='15' fill='#fff'/><ellipse cx='60' cy='130' rx='3.5' ry='11' fill='#0d0d12'/><ellipse cx='114' cy='130' rx='3.5' ry='11' fill='#0d0d12'/><circle cx='63' cy='122' r='3' fill='#fff'/><circle cx='117' cy='122' r='3' fill='#fff'/></svg>` },
-    sparkles: { name: 'Sparkles', svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'><g fill='#fff'><path d='M90 20Q96 84 160 90Q96 96 90 160Q84 96 20 90Q84 84 90 20Z'/><path d='M154 132Q157 164 188 168Q157 172 154 204Q151 172 120 168Q151 164 154 132Z' opacity='.85'/><path d='M42 168Q44 188 64 190Q44 192 42 212Q40 192 20 190Q40 188 42 168Z' opacity='.7'/><circle cx='160' cy='40' r='5' opacity='.8'/><circle cx='30' cy='40' r='3' opacity='.6'/><circle cx='112' cy='222' r='3.5' opacity='.6'/></g></svg>` },
-    moon: { name: 'Moon', svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'><path d='M118 28a92 92 0 1 0 64 150a76 76 0 1 1 -64 -150z' fill='#f4f1ff' stroke='#fff' stroke-width='3'/><g fill='#fff'><path d='M150 46Q152 62 168 64Q152 66 150 82Q148 66 132 64Q148 62 150 46Z'/><circle cx='176' cy='110' r='4'/><circle cx='34' cy='214' r='3'/><path d='M178 190Q179 198 187 199Q179 200 178 208Q177 200 169 199Q177 198 178 190Z' opacity='.8'/></g><g fill='#d8d4ea' opacity='.6'><circle cx='70' cy='120' r='10'/><circle cx='96' cy='176' r='7'/><circle cx='54' cy='170' r='5'/></g></svg>` },
-    blackhole: { name: 'Black hole', svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'><defs><radialGradient id='g' cx='50%' cy='50%' r='50%'><stop offset='55%' stop-color='#b9c6ff' stop-opacity='.55'/><stop offset='100%' stop-color='#b9c6ff' stop-opacity='0'/></radialGradient></defs><circle cx='110' cy='110' r='100' fill='url(#g)'/><path d='M14 122 A96 26 -12 0 1 206 98' fill='none' stroke='#fff' stroke-width='5' opacity='.55'/><circle cx='110' cy='110' r='46' fill='#000' stroke='#fff' stroke-width='5'/><path d='M14 122 A96 26 -12 0 0 206 98' fill='none' stroke='#fff' stroke-width='6'/></svg>` },
-    butterflies: { name: 'Butterflies', svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'><g fill='none' stroke='#fff' stroke-width='3.5' stroke-linejoin='round' stroke-linecap='round'><g transform='translate(92 92) rotate(-14)'><path d='M0-30C-40-70-78-30-56 2C-40 24-10 14 0 0Z' fill='rgba(255,255,255,.12)'/><path d='M0-30C40-70 78-30 56 2C40 24 10 14 0 0Z' fill='rgba(255,255,255,.12)'/><path d='M0 0C-30 10-46 44-24 52C-8 58 0 30 0 14ZM0 0C30 10 46 44 24 52C8 58 0 30 0 14Z' fill='rgba(255,255,255,.08)'/><path d='M0-36V40M0-36L-12-58M0-36L12-58'/></g><g transform='translate(146 192) rotate(18) scale(.5)'><path d='M0-30C-40-70-78-30-56 2C-40 24-10 14 0 0Z' fill='rgba(255,255,255,.12)'/><path d='M0-30C40-70 78-30 56 2C40 24 10 14 0 0Z' fill='rgba(255,255,255,.12)'/><path d='M0-36V30M0-36L-12-58M0-36L12-58'/></g></g><g fill='#fff' opacity='.7'><circle cx='40' cy='196' r='3'/><circle cx='170' cy='40' r='3'/></g></svg>` },
-    hearts: { name: 'Hearts', svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'><g fill='none' stroke='#fff' stroke-width='4' stroke-linejoin='round' stroke-linecap='round'><path d='M96 176s-70-40-74-86c-3-32 36-48 62-20c6 6 10 12 12 16c2-4 6-10 12-16c26-28 66-12 62 20c-4 46-74 86-74 86z' fill='rgba(255,255,255,.1)'/><path d='M150 216s-26-15-28-32c-1-12 13-18 23-8l5 6l5-6c10-10 24-4 23 8c-2 17-28 32-28 32z' opacity='.85'/><path d='M40 40s-16-9-17-20c-1-7 8-11 14-5l3 4l3-4c6-6 15-2 14 5c-1 11-17 20-17 20z' opacity='.75'/><path d='M60 120c6-14 22-22 34-18' opacity='.6'/></g></svg>` },
-  };
-  const decoUrlOf = key => (DECOS[key] ? 'data:image/svg+xml,' + encodeURIComponent(DECOS[key].svg) : '');
-  // What to show: { src, pos, size } or null
-  function decoInfo(data, media) {
-    const d = data && data.deco;
-    if (!d || !d.type) return null;
-    const src = d.type === 'custom' ? (media.decoUrl || data.decoUrl || '') : decoUrlOf(d.type);
-    return src ? { src, pos: d.pos || 'left', size: d.size || 30, custom: d.type === 'custom' } : null;
-  }
-  function renderDeco(root, info) {
-    let img = root.querySelector(':scope > .pc-deco');
-    if (!info) { if (img) img.remove(); return; }
-    if (!img) {
-      img = el('img', 'pc-deco');
-      img.alt = '';
-      img.setAttribute('aria-hidden', 'true');
-      img.draggable = false;
-      root.insertBefore(img, root.querySelector('.profile-card'));
-    }
-    if (img.getAttribute('src') !== info.src) img.src = info.src;
-    img.className = 'pc-deco pos-' + info.pos;
-    img.style.setProperty('--deco-size', info.size);
-  }
-
   // ---------- custom cursor ----------
   // Presets are tiny SVGs; uploaded images are turned into a 32x32 PNG (the size every browser accepts).
   const svgCursor = svg => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
   const CURSOR_PRESETS = {
     crosshair: svgCursor("<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><g stroke-linecap='round'><path d='M16 4v7M16 21v7M4 16h7M21 16h7' stroke='black' stroke-opacity='.55' stroke-width='3.5'/><path d='M16 4v7M16 21v7M4 16h7M21 16h7' stroke='white' stroke-width='1.5'/></g><circle cx='16' cy='16' r='1.7' fill='white' stroke='black' stroke-opacity='.5'/></svg>") + ' 16 16, crosshair',
-    dot: svgCursor("<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><circle cx='16' cy='16' r='6' fill='white' stroke='black' stroke-opacity='.45' stroke-width='2'/></svg>") + ' 16 16, default',
   };
   function cursorCss(data, url) {
     if (!data) return '';
@@ -751,10 +709,7 @@
   function renderProfile(root, data, media, opts = {}) {
     renderBackground(root, media, data.dim, data.blur);
     applyCursor(root, cursorCss(data, media.cursorUrl || data.cursorUrl));
-    const deco = decoInfo(data, media);
-    renderDeco(root, deco);
     const card = ensureCard(root);
-    card.querySelector('.pc-np')._deco = deco;
 
     const avatar = card.querySelector('.pc-avatar');
     avatar.textContent = '';
@@ -892,11 +847,6 @@
   const fBlur = $('pb-blur'), fNowPlaying = $('pb-nowplaying');
   const segSound = $('pb-sound'), segLayout = $('pb-layout');
   const segCursor = $('pb-cursor'), segCursorHot = $('pb-cursor-hot'), fCursor = $('pb-cursor-file');
-  const segDeco = $('pb-deco'), segDecoPos = $('pb-deco-pos'), fDecoFile = $('pb-deco-file'), fDecoSize = $('pb-deco-size');
-  // Template tiles: None, the built-in figures, then "Your image"
-  segDeco.innerHTML = `<button type="button" data-v="none" aria-pressed="true"><span class="deco-none">∅</span><small>${t('b.deco_none')}</small></button>`
-    + Object.entries(DECOS).map(([k, d]) => `<button type="button" data-v="${k}" aria-pressed="false" title="${d.name}"><img src="${decoUrlOf(k)}" alt=""><small>${d.name}</small></button>`).join('')
-    + `<button type="button" data-v="custom" aria-pressed="false"><span class="deco-up" id="pb-deco-swatch">+</span><small>${t('b.deco_custom')}</small></button>`;
   const linksBox = $('pb-links');
 
   // Each media slot is either a new local file (Blob, not uploaded yet) or a file
@@ -907,7 +857,6 @@
     bgPosterBlob: null, bgPosterUrl: '', bgPosterPath: null,   // still frame of a video background
     audioBlob: null, audioUrl: '', audioPath: null, audioName: '',
     cursorBlob: null, cursorUrl: '', cursorPath: null,
-    decoBlob: null, decoUrl: '', decoPath: null,
     icons: {},          // linkId → { blob, url, path }
   };
   const revoke = url => { if (url && url.startsWith('blob:')) URL.revokeObjectURL(url); };
@@ -1122,8 +1071,7 @@
       cursor: segValue(segCursor),
       cursorHotspot: segValue(segCursorHot),
       hadCursor: !!(myPageCache && myPageCache.cursor && myPageCache.cursor !== 'default'),
-      deco: segValue(segDeco) === 'none' ? null : { type: segValue(segDeco), pos: segValue(segDecoPos), size: Number(fDecoSize.value) },
-      hadDeco: !!(myPageCache && myPageCache.deco),
+      hadDeco: !!(myPageCache && myPageCache.decoPath),
     };
   }
 
@@ -1203,16 +1151,6 @@
     $('pb-cursor-swatch').style.backgroundImage = draft.cursorUrl ? `url("${draft.cursorUrl}")` : '';
     $('pb-cursor-note').textContent = cur === 'custom' && !draft.cursorUrl ? t('b.cursor_need') : cur !== 'default' ? t('b.cursor_try') : '';
 
-    // Decoration
-    const dType = segValue(segDeco);
-    $('pb-deco-custom').hidden = dType !== 'custom';
-    $('pb-deco-opts').hidden = dType === 'none';
-    $('pb-deco-size-val').textContent = fDecoSize.value + '%';
-    const sw = $('pb-deco-swatch');
-    if (sw) { sw.style.backgroundImage = draft.decoUrl ? `url("${draft.decoUrl}")` : ''; sw.textContent = draft.decoUrl ? '' : '+'; }
-    $('pb-deco-drop').classList.toggle('has-file', !!draft.decoUrl);
-    $('pb-deco-note').textContent = dType === 'custom' && !draft.decoUrl ? t('b.deco_need') : '';
-
     paintRows();
     renderProfile(phone, currentData(), { ...draft, icons: iconUrls() }, {
       preview: true,
@@ -1267,27 +1205,7 @@
       update();
     } catch (_) { toast(t('b.cursor_bad')); }
   });
-  fDecoFile.addEventListener('change', () => {
-    const file = fDecoFile.files[0];
-    fDecoFile.value = '';
-    if (!file) return;
-    if (!/^image\/(png|gif|webp|jpeg)$/.test(file.type)) { toast(t('b.deco_bad')); return; }
-    if (file.size > 4 * 1024 * 1024) { toast(t('toast.full')); return; }
-    setBlob('deco', file, file.name);
-    seg(segDeco, 'custom');
-    update();
-  });
-  const decoDrop = $('pb-deco-drop');
-  ['dragenter', 'dragover'].forEach(ev => decoDrop.addEventListener(ev, e => { e.preventDefault(); decoDrop.classList.add('drag'); }));
-  ['dragleave', 'drop'].forEach(ev => decoDrop.addEventListener(ev, e => { e.preventDefault(); decoDrop.classList.remove('drag'); }));
-  decoDrop.addEventListener('drop', e => {
-    const file = e.dataTransfer.files[0];
-    if (!file || !/^image\/(png|gif|webp|jpeg)$/.test(file.type) || file.size > 4 * 1024 * 1024) { toast(t('b.deco_bad')); return; }
-    setBlob('deco', file, file.name);
-    seg(segDeco, 'custom');
-    update();
-  });
-  [segSound, segLayout, segCursor, segCursorHot, segDeco, segDecoPos].forEach(s => s.addEventListener('click', e => {
+  [segSound, segLayout, segCursor, segCursorHot].forEach(s => s.addEventListener('click', e => {
     const b = e.target.closest('button[data-v]');
     if (!b) return;
     seg(s, b.dataset.v);
@@ -1308,10 +1226,6 @@
     setBlob('cursor', null);
     seg(segCursor, 'default');
     seg(segCursorHot, 'tip');
-    setBlob('deco', null);
-    seg(segDeco, 'none');
-    seg(segDecoPos, 'left');
-    fDecoSize.value = 30;
     Object.keys(draft.icons).forEach(id => setIcon(id, null));
     linksBox.textContent = '';
     addLink({ label: 'GitHub', icon: 'github' });
@@ -1337,7 +1251,7 @@
   });
 
   // Photos are re-encoded to a sensible size before upload (GIFs, video and audio are left alone)
-  const SHRINK = { avatar: 512, background: 2560, decoration: 1000 };
+  const SHRINK = { avatar: 512, background: 2560 };
   async function shrink(blob, name) {
     const max = name.startsWith('icon-') ? 160 : SHRINK[name];
     if (!max || !/^image\/(png|jpeg|webp)$/.test(blob.type)) return blob;
@@ -1392,7 +1306,6 @@
       const bgP = slot('bg', 'background');
       const audioP = data.sound === 'file' ? slot('audio', 'audio') : Promise.resolve(draft.audioUrl ? draft.audioPath : null);
       const cursorP = data.cursor === 'custom' ? slot('cursor', 'cursor') : Promise.resolve(null);
-      const decoP = data.deco && data.deco.type === 'custom' ? slot('deco', 'decoration') : Promise.resolve(null);
       const posterP = draft.bgType !== 'video' || !draft.bgUrl ? Promise.resolve(null)
         : draft.bgPosterBlob ? queue('background-poster', draft.bgPosterBlob)
         : Promise.resolve(draft.bgPosterUrl ? draft.bgPosterPath : null);
@@ -1406,15 +1319,15 @@
         btn.textContent = `${t('b.uploading')} 0/${jobs.length}`;
         jobs.forEach(j => j.then(() => { btn.textContent = `${t('b.uploading')} ${++done}/${jobs.length}`; }, () => {}));
       }
-      const [avatarPath, bgPath, audioPath, cursorPath, bgPosterPath, decoPath, ...iconPaths] = await Promise.all([avatarP, bgP, audioP, cursorP, posterP, decoP, ...iconJobs]);
+      const [avatarPath, bgPath, audioPath, cursorPath, bgPosterPath, ...iconPaths] = await Promise.all([avatarP, bgP, audioP, cursorP, posterP, ...iconJobs]);
       btn.textContent = working();
       const links = data.links.map((l, i) => ({ ...l, iconPath: iconPaths[i] }));
-      const saved = await DB.savePage({ ...data, links, avatarPath, bgPath, bgType: draft.bgType, audioPath, cursorPath, bgPosterPath, decoPath, hadPoster: !!(myPageCache && myPageCache.bgPosterPath) }, myPageCache);
+      const saved = await DB.savePage({ ...data, links, avatarPath, bgPath, bgType: draft.bgType, audioPath, cursorPath, bgPosterPath, hadPoster: !!(myPageCache && myPageCache.bgPosterPath) }, myPageCache);
       if (draft.bgPosterBlob) { draft.bgPosterBlob = null; draft.bgPosterPath = bgPosterPath; }
       myPageCache = saved;
       takenCache[saved.username] = me().id;
       // Keep showing the local copies (no re-download), but remember where they're stored now
-      const paths = { avatar: avatarPath, bg: bgPath, audio: audioPath, cursor: cursorPath, deco: decoPath };
+      const paths = { avatar: avatarPath, bg: bgPath, audio: audioPath, cursor: cursorPath };
       Object.keys(paths).forEach(kind => { if (draft[kind + 'Blob']) { draft[kind + 'Blob'] = null; draft[kind + 'Path'] = paths[kind]; } });
       data.links.forEach((l, i) => { const ic = draft.icons[l.id]; if (ic && ic.blob) { ic.blob = null; ic.path = iconPaths[i]; } });
       $('pb-result-url').textContent = siteHost() + '/' + saved.username;
@@ -1424,7 +1337,7 @@
       document.dispatchEvent(new CustomEvent('pagepublished', { detail: saved.username }));
     } catch (e) {
       const msg = (e && (e.message || '')) + ' ' + (e && e.code || '');
-      toast(/deco_upgrade/.test(msg) ? t('b.deco_upgrade') : /cursor/i.test(msg) ? t('b.cursor_upgrade') : /23505|duplicate/.test(msg) ? t('b.taken_full') : /payload|size|large/i.test(msg) ? t('toast.full') : t('toast.save_fail'));
+      toast(/cursor/i.test(msg) ? t('b.cursor_upgrade') : /23505|duplicate/.test(msg) ? t('b.taken_full') : /payload|size|large/i.test(msg) ? t('toast.full') : t('toast.save_fail'));
     } finally {
       btn.disabled = false;
       syncPublishBtn();
@@ -1471,12 +1384,8 @@
     setBlob('bg', null, page.bgType, page.bgUrl ? { url: page.bgUrl, path: page.bgPath, type: page.bgType, posterUrl: page.bgPosterUrl, posterPath: page.bgPosterPath } : null);
     setBlob('audio', null, 'audio', page.audioUrl ? { url: page.audioUrl, path: page.audioPath } : null);
     setBlob('cursor', null, '', page.cursorUrl ? { url: page.cursorUrl, path: page.cursorPath } : null);
-    seg(segCursor, page.cursor === 'custom' && !page.cursorUrl ? 'default' : (page.cursor || 'default'));
+    seg(segCursor, (page.cursor === 'custom' && !page.cursorUrl) || page.cursor === 'dot' ? 'default' : (page.cursor || 'default'));
     seg(segCursorHot, page.cursorHotspot || 'tip');
-    setBlob('deco', null, '', page.decoUrl ? { url: page.decoUrl, path: page.decoPath } : null);
-    seg(segDeco, page.deco ? (page.deco.type === 'custom' && !page.decoUrl ? 'none' : page.deco.type) : 'none');
-    seg(segDecoPos, (page.deco && page.deco.pos) || 'left');
-    fDecoSize.value = (page.deco && page.deco.size) || 30;
     $('pb-result-url').textContent = siteHost() + '/' + page.username;
     $('pb-result').hidden = false;
     update();
@@ -1523,7 +1432,7 @@
       renderProfile(view, { username: user, name: t(window.DB ? 'p.missing' : 'toast.offline'), links: [] }, {});
     } else {
       const media = {
-        avatarUrl: page.avatarUrl, bgUrl: page.bgUrl, bgType: page.bgType, bgPosterUrl: page.bgPosterUrl, cursorUrl: page.cursorUrl, decoUrl: page.decoUrl,
+        avatarUrl: page.avatarUrl, bgUrl: page.bgUrl, bgType: page.bgType, bgPosterUrl: page.bgPosterUrl, cursorUrl: page.cursorUrl,
         icons: Object.fromEntries((page.links || []).filter(l => l.iconUrl).map(l => [l.id, l.iconUrl])),
       };
       if (page.audioUrl && page.sound === 'file') {
