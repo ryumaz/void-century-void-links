@@ -60,6 +60,8 @@ window.siteHost = () => {
       bgPosterPath: r.bg_poster || null, bgPosterUrl: publicUrl(r.bg_poster),
       cursor: r.cursor || 'default', cursorHotspot: r.cursor_hotspot || 'tip',
       cursorPath: r.cursor_path || null, cursorUrl: publicUrl(r.cursor_path),
+      deco: r.deco && r.deco.type ? { type: r.deco.type, pos: r.deco.pos || 'left', size: Number(r.deco.size) || 30 } : null,
+      decoPath: (r.deco && r.deco.path) || null, decoUrl: publicUrl(r.deco && r.deco.path),
     };
   }
   function toRow(p, owner) {
@@ -83,11 +85,16 @@ window.siteHost = () => {
       row.cursor_path = custom ? p.cursorPath : null;
       row.cursor_hotspot = p.cursorHotspot === 'center' ? 'center' : 'tip';
     }
+    // Decoration (column from upgrade-decorations.sql); only sent when used
+    if ((p.deco && p.deco.type) || p.hadDeco) {
+      const d = p.deco && p.deco.type && (p.deco.type !== 'custom' || p.decoPath) ? p.deco : null;
+      row.deco = d ? { type: d.type, pos: d.pos || 'left', size: Math.max(10, Math.min(70, Math.round(d.size || 30))), ...(d.type === 'custom' ? { path: p.decoPath } : {}) } : null;
+    }
     // Still frame for video backgrounds (column from upgrade-clean-urls.sql); only sent when used
     if (p.bgPosterPath || p.hadPoster) row.bg_poster = p.bgPath && p.bgType === 'video' ? (p.bgPosterPath || null) : null;
     return row;
   }
-  const filesOf = p => (p ? [p.avatarPath, p.bgPath, p.bgPosterPath, p.audioPath, p.cursorPath, ...(p.links || []).map(l => l.iconPath)].filter(Boolean) : []);
+  const filesOf = p => (p ? [p.avatarPath, p.bgPath, p.bgPosterPath, p.audioPath, p.cursorPath, p.decoPath, ...(p.links || []).map(l => l.iconPath)].filter(Boolean) : []);
 
   // Public address of the site, used for short links and page links.
   const siteBase = () => {
@@ -210,6 +217,10 @@ window.siteHost = () => {
       if (res.error && 'bg_poster' in row && /bg_poster|PGRST204|42703/.test(res.error.code + ' ' + res.error.message)) {
         delete row.bg_poster;
         res = await write(row);
+      }
+      // No deco column yet: say exactly what to run instead of a generic error
+      if (res.error && 'deco' in row && /deco|PGRST204|42703/.test(res.error.code + ' ' + res.error.message)) {
+        const e = new Error('decoration-upgrade'); e.code = 'deco_upgrade'; throw e;
       }
       fail(res.error);
       const saved = fromRow(res.data);

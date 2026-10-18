@@ -45,7 +45,7 @@
       'b.avatar': 'Avatar', 'b.bg': 'Background', 'b.drop': 'Drop an image, GIF or video, or click to upload',
       'b.void': 'No background: your page floats over the black hole.', 'b.remove': 'Remove',
       'b.dim': 'Background dim', 'b.links': 'Links', 'b.addlink': '+ Add link', 'b.label_ph': 'Label',
-      'b.publish': 'Publish page', 'b.save': 'Save changes', 'b.saving': 'Saving…', 'b.reset': 'Reset', 'b.copy': 'Copy link', 'b.open': 'Open page',
+      'b.publish': 'Publish page', 'b.save': 'Save changes', 'b.saving': 'Saving…', 'b.deco': 'Decoration', 'b.deco_label': 'Add a figure or sticker to your page', 'b.deco_none': 'None', 'b.deco_custom': 'Your image', 'b.deco_upload': 'Upload a PNG, GIF or WebP with a see-through background (up to 4 MB)', 'b.deco_pos': 'Position', 'b.deco_left': 'Left', 'b.deco_right': 'Right', 'b.deco_bl': 'Bottom left', 'b.deco_br': 'Bottom right', 'b.deco_size': 'Size', 'b.deco_need': 'Upload an image to use this.', 'b.deco_bad': "That image can't be used. Try a PNG, GIF or WebP up to 4 MB.", 'b.deco_upgrade': 'Decorations need a quick database upgrade: run supabase/upgrade-decorations.sql in Supabase.', 'b.reset': 'Reset', 'b.copy': 'Copy link', 'b.open': 'Open page',
       'b.available': 'available', 'b.yours': 'yours, publishing updates it', 'b.invalid': '2–20 letters, numbers, _ . -',
       'b.preview': 'Live preview', 'b.views': 'views', 'b.published': 'Published',
       'an.eyebrow': 'Analytics & clicks', 'an.title': 'Data that actually<br>means something',
