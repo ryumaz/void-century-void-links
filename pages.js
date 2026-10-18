@@ -251,7 +251,7 @@
             const imgs = j.item.album.images || [];
             data = {
               song: j.item.name, artist: j.item.artists.map(a => a.name).join(', '),
-              art: (imgs[1] || imgs[0] || {}).url || '', url: j.item.external_urls.spotify,
+              art: (imgs[1] || imgs[0] || {}).url || '', url: j.item.external_urls.spotify, album: j.item.album.name,
               progress: j.progress_ms, duration: j.item.duration_ms, playing: j.is_playing, at: Date.now(),
             };
           }
@@ -264,15 +264,59 @@
   const exampleNp = () => ({ song: 'No. 1 Party Anthem', artist: 'Arctic Monkeys', art: '', duration: 243000, progress: 7000, playing: true, at: Date.now() });
   const fmtTime = ms => { const sec = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`; };
 
+  // Spotify via Discord (Lanyard): what visitors can see, since it needs no login of theirs
+  const fromLanyard = d => {
+    if (!d || typeof d !== 'object' || !d.listening_to_spotify || !d.spotify) return null;
+    const sp = d.spotify, ts = sp.timestamps || {};
+    return {
+      song: sp.song, artist: (sp.artist || '').replace(/; /g, ', '), album: sp.album || '', art: sp.album_art_url || '',
+      url: sp.track_id ? 'https://open.spotify.com/track/' + sp.track_id : '',
+      progress: ts.start ? Date.now() - ts.start : 0, duration: ts.start && ts.end ? ts.end - ts.start : 0, playing: true, at: Date.now(),
+    };
+  };
+  const SVG_MIC = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/></svg>';
+  const SVG_OPEN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>';
+  // A CD with the album art printed on it; spins while the song plays
+  function discEl(np, big) {
+    const wrap = el('div', 'np-disc-wrap' + (big ? ' big' : ''));
+    const disc = el('div', 'np-disc' + (np.playing ? ' spin' : ''));
+    if (np.art) disc.style.setProperty('--art', `url("${np.art.replace(/"/g, '%22')}")`);
+    else disc.classList.add('no-art');
+    disc.appendChild(el('span', 'np-hole'));
+    wrap.append(disc, el('span', 'np-sheen'));
+    return wrap;
+  }
+
   function renderNowPlaying(box, np, example) {
     box.textContent = '';
     box.classList.toggle('np-example', !!example);
-    const head = el('p', 'np-head');
-    head.innerHTML = iconSvg('spotify', 14);
-    head.appendChild(document.createTextNode(' ' + t(example ? 'np.example' : 'np.listening')));
+    const top = el('div', 'np-top');
+    const label = el('p', 'np-head');
+    label.innerHTML = iconSvg('spotify', 14);
+    label.appendChild(document.createTextNode(' ' + t(example ? 'np.example' : 'np.listening')));
+    const eq = el('span', 'np-eq' + (np.playing ? ' on' : ''));
+    eq.innerHTML = '<i></i><i></i><i></i><i></i><i></i>';
+    eq.setAttribute('aria-hidden', 'true');
+    top.append(label, eq);
+    if (!example) {
+      const lyr = el('button', 'np-btn');
+      lyr.type = 'button';
+      lyr.innerHTML = SVG_MIC;
+      lyr.title = 'Lyrics';
+      lyr.setAttribute('aria-label', 'Show lyrics');
+      lyr.addEventListener('click', () => openLyrics(box));
+      top.appendChild(lyr);
+      if (np.url) {
+        const open = el('a', 'np-btn');
+        open.href = np.url; open.target = '_blank'; open.rel = 'noopener noreferrer';
+        open.innerHTML = SVG_OPEN; open.title = 'Open in Spotify';
+        open.setAttribute('aria-label', 'Open in Spotify');
+        top.appendChild(open);
+      }
+    }
     const row = el('div', 'np-row');
-    const art = el('div', 'np-art');
-    if (np.art) { const img = el('img'); img.src = np.art; img.alt = ''; art.appendChild(img); } else { art.innerHTML = MUSIC; }
+    const disc = discEl(np);
+    if (!example) { disc.title = 'Show lyrics'; disc.addEventListener('click', () => openLyrics(box)); }
     const info = el('div', 'np-info');
     let song = el('strong', 'np-song', np.song);
     if (np.url) { song = el('a', 'np-song', np.song); song.href = np.url; song.target = '_blank'; song.rel = 'noopener noreferrer'; }
@@ -282,9 +326,11 @@
     const cur = el('span');
     const times = el('div', 'np-times');
     times.append(cur, el('span', '', fmtTime(np.duration)));
-    info.append(song, el('span', 'np-artist', np.artist), bar, times);
-    row.append(art, info);
-    box.append(head, row);
+    info.append(song, el('span', 'np-artist', np.artist));
+    if (np.album && np.album !== np.song) info.appendChild(el('span', 'np-album', np.album));
+    info.append(bar, times);
+    row.append(disc, info);
+    box.append(top, row);
     box._np = { ...np, fill, cur };
     tickNp(box);
   }
@@ -294,6 +340,158 @@
     const pos = Math.min(n.duration, n.progress + (n.playing ? Date.now() - n.at : 0));
     n.fill.style.width = (pos / n.duration * 100).toFixed(2) + '%';
     n.cur.textContent = fmtTime(pos);
+  }
+
+  // ---------- lyrics (LRCLIB: free, open, time-synced lyrics) ----------
+  const lyricsCache = new Map();
+  async function fetchLyrics(np) {
+    const key = (np.artist + '|' + np.song).toLowerCase();
+    if (lyricsCache.has(key)) return lyricsCache.get(key);
+    const first = np.artist.split(',')[0].trim();
+    const q = new URLSearchParams({ track_name: np.song, artist_name: first });
+    let out = null;
+    try {
+      const exact = new URLSearchParams(q);
+      if (np.album) exact.set('album_name', np.album);
+      if (np.duration) exact.set('duration', String(Math.round(np.duration / 1000)));
+      let r = await fetch('https://lrclib.net/api/get?' + exact);
+      if (r.ok) out = await r.json();
+      // No timestamps on the exact match? Look for a version that has them
+      if (!out || !out.syncedLyrics) {
+        r = await fetch('https://lrclib.net/api/search?' + q);
+        const list = r.ok ? await r.json() : [];
+        out = list.find(x => x.syncedLyrics) || (out && out.plainLyrics ? out : list.find(x => x.plainLyrics)) || null;
+      }
+    } catch (_) { out = 'error'; }
+    const lines = [];
+    if (out && out !== 'error' && out.syncedLyrics) {
+      out.syncedLyrics.split('\n').forEach(line => {
+        const m = line.match(/^\[(\d+):(\d+(?:\.\d+)?)\](.*)$/);
+        if (m) lines.push({ t: (+m[1] * 60 + +m[2]) * 1000, text: m[3].trim() });
+      });
+    }
+    const res = out === 'error' ? { error: true } : lines.length ? { synced: lines } : out && out.plainLyrics ? { plain: out.plainLyrics.split('\n') } : { none: true };
+    if (!res.error) lyricsCache.set(key, res);
+    return res;
+  }
+
+  let lyr = null;   // the open viewer
+  function lyricsShell() {
+    if (document.getElementById('lyr')) return document.getElementById('lyr');
+    const v = el('div', 'lyr');
+    v.id = 'lyr';
+    v.hidden = true;
+    v.setAttribute('role', 'dialog');
+    v.setAttribute('aria-modal', 'true');
+    v.setAttribute('aria-label', 'Lyrics');
+    v.innerHTML = `<div class="lyr-bg"></div>
+      <div class="lyr-box">
+        <div class="lyr-head">
+          <button type="button" class="lyr-icon" data-act="full" title="Full screen" aria-label="Full screen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+          <div class="lyr-title"><strong></strong><span></span></div>
+          <button type="button" class="lyr-icon" data-act="close" title="Close" aria-label="Close lyrics"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <div class="lyr-body"><div class="lyr-side"></div><div class="lyr-lines" tabindex="0"></div></div>
+        <div class="lyr-foot"><span class="lyr-cur">0:00</span><div class="lyr-bar"><i></i></div><span class="lyr-left">-0:00</span></div>
+      </div>`;
+    v.addEventListener('click', e => {
+      const a = e.target.closest('[data-act]');
+      if (a && a.dataset.act === 'close') closeLyrics();
+      else if (a && a.dataset.act === 'full') {
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        else (v.requestFullscreen ? v.requestFullscreen() : Promise.reject()).catch(() => {});
+      } else if (e.target === v || e.target.classList.contains('lyr-bg')) closeLyrics();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && lyr) closeLyrics(); });
+    document.body.appendChild(v);
+    return v;
+  }
+  function closeLyrics() {
+    const v = document.getElementById('lyr');
+    if (!v || !lyr) return;
+    clearInterval(lyr.timer); clearInterval(lyr.poll);
+    if (document.fullscreenElement === v) document.exitFullscreen().catch(() => {});
+    v.hidden = true;
+    document.body.classList.remove('lyr-open');
+    const back = lyr.box && lyr.box.querySelector('.np-btn');
+    lyr = null;
+    if (back) back.focus({ preventScroll: true });
+  }
+  async function openLyrics(box) {
+    const np = box._np;
+    if (!np) return;
+    const v = lyricsShell();
+    v.hidden = false;
+    document.body.classList.add('lyr-open');
+    if (lyr) { clearInterval(lyr.timer); clearInterval(lyr.poll); }
+    lyr = { box, np, key: '', lines: null, idx: -2 };
+    await showTrack(np);
+    lyr.timer = setInterval(tickLyrics, 250);
+    // Follow the song: re-read what's playing every 15 s
+    lyr.poll = setInterval(async () => {
+      if (!lyr || !lyr.box._refresh) return;
+      const fresh = await lyr.box._refresh();
+      if (fresh && lyr) { lyr.np = fresh; if ((fresh.artist + fresh.song) !== lyr.key) showTrack(fresh); }
+    }, 15000);
+    v.querySelector('[data-act="close"]').focus({ preventScroll: true });
+  }
+  async function showTrack(np) {
+    const v = document.getElementById('lyr');
+    lyr.key = np.artist + np.song;
+    lyr.np = np;
+    lyr.idx = -2;
+    v.querySelector('.lyr-title strong').textContent = np.song;
+    v.querySelector('.lyr-title span').textContent = np.artist;
+    v.querySelector('.lyr-bg').style.backgroundImage = np.art ? `url("${np.art.replace(/"/g, '%22')}")` : '';
+    const side = v.querySelector('.lyr-side');
+    side.textContent = '';
+    side.appendChild(discEl(np, true));
+    if (np.url) {
+      const a = el('a', 'lyr-open-sp');
+      a.href = np.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.innerHTML = iconSvg('spotify', 16) + ' <span>Play on Spotify</span>';
+      side.appendChild(a);
+    }
+    const box = v.querySelector('.lyr-lines');
+    box.innerHTML = '<p class="lyr-msg">Loading lyrics…</p>';
+    const res = await fetchLyrics(np);
+    if (!lyr || lyr.key !== np.artist + np.song) return;
+    box.textContent = '';
+    if (res.synced) {
+      lyr.lines = res.synced;
+      res.synced.forEach(l => box.appendChild(el('p', 'lyr-line' + (l.text ? '' : ' gap'), l.text || '♪')));
+    } else if (res.plain) {
+      lyr.lines = null;
+      box.classList.add('plain');
+      res.plain.forEach(text => box.appendChild(el('p', 'lyr-line on', text || ' ')));
+      box.appendChild(el('p', 'lyr-msg', 'These lyrics are not time-synced.'));
+    } else {
+      lyr.lines = null;
+      box.appendChild(el('p', 'lyr-msg', res.error ? "Couldn't load lyrics. Check your connection." : 'No lyrics found for this song.'));
+    }
+    box.classList.toggle('plain', !!res.plain);
+    box.scrollTop = 0;
+    tickLyrics();
+  }
+  function tickLyrics() {
+    if (!lyr) return;
+    const v = document.getElementById('lyr');
+    const n = lyr.np;
+    const pos = Math.min(n.duration || Infinity, n.progress + (n.playing ? Date.now() - n.at : 0));
+    if (n.duration) {
+      v.querySelector('.lyr-bar i').style.width = (pos / n.duration * 100).toFixed(2) + '%';
+      v.querySelector('.lyr-cur').textContent = fmtTime(pos);
+      v.querySelector('.lyr-left').textContent = '-' + fmtTime(n.duration - pos);
+    }
+    if (!lyr.lines) return;
+    let i = -1;
+    for (let k = 0; k < lyr.lines.length; k++) { if (lyr.lines[k].t <= pos + 150) i = k; else break; }
+    if (i === lyr.idx) return;
+    lyr.idx = i;
+    const box = v.querySelector('.lyr-lines');
+    [...box.children].forEach((p, k) => { p.classList.toggle('on', k === i); p.classList.toggle('past', k < i); });
+    const cur = box.children[Math.max(0, i)];
+    if (cur) box.scrollTo({ top: cur.offsetTop - box.clientHeight / 2 + cur.clientHeight / 2, behavior: 'smooth' });
   }
   setInterval(() => document.querySelectorAll('.pc-np:not([hidden])').forEach(tickNp), 1000);
 
@@ -536,7 +734,13 @@
     if (!data.nowPlaying) {
       npBox.hidden = true;
     } else {
-      spNowPlaying().then(np => {
+      const readNp = async () => {
+        let np = await spNowPlaying();
+        if (!np && /^\d{17,20}$/.test(discordId)) np = fromLanyard(await lanyard(discordId));
+        return np;
+      };
+      npBox._refresh = readNp;
+      readNp().then(np => {
         if (!npBox.dataset.want) return;
         if (np) { npBox.hidden = false; renderNowPlaying(npBox, np, false); }
         else if (opts.preview) { npBox.hidden = false; renderNowPlaying(npBox, exampleNp(), true); }
@@ -1036,12 +1240,20 @@
     } catch (_) { return blob; }
   }
 
+  // "Publish page" the first time; "Save changes" once the page is live
+  function syncPublishBtn() {
+    const btn = form && form.querySelector('button[type="submit"]');
+    if (!btn || btn.disabled) return;
+    btn.dataset.i18n = myPageCache ? 'b.save' : 'b.publish';
+    btn.textContent = t(btn.dataset.i18n);
+  }
   async function publish() {
     if (!usernameNote()) { fUser.focus(); return; }
     if (!window.DB) { toast(t('toast.offline')); return; }
     const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;
-    btn.textContent = t('b.publishing');
+    const working = () => t(myPageCache ? 'b.saving' : 'b.publishing');
+    btn.textContent = working();
     try {
       const data = currentData();
       // Only ask the server about the name if it changed
@@ -1078,7 +1290,7 @@
         jobs.forEach(j => j.then(() => { btn.textContent = `${t('b.uploading')} ${++done}/${jobs.length}`; }, () => {}));
       }
       const [avatarPath, bgPath, audioPath, cursorPath, bgPosterPath, ...iconPaths] = await Promise.all([avatarP, bgP, audioP, cursorP, posterP, ...iconJobs]);
-      btn.textContent = t('b.publishing');
+      btn.textContent = working();
       const links = data.links.map((l, i) => ({ ...l, iconPath: iconPaths[i] }));
       const saved = await DB.savePage({ ...data, links, avatarPath, bgPath, bgType: draft.bgType, audioPath, cursorPath, bgPosterPath, hadPoster: !!(myPageCache && myPageCache.bgPosterPath) }, myPageCache);
       if (draft.bgPosterBlob) { draft.bgPosterBlob = null; draft.bgPosterPath = bgPosterPath; }
@@ -1098,7 +1310,7 @@
       toast(/cursor/i.test(msg) ? t('b.cursor_upgrade') : /23505|duplicate/.test(msg) ? t('b.taken_full') : /payload|size|large/i.test(msg) ? t('toast.full') : t('toast.save_fail'));
     } finally {
       btn.disabled = false;
-      btn.textContent = t('b.publish');
+      syncPublishBtn();
     }
   }
 
@@ -1335,6 +1547,7 @@
   function mountBuilder(slot) {
     if (slot && builder.parentElement !== slot) slot.appendChild(builder);
     update();
+    syncPublishBtn();
   }
   function unmountBuilder() {
     closeIconMenu();
@@ -1367,6 +1580,7 @@
     delete takenCache[myPageCache.username];
     myPageCache = null;
     resetBuilder();
+    syncPublishBtn();
   }
   // Called whenever someone signs in or out: load (or clear) their page
   function onAuthChange() {
@@ -1374,6 +1588,7 @@
       try { myPageCache = me() && window.DB ? await DB.getMyPage() : null; } catch (_) { myPageCache = null; }
       if (myPageCache) loadIntoBuilder(myPageCache);
       else resetBuilder();
+      syncPublishBtn();
       if (typeof updateAuthUI === 'function') updateAuthUI();
     })();
     return syncing;
