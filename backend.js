@@ -97,7 +97,7 @@ window.siteHost = () => {
   };
   const SLUG_RE = /^[A-Za-z0-9_-]{2,40}$/;
   // Paths the site itself uses, so they can't become short links
-  const RESERVED = new Set(['admin', 'go', 'index', 'assets', 'api', 'login', 'signup', 'dashboard', 'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify']);
+  const RESERVED = new Set(['admin', 'go', 'index', 'assets', 'api', 'login', 'signup', 'dashboard', 'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify', 'functions']);
   // Link columns the browser may read (the password hash stays on the server)
   const LINK_COLS = 'slug, destination, clicks, created_at, starts_at, expires_at, max_clicks, status, has_password, updated_at';
   const MISSING_COLUMN = /42703|PGRST204|column/i;

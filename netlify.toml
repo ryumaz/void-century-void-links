@@ -1,27 +1,12 @@
-# Netlify settings. The site is plain static files: no build step.
-# Security headers live in _headers (shared with Cloudflare Pages).
-# Cloudflare Pages ignores this file; there, functions/_middleware.js does the routing.
+# Void Links moved to https://voids.wtf (hosted on Cloudflare Pages).
+# This keeps the old address working: every voidlinks.netlify.app/... address
+# is sent to the same path on voids.wtf, so old short links, profile pages and
+# QR codes still open.
 [build]
   publish = "."
 
-# Short-link redirects run at the edge (netlify/edge-functions/shortlink.ts).
-# Real files (index.html, admin.html, assets…) are always served before these rules.
-
-# Staff portal: /admin
-[[redirects]]
-  from = "/admin"
-  to = "/admin.html"
-  status = 200
-
-# A missing file under /assets must be a real 404, never the redirect page
-# (browsers cache /assets for 7 days, so a wrong answer would stick)
-[[redirects]]
-  from = "/assets/*"
-  to = "/404.html"
-  status = 404
-
-# Everything else goes to go.html: /abc123 → short link, /@name → profile page
 [[redirects]]
   from = "/*"
-  to = "/go.html"
-  status = 200
+  to = "https://voids.wtf/:splat"
+  status = 301
+  force = true

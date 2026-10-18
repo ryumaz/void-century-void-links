@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "description": "Run functions/_middleware.js only for page addresses (short links, /name, /admin). Files are served directly, which keeps them fast and off the free function quota.",
+  "include": ["/*"],
+  "exclude": [
+    "/",
+    "/assets/*",
+    "/docs/*",
+    "/supabase/*",
+    "/netlify/*",
+    "/404.html",
+    "/admin.html",
+    "/go.html",
+    "/index.html",
+    "/privacy.html",
+    "/terms.html",
+    "/admin.js",
+    "/backend.js",
+    "/blackhole.js",
+    "/helpbot.css",
+    "/helpbot.js",
+    "/i18n.js",
+    "/pages.js",
+    "/supabase-config.js",
+    "/favicon.ico",
+    "/robots.txt"
+  ]
+}

@@ -12,7 +12,7 @@ create or replace function public.names_are_shared()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare
   reserved text[] := array['admin', 'go', 'index', 'assets', 'api', 'login', 'signup', 'dashboard',
-                           'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify'];
+                           'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify', 'functions'];
 begin
   if tg_table_name = 'pages' then
     if tg_op = 'UPDATE' and new.username = old.username then return new; end if;
@@ -60,3 +60,9 @@ grant execute on function public.name_is_free(text) to anon, authenticated;
 alter table public.pages add column if not exists bg_poster text;
 
 notify pgrst, 'reload schema';
+
+-- Clicks follow a short link when its name changes (renaming keeps the stats)
+alter table public.clicks drop constraint if exists clicks_slug_fkey;
+alter table public.clicks add constraint clicks_slug_fkey
+  foreign key (slug) references public.short_links (slug)
+  on update cascade on delete cascade;

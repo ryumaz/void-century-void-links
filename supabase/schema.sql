@@ -73,7 +73,7 @@ create table if not exists public.short_links (
 
 create table if not exists public.clicks (
   id       bigserial primary key,
-  slug     text not null references public.short_links on delete cascade,
+  slug     text not null references public.short_links on update cascade on delete cascade,
   at       timestamptz not null default now(),
   country  text,
   device   text,

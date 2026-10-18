@@ -23,7 +23,13 @@ export async function onRequest(context) {
   const path = url.pathname;
 
   // Real files, the home page and the staff portal: nothing to do here
-  if (path === '/' || path.includes('.') || path.startsWith('/assets/')) return context.next();
+  if (path === '/' || path.startsWith('/assets/')) return context.next();
+  // A dot usually means a file, but usernames may contain dots too (/john.doe):
+  // if no such file exists, go.html looks the name up and opens the profile
+  if (path.includes('.')) {
+    const res = await context.next();
+    return res.status === 404 ? page(context, '/go') : res;
+  }
   if (path === '/admin' || path === '/admin/') return page(context, '/admin');
 
   const old = path.match(OLD_PROFILE);
