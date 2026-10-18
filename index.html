@@ -11,7 +11,7 @@
   <meta name="description" content="Void Links by Void Century: short links with live analytics, QR codes and link-in-bio pages.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Lexend:wght@400;500;600;700;800&family=Michroma&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Michroma&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -35,7 +35,7 @@
       --purple: rgba(255,255,255,0.7);
       --radius: 16px;
       --glass: blur(10px);
-      --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+      --mono: 'Geist Mono', ui-monospace, Consolas, monospace;
     }
 
     html { scroll-behavior: smooth; }
@@ -43,7 +43,7 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: 'Geist', -apple-system, sans-serif;
       overflow-x: hidden;
       min-height: 100vh;
     }
@@ -145,7 +145,7 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 700;
       font-size: 1.2rem;
       letter-spacing: -0.02em;
@@ -167,7 +167,7 @@
     .logo > span { white-space: nowrap; }
     .dash-sidebar .logo > span { font-size: 0.78em; }
     .logo > span, .modal-logo .logo {
-      font-family: 'Michroma', 'Lexend', sans-serif;
+      font-family: 'Michroma', 'Geist', sans-serif;
       font-weight: 400;
       font-size: 0.92em;
       letter-spacing: 0.04em;
@@ -289,11 +289,11 @@
       50% { opacity: 0.7; box-shadow: 0 0 0 5px rgba(255,255,255,0); }
     }
     .hero-title {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-size: clamp(3rem, 8vw, 6.5rem);
-      font-weight: 800;
+      font-weight: 700;
       line-height: 1.0;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.05em;
       color: var(--text);
       max-width: 900px;
       margin-bottom: 24px;
@@ -354,7 +354,7 @@
       gap: 12px;
     }
     #shortened-result .short-link {
-      font-family: 'Lexend', monospace;
+      font-family: 'Geist', monospace;
       font-weight: 600;
       color: var(--green);
       font-size: 1rem;
@@ -403,7 +403,7 @@
       margin-bottom: 16px;
     }
     .section-title {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-size: clamp(2rem, 5vw, 3.2rem);
       font-weight: 800;
       letter-spacing: -0.035em;
@@ -452,14 +452,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 800;
       font-size: 1rem;
       color: var(--accent);
       flex-shrink: 0;
     }
     .step-content h3 {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 700;
       font-size: 1.1rem;
       color: var(--text);
@@ -519,7 +519,7 @@
     .feat-icon.purple { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: var(--purple); }
     .feat-icon.green { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: var(--green); }
     .feature-card h3 {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 700;
       font-size: 1.1rem;
       letter-spacing: -0.02em;
@@ -580,7 +580,7 @@
     }
     .metric-label { font-size: 0.85rem; color: var(--text-muted); flex: 1; }
     .metric-val {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 700;
       font-size: 1.1rem;
       color: var(--text);
@@ -611,7 +611,7 @@
       justify-content: space-between;
     }
     .dash-title-row {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 600;
       font-size: 0.92rem;
       color: var(--text);
@@ -645,7 +645,7 @@
     }
     .kpi-label { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
     .kpi-val {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 800;
       font-size: 1.5rem;
       letter-spacing: -0.04em;
@@ -767,7 +767,7 @@
     .footer-links a:hover, .footer-up:hover { color: var(--text); }
     /* The name returns at full width as the close */
     .footer-word {
-      font-family: 'Michroma', 'Lexend', sans-serif;
+      font-family: 'Michroma', 'Geist', sans-serif;
       font-weight: 400;
       font-size: clamp(1.9rem, 8.2vw, 8.4rem);
       letter-spacing: 0.02em;
@@ -882,7 +882,7 @@
     }
     .metric-icon { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
     .country-flag { font-size: 0.72rem !important; font-weight: 600; color: var(--text-muted); width: 24px !important; }
-    .favicon-wrap { font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 0.8rem !important; color: var(--text-muted); }
+    .favicon-wrap { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 0.8rem !important; color: var(--text-muted); }
     /* === MODALS === */
     .modal-overlay {
       position: fixed;
@@ -933,7 +933,7 @@
       margin-bottom: 28px;
     }
     .modal-title {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 700;
       font-size: 1.5rem;
       letter-spacing: -0.03em;
@@ -1070,7 +1070,7 @@
     .dash-main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
     .dash-page-title {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.03em;
@@ -1093,7 +1093,7 @@
     }
     .kpi-big-label { font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
     .kpi-big-val {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-size: 2rem;
       font-weight: 800;
       letter-spacing: -0.05em;
@@ -1112,7 +1112,7 @@
       padding: 20px;
     }
     .dash-panel-title {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 600;
       font-size: 0.92rem;
       color: var(--text);
@@ -1132,6 +1132,49 @@
 
     /* Link table */
     .link-table { width: 100%; }
+    /* API keys */
+    .api-panel { grid-column: 1 / -1; }
+    .api-lead { color: var(--text-muted); font-size: 0.92rem; margin: -4px 0 14px; }
+    .api-create { display: flex; gap: 8px; flex-wrap: wrap; }
+    .api-create input { flex: 1; min-width: 180px; }
+    .api-keys { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .api-key { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; font-size: 0.9rem; }
+    .api-key code { font-family: var(--mono); color: var(--text); }
+    .api-key .meta { color: var(--text-muted); font-size: 0.8rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .api-muted { color: var(--text-muted); font-size: 0.85rem; }
+    .api-reveal { border: 1px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .api-reveal strong { display: block; margin-bottom: 8px; }
+    .api-reveal .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .api-reveal code { font-family: var(--mono); font-size: 0.85rem; background: #000; padding: 8px 10px; border-radius: 8px; word-break: break-all; flex: 1; min-width: 0; }
+    .api-docs { margin-top: 14px; font-size: 0.88rem; color: var(--text-muted); }
+    .api-docs summary { cursor: pointer; color: var(--text); font-weight: 600; }
+    .api-docs code { font-family: var(--mono); color: var(--text); }
+    .api-docs pre { font-family: var(--mono); font-size: 0.8rem; background: #000; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; overflow-x: auto; color: var(--text); white-space: pre; margin: 10px 0; }
+    .api-docs ul { padding-left: 18px; line-height: 1.8; }
+    /* Bulk import */
+    .csv-panel { margin-bottom: 16px; }
+    .csv-panel > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .csv-panel > summary::-webkit-details-marker { display: none; }
+    .csv-panel > summary .dash-panel-title { margin: 0; }
+    .csv-panel > summary .csv-hint { color: var(--text-muted); font-size: 0.85rem; }
+    .csv-panel[open] > summary { margin-bottom: 14px; }
+    .csv-drop { border: 1px dashed rgba(255,255,255,0.22); border-radius: 14px; padding: 22px; text-align: center; color: var(--text-muted); font-size: 0.92rem; transition: border-color .2s, background .2s; }
+    .csv-drop.over { border-color: #fff; background: rgba(255,255,255,0.04); }
+    .csv-drop strong { color: var(--text); }
+    .csv-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
+    .csv-format { margin-top: 12px; font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+    .csv-format code { font-family: var(--mono); color: var(--text); background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 5px; }
+    .csv-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 16px 0 10px; font-size: 0.92rem; }
+    .csv-summary b { color: var(--text); }
+    .csv-table { max-height: 320px; overflow: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; }
+    .csv-row { display: grid; grid-template-columns: 34px minmax(0,1.1fr) minmax(0,1.6fr) minmax(0,1.3fr); gap: 10px; padding: 9px 12px; font-size: 0.84rem; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center; }
+    .csv-row:last-child { border-bottom: 0; }
+    .csv-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .csv-row .n { color: var(--text-muted); font-family: var(--mono); }
+    .csv-row .short { font-family: var(--mono); color: var(--text); }
+    .csv-row .dest { color: var(--text-muted); }
+    .csv-row .st.ok { color: #9be7b0; } .csv-row .st.bad { color: #ff9b9b; white-space: normal; } .csv-row .st.done { color: #fff; }
+    @media (max-width: 640px) { .csv-row { grid-template-columns: 28px minmax(0,1fr); } .csv-row .dest { display: none; } .csv-row .st { grid-column: 2; } }
     .link-row {
       display: flex;
       align-items: center;
@@ -1152,7 +1195,7 @@
       flex-shrink: 0;
     }
     .link-row .slug {
-      font-family: 'Lexend', monospace;
+      font-family: 'Geist', monospace;
       font-weight: 600;
       color: var(--accent);
       min-width: 90px;
@@ -1166,7 +1209,7 @@
       font-size: 0.8rem;
     }
     .link-row .clicks {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 700;
       color: var(--text);
       min-width: 48px;
@@ -1363,7 +1406,7 @@
       background: rgba(255,255,255,0.06);
     }
     .publish-result[hidden] { display: none; }
-    .publish-url { flex: 1; font-family: 'Lexend', sans-serif; font-weight: 600; }
+    .publish-url { flex: 1; font-family: 'Geist', sans-serif; font-weight: 600; }
 
     .builder-preview {
       position: sticky;
@@ -1415,13 +1458,13 @@
       justify-content: center;
       background: rgba(255,255,255,0.08);
       border: 2px solid rgba(255,255,255,0.28);
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-size: 2rem;
       font-weight: 700;
     }
     .pc-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .pc-name {
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.02em;
@@ -1474,7 +1517,7 @@
       align-items: center;
       justify-content: center;
       background: rgba(255,255,255,0.1);
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-weight: 700;
       font-size: 0.8rem;
     }
@@ -1684,7 +1727,7 @@
       background: rgba(255,255,255,0.06);
       color: #fff;
     }
-    .showcase-points strong { display: block; font-family: 'Lexend', sans-serif; font-size: 1.05rem; margin-bottom: 2px; }
+    .showcase-points strong { display: block; font-family: 'Geist', sans-serif; font-size: 1.05rem; margin-bottom: 2px; }
     .showcase-points span { color: var(--text-muted); font-size: 0.95rem; line-height: 1.55; }
     .claim-box.claim-left { margin: 0; }
     .showcase-demo { display: flex; flex-direction: column; align-items: center; gap: 16px; }
@@ -1702,7 +1745,7 @@
     .builder-form legend {
       padding: 0;
       margin-bottom: 14px;
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-size: 1.05rem;
       font-weight: 600;
       color: #fff;
@@ -1856,7 +1899,7 @@
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       color: #fff;
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-size: 1.4rem;
       font-weight: 600;
       letter-spacing: -0.01em;
@@ -1935,7 +1978,7 @@
       border: 1px solid var(--border);
     }
     .page-card-info { flex: 1; min-width: 180px; }
-    .page-card-info strong { display: block; font-family: 'Lexend', sans-serif; font-size: 1.1rem; }
+    .page-card-info strong { display: block; font-family: 'Geist', sans-serif; font-size: 1.1rem; }
     .page-card-info span { font-size: 0.85rem; color: var(--text-muted); }
     .page-card-actions { display: flex; gap: 8px; }
     #dash-content .builder { margin-top: 8px; }
@@ -1953,7 +1996,7 @@
       justify-content: center;
       background: #fff;
       color: #000;
-      font-family: 'Lexend', sans-serif;
+      font-family: 'Geist', sans-serif;
       font-size: 1.5rem;
       font-weight: 700;
     }
@@ -2138,7 +2181,7 @@
     .auth-resend[hidden] { display: none; }
     .auth-sent { text-align: center; padding: 8px 0 4px; }
     .auth-sent[hidden] { display: none; }
-    .auth-sent h3 { font-family: 'Lexend', sans-serif; font-size: 1.2rem; margin-bottom: 8px; }
+    .auth-sent h3 { font-family: 'Geist', sans-serif; font-size: 1.2rem; margin-bottom: 8px; }
     .auth-sent p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.55; margin-bottom: 12px; }
     .auth-sent strong { color: #fff; }
     .auth-small { font-size: 0.82rem !important; margin-bottom: 8px !important; }
@@ -2208,7 +2251,7 @@
     }
     .qr-box canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
     .qr-box.qr-offline { background: rgba(255,255,255,0.06); }
-    .qr-url { font-family: 'Lexend', sans-serif; font-weight: 600; font-size: 1rem; }
+    .qr-url { font-family: 'Geist', sans-serif; font-weight: 600; font-size: 1rem; }
     .qr-meta { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 12px; }
     .qr-actions { display: flex; gap: 8px; width: 100%; }
     .qr-actions .btn-primary { flex: 1; min-width: 0; justify-content: center; padding: 10px 12px; }
@@ -2351,7 +2394,7 @@
     .lm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 4px; padding-top: 18px; border-top: 1px solid var(--border); }
     .btn.danger { color: var(--red); }
     .btn.danger:hover { border-color: rgba(244,180,180,0.4); color: var(--red); }
-    .lm-h { font-family: 'Lexend', sans-serif; font-size: 0.95rem; margin: 22px 0 10px; }
+    .lm-h { font-family: 'Geist', sans-serif; font-size: 0.95rem; margin: 22px 0 10px; }
     @media (max-width: 560px) { .lm-box { padding: 26px 18px; } .lm-box .adv-grid { grid-template-columns: 1fr; } }
 
     .audit-filter select {
@@ -2534,7 +2577,7 @@
       animation: pickIn 0.14s ease both;
     }
     .dtp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .dtp-head strong { font-family: 'Lexend', sans-serif; font-weight: 600; font-size: 0.98rem; }
+    .dtp-head strong { font-family: 'Geist', sans-serif; font-weight: 600; font-size: 0.98rem; }
     .dtp-nav {
       width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--border);
       background: rgba(255,255,255,0.04); color: var(--text); font-size: 1.2rem; line-height: 1;
@@ -2604,7 +2647,7 @@
       content: ''; position: absolute; top: -7px; right: 150px; width: 14px; height: 14px;
       background: #fff; transform: rotate(45deg); border-radius: 2px;
     }
-    .dash-hint strong { font-family: 'Lexend', sans-serif; font-size: 0.95rem; }
+    .dash-hint strong { font-family: 'Geist', sans-serif; font-size: 0.95rem; }
     .dash-hint span { font-size: 0.85rem; color: rgba(0,0,0,0.7); line-height: 1.45; }
     .dash-hint-ok {
       align-self: flex-start; margin-top: 8px; padding: 6px 12px; border-radius: 8px;
@@ -2634,7 +2677,7 @@
 
     /* Beta tag next to the wordmark */
     .logo > .beta-tag {
-      font-style: normal; font-family: 'Inter', sans-serif; font-size: 0.58rem; font-weight: 700;
+      font-style: normal; font-family: 'Geist', sans-serif; font-size: 0.58rem; font-weight: 700;
       letter-spacing: 0.08em; text-transform: uppercase;
       padding: 3px 7px; border-radius: 999px; margin-left: -2px;
       color: #000; background: rgba(255,255,255,0.85); align-self: center;
@@ -2705,7 +2748,7 @@
 <!-- === HERO === -->
 <section id="hero">
   <div class="container" style="position:relative;z-index:2;">
-    <h1 class="hero-title" data-i18n-html="hero.title">Short links.<br><span class="word-dim">Real data.</span></h1>
+    <h1 class="hero-title" data-i18n-html="hero.title">Shorter links.<br><span class="word-dim">Longer reach.</span></h1>
     <p class="hero-sub" data-i18n="hero.sub">For creators, students and small teams: short links you can lock, schedule and track, plus one page for all your links.</p>
 
     <div class="hero-shortener" data-mode="shorten">
@@ -3012,7 +3055,7 @@
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('login-modal')">✕</button>
     <div class="modal-logo">
-      <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="8" rx="6.6" ry="2.5" fill="none" stroke="#000" stroke-width="1.6" transform="rotate(-24 8 8)"/><circle cx="8" cy="8" r="2.4" fill="#000"/></svg></div>
+      <div class="logo-icon"></div>
       <span class="logo" style="font-size:1rem;">Void Links</span>
     </div>
     <h2 class="modal-title">Welcome back</h2>
@@ -3054,7 +3097,7 @@
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('signup-modal')">✕</button>
     <div class="modal-logo">
-      <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="8" rx="6.6" ry="2.5" fill="none" stroke="#000" stroke-width="1.6" transform="rotate(-24 8 8)"/><circle cx="8" cy="8" r="2.4" fill="#000"/></svg></div>
+      <div class="logo-icon"></div>
       <span class="logo" style="font-size:1rem;">Void Links</span>
     </div>
     <h2 class="modal-title">Create your account</h2>
@@ -3572,7 +3615,7 @@ const sectionObs = new IntersectionObserver(entries => {
       if (!links.some(l => l.slug === slug)) {
         links.push({ slug, dest: url.replace(/^https?:\/\//, ''), clicks: 0 });
       }
-      line('✓ ' + siteHost() + '/' + slug, 'term-ok');
+      line('✓ ' + (window.DB ? DB.shortHost() : siteHost() + '/') + slug, 'term-ok');
       line('  → ' + url, 'term-dim');
     },
     stats() {
@@ -4347,7 +4390,7 @@ function pageCard() {
     </div>`;
   }
   return `<div class="page-card">
-    <div class="page-card-info"><strong>${esc(DB.shortHost() + page.username)}</strong><span>${fmt(page.views)} ${page.views === 1 ? 'view' : 'views'} · ${(page.links || []).length} links</span></div>
+    <div class="page-card-info"><strong>${esc(DB.prettyUrl('@' + page.username))}</strong><span>${fmt(page.views)} ${page.views === 1 ? 'view' : 'views'} · ${(page.links || []).length} links</span></div>
     <div class="page-card-actions">
       <button class="btn btn-ghost" onclick="LP.copyLink('${page.username}')">Copy link</button>
       <button class="btn btn-ghost" onclick="showDashTab('page')">Edit</button>
@@ -4374,7 +4417,7 @@ const dashPages = {
     <div class="kpi-grid">
       ${kpi('Clicks, last 7 days', fmt(last7), delta === null ? (last7 ? 'Your first week of data' : 'No clicks yet') : `${delta >= 0 ? '↑' : '↓'} ${Math.abs(delta)}% vs the week before`, delta === null ? '' : (delta >= 0 ? 'pos' : 'neg'))}
       ${kpi('Short links', fmt(dash.links.length), dash.links.length ? `${fmt(dash.links.reduce((a, l) => a + Number(l.clicks || 0), 0))} clicks all time` : 'Create your first one')}
-      ${kpi('Page views', page ? fmt(page.views) : '—', page ? DB.shortHost() + page.username : 'No page yet')}
+      ${kpi('Page views', page ? fmt(page.views) : '—', page ? DB.prettyUrl('@' + page.username) : 'No page yet')}
       ${kpi('Top link, 30 days', top ? fmt(top[1]) : '—', top ? DB.shortHost() + top[0] : 'No clicks yet')}
     </div>
     <div class="dash-row">
@@ -4413,6 +4456,7 @@ const dashPages = {
         <button type="submit" class="btn btn-primary">Create link →</button>
       </form>
     </div>
+    ${csvPanelHtml()}
     <div class="dash-panel">
       <div class="dash-panel-title">All links <span class="dash-panel-badge">${fmt(dash.links.length)} total</span></div>
       <div class="link-table">${linkRowsHtml(dash.links)}</div>
@@ -4483,8 +4527,8 @@ const dashPages = {
       ${items.map(i => `
       <div class="dash-panel qr-card">
         <span class="qr-kind">${i.kind}</span>
-        <div class="qr-box"><canvas data-qr="${i.slug}" width="232" height="232" role="img" aria-label="QR code for ${esc(DB.shortHost() + i.slug.replace(/^@/, ''))}"></canvas></div>
-        <div class="qr-url">${esc(DB.shortHost() + i.slug.replace(/^@/, ''))}</div>
+        <div class="qr-box"><canvas data-qr="${i.slug}" width="232" height="232" role="img" aria-label="QR code for ${esc(DB.prettyUrl(i.slug))}"></canvas></div>
+        <div class="qr-url">${esc(DB.prettyUrl(i.slug))}</div>
         <div class="qr-meta">${i.meta}</div>
         <div class="qr-actions">
           <button class="btn btn-primary" onclick="qrDownload('${i.slug}')" title="Download PNG">Download</button>
@@ -4553,6 +4597,30 @@ const dashPages = {
             <button type="button" class="btn btn-ghost" onclick="toggleAcctForm('password', false)">Cancel</button>
           </div>
         </form>
+      </div>
+
+      <div class="dash-panel api-panel">
+        <div class="dash-panel-title">API keys <span class="dash-panel-badge">Developers</span></div>
+        <p class="api-lead">Create and manage short links from your own apps. Keep keys secret: anyone with a key can manage your links.</p>
+        <div id="api-new-key" hidden></div>
+        <form class="api-create" onsubmit="createApiKey(event)">
+          <input id="api-key-name" type="text" maxlength="40" placeholder="Key name, e.g. My app" aria-label="Key name">
+          <button type="submit" class="btn btn-primary">Create key</button>
+        </form>
+        <p class="acct-error" id="api-error" aria-live="polite"></p>
+        <div id="api-keys-list" class="api-keys"><p class="api-muted">Loading…</p></div>
+        <details class="api-docs">
+          <summary>How to use the API</summary>
+          <p>Base address: <code id="api-base"></code></p>
+          <pre id="api-example"></pre>
+          <ul>
+            <li><code>GET /links</code> your links · <code>POST /links</code> create one</li>
+            <li><code>GET /links/:slug</code> one link with 30-day clicks, countries and devices</li>
+            <li><code>PATCH /links/:slug</code> change <code>url</code> or <code>status</code> (active, paused, revoked)</li>
+            <li><code>DELETE /links/:slug</code> delete a link</li>
+          </ul>
+          <p class="api-muted">Limits: 600 requests per key per hour, 200 new links per account per hour.</p>
+        </details>
       </div>
 
       <div class="dash-panel">
@@ -4739,7 +4807,7 @@ async function qrShare(slug) {
   try {
     const file = new File([await qrBlob(slug)], `qr-${slug.replace('@', 'page-')}.png`, { type: 'image/png' });
     const withFile = navigator.canShare && navigator.canShare({ files: [file] });
-    const title = DB.shortHost() + slug.replace(/^@/, '');
+    const title = DB.prettyUrl(slug);
     await navigator.share(withFile ? { title, text: url, url, files: [file] } : { title, url });
   } catch (e) {
     if (e && e.name !== 'AbortError') qrCopy(slug);
@@ -4780,6 +4848,202 @@ async function deleteShortLink(slug) {
   showDashTab(currentTab);
   showToast('Link deleted');
 }
+// ----- API keys (Settings) -----
+const apiBase = () => (/^https?:$/.test(location.protocol) && !/^go\./.test(location.hostname) ? location.origin : 'https://voids.wtf') + '/api/v1';
+const API_UPGRADE_MSG = 'The API needs a quick database upgrade: run supabase/upgrade-api.sql in Supabase.';
+async function loadApiKeys() {
+  const box = document.getElementById('api-keys-list');
+  if (!box) return;
+  const base = apiBase();
+  document.getElementById('api-base').textContent = base;
+  document.getElementById('api-example').textContent =
+`curl -X POST ${base}/links \\
+  -H "Authorization: Bearer YOUR_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"url": "https://example.com/launch", "alias": "launch"}'`;
+  try {
+    const keys = await DB.apiKeys();
+    box.innerHTML = keys.length ? keys.map(k => `<div class="api-key">
+      <code>${esc(k.prefix)}…</code>
+      <span class="meta">${esc(k.name)} · created ${new Date(k.created_at).toLocaleDateString()} · ${k.last_used_at ? 'last used ' + new Date(k.last_used_at).toLocaleString() : 'never used'}</span>
+      <button type="button" class="btn btn-ghost" onclick="revokeApiKey('${k.id}')">Revoke</button>
+    </div>`).join('') : '<p class="api-muted">No keys yet.</p>';
+  } catch (e) {
+    box.innerHTML = `<p class="api-muted">${esc(/api_keys|relation|schema cache|PGRST/i.test((e && e.message) || '') ? API_UPGRADE_MSG : "Couldn't load your keys.")}</p>`;
+  }
+}
+async function createApiKey(e) {
+  e.preventDefault();
+  const err = document.getElementById('api-error');
+  const btn = e.target.querySelector('button');
+  err.textContent = ''; btn.disabled = true;
+  try {
+    const k = await DB.createApiKey(document.getElementById('api-key-name').value.trim());
+    const box = document.getElementById('api-new-key');
+    box.hidden = false;
+    box.innerHTML = `<div class="api-reveal"><strong>Copy your new key now. You won't see it again.</strong>
+      <div class="row"><code id="api-new-key-value">${esc(k.key)}</code><button type="button" class="btn btn-primary" onclick="copyApiKey()">Copy</button></div></div>`;
+    document.getElementById('api-key-name').value = '';
+    loadApiKeys();
+  } catch (e2) {
+    const m = (e2 && e2.message) || '';
+    err.textContent = /create_api_key|schema cache|PGRST/i.test(m) ? API_UPGRADE_MSG : (m || "Couldn't create a key.");
+  }
+  btn.disabled = false;
+}
+function copyApiKey() {
+  const v = document.getElementById('api-new-key-value');
+  if (v) navigator.clipboard.writeText(v.textContent).then(() => showToast('Key copied')).catch(() => {});
+}
+async function revokeApiKey(id) {
+  if (!confirm('Revoke this key? Apps using it stop working right away.')) return;
+  try { await DB.revokeApiKey(id); showToast('Key revoked'); } catch (_) { showToast("Couldn't revoke. Try again."); }
+  loadApiKeys();
+}
+
+// ----- bulk import from a CSV file -----
+// Columns (header names are flexible): url, alias, password, starts, expires, max_clicks.
+// Without a header row, column 1 is the URL and column 2 the custom ending.
+const CSV_MAX = 200;
+const csvImport = { rows: [], running: false, fileName: '' };
+const CSV_COLS = {
+  url: ['url', 'link', 'long url', 'long_url', 'destination', 'target'],
+  alias: ['alias', 'slug', 'ending', 'custom ending', 'custom', 'short', 'name'],
+  password: ['password', 'pass', 'pw'],
+  starts: ['starts', 'starts_at', 'start', 'opens', 'opens_at', 'open'],
+  expires: ['expires', 'expires_at', 'expiry', 'end', 'ends', 'closes'],
+  max: ['max_clicks', 'max clicks', 'max', 'limit', 'uses', 'max uses'],
+};
+function parseCsv(text) {
+  const rows = []; let row = [], cell = '', q = false;
+  text = text.replace(/^\uFEFF/, '');
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+      else cell += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ',' || ch === ';' || ch === '\t') { row.push(cell); cell = ''; }
+    else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && text[i + 1] === '\n') i++;
+      row.push(cell); cell = '';
+      if (row.some(c => c.trim())) rows.push(row);
+      row = [];
+    } else cell += ch;
+  }
+  row.push(cell);
+  if (row.some(c => c.trim())) rows.push(row);
+  return rows.map(r => r.map(c => c.trim()));
+}
+function csvRowsFromText(text) {
+  const raw = parseCsv(text);
+  if (!raw.length) return { error: 'That file is empty.' };
+  const head = raw[0].map(h => h.toLowerCase());
+  const idx = {};
+  for (const [key, names] of Object.entries(CSV_COLS)) idx[key] = head.findIndex(h => names.includes(h));
+  const hasHeader = idx.url >= 0;
+  if (!hasHeader) { idx.url = 0; idx.alias = 1; idx.password = idx.starts = idx.expires = idx.max = -1; }
+  const body = hasHeader ? raw.slice(1) : raw;
+  if (!body.length) return { error: 'No rows found under the header.' };
+  if (body.length > CSV_MAX) return { error: `That file has ${fmt(body.length)} rows. Import up to ${CSV_MAX} at a time: split it into smaller files.` };
+  const get = (r, k) => (idx[k] >= 0 ? (r[idx[k]] || '').trim() : '');
+  const mine = new Set(dash.links.map(l => l.slug.toLowerCase()));
+  const seen = new Set();
+  return { rows: body.map((r, i) => {
+    const row = { n: i + 1, url: get(r, 'url'), alias: get(r, 'alias').replace(/^\//, ''), opts: {}, status: 'ok', note: 'Ready' };
+    const bad = msg => { row.status = 'bad'; row.note = msg; return row; };
+    row.dest = normalizeDest(row.url);
+    if (!row.url) return bad('Missing URL');
+    if (!row.dest) return bad('Not a valid URL');
+    if (row.alias) {
+      const e = DB.slugError(row.alias);
+      if (e) return bad(e);
+      const k = row.alias.toLowerCase();
+      if (seen.has(k)) return bad('Same ending used twice in this file');
+      if (mine.has(k)) return bad('You already have this link');
+      seen.add(k);
+    }
+    const pw = get(r, 'password'), st = get(r, 'starts'), ex = get(r, 'expires'), mx = get(r, 'max');
+    if (pw) { if (pw.length < 4 || pw.length > 72) return bad('Password must be 4 to 72 characters'); row.opts.password = pw; }
+    if (st) { const d = new Date(st); if (isNaN(d)) return bad('Check the start date'); if (d <= Date.now()) return bad('Start date is in the past'); row.opts.startsAt = d.toISOString(); }
+    if (ex) { const d = new Date(ex); if (isNaN(d)) return bad('Check the expiry date'); if (d <= Date.now()) return bad('Expiry date is in the past'); row.opts.expiresAt = d.toISOString(); }
+    if (st && ex && new Date(ex) <= new Date(st)) return bad('Expiry must be after the start');
+    if (mx) { if (!/^\d+$/.test(mx) || +mx < 1) return bad('Max clicks must be a whole number'); row.opts.maxClicks = +mx; }
+    return row;
+  }) };
+}
+function csvPanelHtml() {
+  const r = csvImport.rows, ok = r.filter(x => x.status === 'ok').length, bad = r.filter(x => x.status === 'bad').length, done = r.filter(x => x.status === 'done').length;
+  const list = r.length ? `
+    <div class="csv-summary">
+      <span>${esc(csvImport.fileName)}:</span> <b>${fmt(ok)} ready</b>${bad ? ` · <b>${fmt(bad)}</b> with problems (skipped)` : ''}${done ? ` · <b>${fmt(done)}</b> imported` : ''}
+      <span style="flex:1"></span>
+      ${ok ? `<button type="button" class="btn btn-primary" onclick="csvRun()" ${csvImport.running ? 'disabled' : ''}>${csvImport.running ? 'Importing…' : `Import ${fmt(ok)} link${ok === 1 ? '' : 's'}`}</button>` : ''}
+      <button type="button" class="btn btn-ghost" onclick="csvClear()" ${csvImport.running ? 'disabled' : ''}>Clear</button>
+    </div>
+    <div class="csv-table">${r.map(x => `<div class="csv-row">
+      <span class="n">${x.n}</span>
+      <span class="short">${esc(x.alias ? DB.shortHost() + x.alias : (x.slug ? DB.shortHost() + x.slug : 'random ending'))}</span>
+      <span class="dest">${esc(x.dest || x.url || '—')}</span>
+      <span class="st ${x.status}">${x.status === 'done' ? '✓ ' : x.status === 'ok' ? '' : '✕ '}${esc(x.note)}</span>
+    </div>`).join('')}</div>` : '';
+  return `
+    <details class="dash-panel csv-panel" ${r.length ? 'open' : ''}>
+      <summary><span class="dash-panel-title">Import from CSV</span><span class="csv-hint">Create up to ${CSV_MAX} links at once ▾</span></summary>
+      <div class="csv-drop" id="csv-drop" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="event.preventDefault();this.classList.remove('over');csvFile(event.dataTransfer.files[0])">
+        <strong>Drop a .csv file here</strong> or choose one. We check every row before anything is created.
+        <div class="csv-actions">
+          <label class="btn btn-primary" for="csv-file">Choose CSV file</label>
+          <input id="csv-file" type="file" accept=".csv,text/csv" hidden onchange="csvFile(this.files[0]); this.value='';">
+          <button type="button" class="btn btn-ghost" onclick="csvTemplate()">Download template</button>
+        </div>
+      </div>
+      <p class="csv-format">Columns: <code>url</code> (required), <code>alias</code>, <code>password</code>, <code>starts</code>, <code>expires</code>, <code>max_clicks</code>. Dates like <code>2026-12-31</code> or <code>2026-12-31 18:00</code>. No header row? Column 1 is the URL, column 2 the custom ending.</p>
+      ${list}
+    </details>`;
+}
+async function csvFile(file) {
+  if (!file) return;
+  if (file.size > 1024 * 1024) { showToast('That file is over 1 MB. Split it into smaller files.'); return; }
+  const res = csvRowsFromText(await file.text());
+  if (res.error) { showToast(res.error); return; }
+  csvImport.rows = res.rows; csvImport.fileName = file.name;
+  showDashTab('links');
+}
+function csvClear() { csvImport.rows = []; csvImport.fileName = ''; showDashTab('links'); }
+function csvTemplate() {
+  const text = 'url,alias,password,starts,expires,max_clicks\nhttps://example.com/launch,launch-2026,,,2026-12-31,500\nhttps://example.com/secret-notes,notes,letmein,,,\nhttps://example.com/no-ending-needed,,,,,\n';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
+  a.download = 'void-links-import-template.csv';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+async function csvRun() {
+  if (csvImport.running) return;
+  csvImport.running = true; showDashTab('links');
+  let made = 0;
+  for (const row of csvImport.rows) {
+    if (row.status !== 'ok') continue;
+    row.note = 'Creating…'; showDashTab('links');
+    try {
+      const link = await DB.createLink(row.dest, row.alias || undefined, row.opts);
+      dash.links.unshift(link);
+      row.status = 'done'; row.slug = link.slug; row.note = 'Created'; made++;
+    } catch (e) {
+      row.status = 'bad'; row.note = (e && e.message) || "Couldn't create";
+      if (/too many requests/i.test(row.note)) {
+        csvImport.rows.forEach(x => { if (x.status === 'ok') { x.status = 'bad'; x.note = 'Hourly limit reached: try these again in an hour'; } });
+        break;
+      }
+    }
+  }
+  csvImport.running = false;
+  dash.auditLoaded = false;
+  showDashTab('links');
+  showToast(made ? `Imported ${fmt(made)} link${made === 1 ? '' : 's'}` : 'Nothing was imported');
+}
+
 document.getElementById('dash-content').addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
   if (!b) return;
@@ -5439,7 +5703,7 @@ function showDashTab(tab) {
   content.innerHTML = dashPages[tab] ? dashPages[tab]() : dashPages.overview();
   content.scrollTop = 0;
   if (tab === 'page' && window.LP) LP.mountBuilder(document.getElementById('builder-slot'));
-  if (tab === 'settings') fillSettings();
+  if (tab === 'settings') { fillSettings(); loadApiKeys(); }
   // Update active nav
   document.querySelectorAll('.dash-nav-item').forEach(item => item.classList.remove('active'));
   document.querySelectorAll('.dash-nav-item').forEach(item => {

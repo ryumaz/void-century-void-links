@@ -95,6 +95,8 @@ window.siteHost = () => {
     if (/^https?:$/.test(location.protocol)) return location.origin + '/';
     return '';
   };
+  // Where short links live (go.voids.wtf/abc); profile pages stay on siteBase()
+  const linkBase = () => (cfg.siteUrl && cfg.linkUrl ? cfg.linkUrl.replace(/\/?$/, '/') : siteBase());
   const SLUG_RE = /^[A-Za-z0-9_-]{2,40}$/;
   // Paths the site itself uses, so they can't become short links
   const RESERVED = new Set(['admin', 'go', 'index', 'assets', 'api', 'login', 'signup', 'dashboard', 'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify', 'functions']);
@@ -235,12 +237,14 @@ window.siteHost = () => {
     // Without it they still work anywhere: site/go.html?s=abc and index.html#@name.
     // ("@name" means a profile page; on the live site the @ is dropped.)
     shortUrl: slug => {
-      if (cfg.siteUrl) return siteBase() + slug.replace(/^@/, '');
+      if (cfg.siteUrl) return slug.startsWith('@') ? siteBase() + slug.slice(1) : linkBase() + slug;
       const base = siteBase();
       if (!base) return slug.startsWith('@') ? location.href.split('#')[0] + '#' + slug : location.href.split('#')[0].replace(/[^/]*$/, '') + 'go.html?s=' + slug;
       return slug.startsWith('@') ? location.href.split('#')[0] + '#' + slug : base + 'go.html?s=' + slug;
     },
-    shortHost: () => (cfg.siteUrl ? siteBase() : siteBase() ? siteBase() + 'go.html?s=' : 'go.html?s=').replace(/^https?:\/\//, ''),
+    shortHost: () => (cfg.siteUrl ? linkBase() : siteBase() ? siteBase() + 'go.html?s=' : 'go.html?s=').replace(/^https?:\/\//, ''),
+    // Address without https:// for showing: "@name" → voids.wtf/name, "abc" → go.voids.wtf/abc
+    prettyUrl: slug => (slug.startsWith('@') ? siteHost() + '/' + slug.slice(1) : DB.shortHost() + slug),
     pageUrl: username => (cfg.siteUrl ? siteBase() + username : location.href.split('#')[0] + '#@' + username),
 
     // ---------- short links ----------
@@ -277,7 +281,16 @@ window.siteHost = () => {
         if (!error) return data;
         if (MISSING_COLUMN.test(error.code + ' ' + error.message)) throw new Error(UPGRADE_MSG);
         if (error.code !== '23505') throw error;
-        if (slug) { const e = new Error('That short name is taken. Try another.'); e.code = 'taken'; throw e; }
+        if (slug) {
+          // Short links and page usernames share one set of addresses, so say which one has it
+          const why = String(error.message || '');
+          const msg = /profile page/i.test(why)
+            ? `"${s}" is reserved for a profile page. Try ${s}-link or another name.`
+            : /reserved/i.test(why)
+              ? `"${s}" is reserved by the site. Try another name.`
+              : `${DB.shortHost()}${s} is already a short link. Try another name.`;
+          const e = new Error(msg); e.code = 'taken'; throw e;
+        }
       }
       throw new Error('Could not create a link. Try again.');
     },
@@ -293,6 +306,22 @@ window.siteHost = () => {
     },
     async deleteLink(slug) {
       fail((await sb.from('short_links').delete().eq('slug', slug)).error);
+    },
+    // ---------- API keys (public API, supabase/upgrade-api.sql) ----------
+    async apiKeys() {
+      const { data, error } = await sb.from('api_keys').select('id, name, prefix, created_at, last_used_at')
+        .is('revoked_at', null).order('created_at', { ascending: false });
+      fail(error);
+      return data || [];
+    },
+    // Returns the full key once ({ id, name, prefix, key, created_at }); only a fingerprint is stored
+    async createApiKey(name) {
+      const { data, error } = await sb.rpc('create_api_key', { p_name: name || 'API key' });
+      fail(error);
+      return data;
+    },
+    async revokeApiKey(id) {
+      fail((await sb.rpc('revoke_api_key', { p_id: id })).error);
     },
     // History of changes to your links, newest first
     async linkAudit(limit = 200) {

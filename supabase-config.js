@@ -15,6 +15,11 @@ window.SUPABASE_CONFIG = {
   // *.netlify.app) the site uses the address it was opened on, so every copy works.
   siteUrl: /^(voids\.wtf|[\w-]+\.pages\.dev|[\w-]+\.netlify\.app)$/.test(location.host) ? location.origin : 'https://voids.wtf',
 
+  // Short links live on their own subdomain (go.voids.wtf/abc), so a short link and
+  // a profile page (voids.wtf/abc) can share a name. Preview addresses have no
+  // subdomain, so there links use the same address as the site.
+  linkUrl: /^[\w-]+\.(pages\.dev|netlify\.app)$/.test(location.host) ? location.origin : 'https://go.voids.wtf',
+
   // Spotify app Client ID (developer.spotify.com/dashboard) for "Connect Spotify".
   // The Client ID is public; the Client Secret is NOT needed and must not go here.
   spotifyClientId: 'c1b1bea7907f4afb87adcb1ea48b5652',

@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#000000">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lexend:wght@400;500;600;700;800&family=Michroma&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Michroma&display=swap" rel="stylesheet">
   <style>
     :root {
       --text: #f5f5f7;
@@ -22,7 +22,7 @@
       --red: #f4b4b4;
     }
     * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; background: #000; color: var(--text); font-family: Inter, -apple-system, 'Segoe UI', sans-serif; }
+    html, body { height: 100%; margin: 0; background: #000; color: var(--text); font-family: 'Geist', Inter, -apple-system, 'Segoe UI', sans-serif; }
     #bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     body.no-webgl { background: radial-gradient(ellipse 60% 18% at 50% 50%, rgba(255,255,255,.12), transparent 70%), #000; }
     /* Darkens the edges so the centre card always reads */
@@ -31,7 +31,7 @@
 
     header { position: fixed; top: 0; left: 0; right: 0; z-index: 3; padding: 22px 28px; }
     .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none;
-      font-family: 'Michroma', 'Lexend', sans-serif; font-weight: 400; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; }
+      font-family: 'Michroma', 'Geist', sans-serif; font-weight: 400; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; }
     .brand i { width: 30px; height: 30px; border-radius: 50%; background: #000 url("assets/brand/quasar-64.png") center / cover; box-shadow: 0 0 0 1px rgba(255,255,255,.18); }
 
     main { position: relative; z-index: 2; min-height: 100%; display: grid; place-items: center; padding: 90px 20px 40px; }
@@ -51,17 +51,17 @@
       background: rgba(255,255,255,.07); border: 1px solid var(--line); }
     .badge.pulse { animation: pulse 2.4s ease-in-out infinite; }
     @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,.18); } 50% { box-shadow: 0 0 0 12px rgba(255,255,255,0); } }
-    h1 { font-family: 'Lexend', sans-serif; font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -.03em; margin: 0 0 10px; }
+    h1 { font-family: 'Geist', sans-serif; font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -.03em; margin: 0 0 10px; }
     p { margin: 0 auto; color: var(--muted); line-height: 1.6; max-width: 400px; }
     .slug { display: inline-block; margin: 16px 0 0; padding: 6px 12px; border-radius: 999px; font-size: .85rem;
-      font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--muted); background: rgba(255,255,255,.06); }
+      font-family: 'Geist Mono', ui-monospace, monospace; color: var(--muted); background: rgba(255,255,255,.06); }
 
     /* Countdown */
     .cd { display: flex; justify-content: center; align-items: flex-start; gap: 10px; margin: 26px 0 8px; }
     .cd-unit { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 78px; }
     .cd-num {
       width: 100%; padding: 14px 6px 12px; border-radius: 14px;
-      font-family: 'Lexend', sans-serif; font-weight: 700; font-size: clamp(2rem, 7vw, 2.9rem);
+      font-family: 'Geist', sans-serif; font-weight: 700; font-size: clamp(2rem, 7vw, 2.9rem);
       line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums;
       background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
       border: 1px solid var(--line); position: relative; overflow: hidden;
@@ -70,7 +70,7 @@
     .cd-num.tick span { display: inline-block; animation: tick .45s cubic-bezier(.2,.8,.2,1); }
     @keyframes tick { from { opacity: 0; transform: translateY(-40%); filter: blur(2px); } to { opacity: 1; transform: none; filter: none; } }
     .cd-unit small { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
-    .cd-sep { font-family: 'Lexend', sans-serif; font-size: 2rem; color: var(--dim); padding-top: 14px; }
+    .cd-sep { font-family: 'Geist', sans-serif; font-size: 2rem; color: var(--dim); padding-top: 14px; }
     .when { margin-top: 18px; color: var(--text); font-weight: 500; }
     .tz { margin-top: 4px; font-size: .82rem; color: var(--dim); }
     .bar { height: 3px; border-radius: 3px; background: rgba(255,255,255,.08); margin: 22px auto 0; max-width: 360px; overflow: hidden; }
@@ -194,19 +194,23 @@
   const oldProfile = path.match(/^@([a-z0-9_.-]{2,20})$/i);
   if (oldProfile) { location.replace('/' + oldProfile[1].toLowerCase()); return; }
   const slug = new URLSearchParams(location.search).get('s') || path;
-  // Normally the Netlify edge function opens /name profiles. This is the backup:
+  const onLinksHost = /^go\./.test(location.hostname) && !!cfg.siteUrl;
+  // Buttons back to the site lead to the main address, not go.voids.wtf
+  if (onLinksHost) document.querySelectorAll('a[href="index.html"]').forEach(a => { a.href = cfg.siteUrl + '/'; });
+  // Normally the server function opens /name profiles. This is the backup:
   // ask the database whether a page has this name, and show it.
+  // On the links address (go.voids.wtf) a profile opens on the main site.
   async function showProfileIfAny() {
     const name = slug.toLowerCase();
     if (!/^[a-z0-9_.-]{2,20}$/.test(name) || !cfg.url) return false;
     try {
       const r = await fetch(cfg.url + '/rest/v1/pages?select=username&username=eq.' + encodeURIComponent(name), { headers: { apikey: cfg.key } });
       const rows = r.ok ? await r.json() : [];
-      if (rows.length) { location.replace('/index.html#@' + name); return true; }
+      if (rows.length) { location.replace((onLinksHost ? cfg.siteUrl : '') + '/index.html#@' + name); return true; }
     } catch (_) {}
     return false;
   }
-  const host = (() => { try { return cfg.siteUrl ? new URL(cfg.siteUrl).host : (/^https?:$/.test(location.protocol) ? location.host : 'voidlinks'); } catch (_) { return 'voidlinks'; } })();
+  const host = (() => { try { return cfg.siteUrl ? new URL(cfg.linkUrl || cfg.siteUrl).host : (/^https?:$/.test(location.protocol) ? location.host : 'voidlinks'); } catch (_) { return 'voidlinks'; } })();
   const pretty = host + '/' + slug;
 
   const ICON = d => `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
