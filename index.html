@@ -1132,25 +1132,67 @@
 
     /* Link table */
     .link-table { width: 100%; }
-    /* API keys */
-    .api-panel { grid-column: 1 / -1; }
-    .api-lead { color: var(--text-muted); font-size: 0.92rem; margin: -4px 0 14px; }
-    .api-create { display: flex; gap: 8px; flex-wrap: wrap; }
-    .api-create input { flex: 1; min-width: 180px; }
-    .api-keys { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .api-key { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; font-size: 0.9rem; }
-    .api-key code { font-family: var(--mono); color: var(--text); }
-    .api-key .meta { color: var(--text-muted); font-size: 0.8rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .api-muted { color: var(--text-muted); font-size: 0.85rem; }
-    .api-reveal { border: 1px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-    .api-reveal strong { display: block; margin-bottom: 8px; }
-    .api-reveal .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .api-reveal code { font-family: var(--mono); font-size: 0.85rem; background: #000; padding: 8px 10px; border-radius: 8px; word-break: break-all; flex: 1; min-width: 0; }
-    .api-docs { margin-top: 14px; font-size: 0.88rem; color: var(--text-muted); }
-    .api-docs summary { cursor: pointer; color: var(--text); font-weight: 600; }
-    .api-docs code { font-family: var(--mono); color: var(--text); }
-    .api-docs pre { font-family: var(--mono); font-size: 0.8rem; background: #000; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; overflow-x: auto; color: var(--text); white-space: pre; margin: 10px 0; }
-    .api-docs ul { padding-left: 18px; line-height: 1.8; }
+    /* API section */
+    .api-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 16px; align-items: start; }
+    .api-create { display: flex; gap: 8px; align-items: flex-end; }
+    .api-create .input-group { flex: 1; margin: 0; }
+    .api-keys { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .api-key { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.02); }
+    .api-key .k-icon { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: rgba(255,255,255,0.06); color: var(--text); }
+    .api-key .k-name { font-weight: 600; font-size: 0.92rem; }
+    .api-key .k-meta { color: var(--text-dim); font-size: 0.78rem; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .api-key .k-meta code { font-family: var(--mono); color: var(--text-muted); }
+    .api-muted { color: var(--text-dim); font-size: 0.86rem; padding: 6px 2px; }
+    .api-reveal { margin-top: 14px; border: 1px solid rgba(255,255,255,0.28); background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius: 14px; padding: 16px; }
+    .api-reveal .r-title { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.92rem; margin-bottom: 4px; }
+    .api-reveal .r-sub { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 12px; }
+    .api-reveal .r-row { display: flex; gap: 8px; align-items: center; }
+    .api-reveal code { flex: 1; min-width: 0; font-family: var(--mono); font-size: 0.82rem; color: var(--text); background: rgba(0,0,0,0.6); border: 1px solid var(--border); padding: 10px 12px; border-radius: 9px; word-break: break-all; }
+    .api-code-tabs { margin-bottom: 10px; }
+    .api-code-tabs button { padding: 6px 12px; font-size: 0.82rem; }
+    .api-code { position: relative; font-family: var(--mono); font-size: 0.78rem; line-height: 1.65; background: rgba(0,0,0,0.55); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; overflow-x: auto; color: var(--text); white-space: pre; margin: 0; }
+    .api-code-copy { position: absolute; top: 8px; right: 8px; }
+    .api-base { display: flex; align-items: center; gap: 10px; font-size: 0.84rem; color: var(--text-muted); margin: 0 0 14px; flex-wrap: wrap; }
+    .api-base code { font-family: var(--mono); color: var(--text); background: rgba(255,255,255,0.06); padding: 4px 9px; border-radius: 7px; }
+    .api-endpoints { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
+    .api-ep { display: grid; grid-template-columns: 66px minmax(0, 150px) minmax(0, 1fr); gap: 12px; align-items: center; padding: 9px 4px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.84rem; }
+    .api-ep:last-child { border-bottom: 0; }
+    .api-ep .m { font-family: var(--mono); font-size: 0.7rem; font-weight: 600; text-align: center; padding: 3px 0; border-radius: 6px; border: 1px solid var(--border); color: var(--text); }
+    .api-ep .m.get { background: rgba(255,255,255,0.06); } .api-ep .m.post { background: #fff; color: #000; border-color: #fff; }
+    .api-ep .m.patch { border-style: dashed; } .api-ep .m.delete { color: #ff9b9b; border-color: rgba(255,120,120,0.35); }
+    .api-ep code { font-family: var(--mono); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .api-ep > span:not(.m) { color: var(--text-muted); }
+    .api-limits { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .api-limits span { font-size: 0.76rem; color: var(--text-muted); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; }
+    .api-grid > * { min-width: 0; }
+    .api-base code { word-break: break-all; }
+    @media (max-width: 980px) { .api-grid { grid-template-columns: minmax(0, 1fr); } }
+    @media (max-width: 560px) { .api-create { flex-direction: column; align-items: stretch; } .api-ep { grid-template-columns: 58px minmax(0, 1fr); row-gap: 4px; } .api-ep > span:not(.m) { grid-column: 2; } .api-code { padding-top: 46px; } }
+
+    /* Analytics */
+    .ana-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+    .ana-head .dash-page-sub { margin-bottom: 0; }
+    .ana-chart { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 8px; }
+    .ana-y { display: flex; flex-direction: column; justify-content: space-between; text-align: right; font-size: 0.7rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+    .ana-plot { position: relative; display: flex; align-items: flex-end; gap: 3px; border-bottom: 1px solid var(--border); }
+    .ana-plot::before, .ana-plot::after { content: ''; position: absolute; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.06); pointer-events: none; }
+    .ana-plot::before { top: 0; } .ana-plot::after { top: 50%; }
+    .ana-bar { flex: 1; position: relative; min-height: 2px; border-radius: 4px 4px 1px 1px; background: linear-gradient(180deg, #fff, rgba(255,255,255,0.28)); opacity: 0.9; transition: opacity .15s, box-shadow .15s; }
+    .ana-bar.zero { background: rgba(255,255,255,0.07); }
+    .ana-bar.peak { box-shadow: 0 0 18px rgba(255,255,255,0.35); }
+    .ana-bar:hover { opacity: 1; box-shadow: 0 0 14px rgba(255,255,255,0.4); }
+    .ana-bar:hover::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: #fff; color: #000; font-size: 0.74rem; font-weight: 600; padding: 5px 9px; border-radius: 7px; white-space: nowrap; z-index: 3; pointer-events: none; }
+    .ana-x { display: flex; gap: 3px; margin: 7px 0 0 46px; }
+    .ana-x span { flex: 1; text-align: center; font-size: 0.66rem; color: var(--text-dim); white-space: nowrap; overflow: visible; }
+    .ana-note { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px; font-size: 0.8rem; color: var(--text-muted); }
+    .ana-note b { color: var(--text); font-weight: 600; }
+    .ana-rank { display: flex; flex-direction: column; gap: 10px; }
+    .ana-rank-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 0.86rem; }
+    .ana-rank-row .r { color: var(--text-dim); font-family: var(--mono); font-size: 0.74rem; }
+    .ana-rank-row .s { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--mono); }
+    .ana-rank-row .bar { grid-column: 2 / 4; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.07); overflow: hidden; margin-top: -4px; }
+    .ana-rank-row .bar i { display: block; height: 100%; background: #fff; border-radius: 4px; }
+    .ana-rank-row .n { font-variant-numeric: tabular-nums; color: var(--text-muted); }
     /* Bulk import */
     .csv-panel { margin-bottom: 16px; }
     .csv-panel > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -3459,6 +3501,10 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         <span>QR Codes</span>
       </a>
+      <a class="dash-nav-item" href="#" onclick="showDashTab('api');return false;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+        <span>API</span>
+      </a>
       <a class="dash-nav-item" href="#" onclick="showDashTab('ai');return false;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
         <span>AI Assistant</span>
@@ -4284,7 +4330,17 @@ if (window.DB) {
     await loadCurrentUser(session);
     updateAuthUI();
     if (window.LP) LP.onAuthChange().then(maybeOnboard);
+    restoreDashboard();
   });
+}
+// After a refresh inside the dashboard, reopen the same tab once you're signed in
+let dashRestored = false;
+function restoreDashboard() {
+  if (dashRestored || !currentUser) return;
+  const m = location.hash.match(/^#\/dashboard(?:\/([a-z]+))?\/?$/);
+  if (!m) return;
+  dashRestored = true;
+  openDashboard(m[1] && dashPages[m[1]] ? m[1] : 'overview');
 }
 updateAuthUI();
 handleAuthReturn();
@@ -4299,7 +4355,8 @@ async function loadDashData(force) {
   if (dash.loading && !force) return dash.loading;
   dash.loading = (async () => {
     try {
-      const [links, clicks] = await Promise.all([DB.myLinks(), DB.myClicks(30)]);
+      // 180 days, so the 90-day view can compare with the 90 days before it
+      const [links, clicks] = await Promise.all([DB.myLinks(), DB.myClicks(180)]);
       dash.links = links;
       dash.clicks = clicks;
     } catch (_) {
@@ -4340,6 +4397,35 @@ function barsHtml(series, height, labels) {
   const days = labels ? `<div class="chart-days">${series.map(s => `<div class="chart-day">${s.date.toLocaleDateString(undefined, { weekday: 'short' })}</div>`).join('')}</div>` : '';
   return `<div class="chart-bars" style="height:${height}px;">${bars}</div>${days}`;
 }
+// Analytics chart: bars with a scale, hover values and sparse date labels
+function anaChartHtml(series, height, labelFn, every) {
+  const max = Math.max(1, ...series.map(s => s.n));
+  const top = max <= 2 ? 2 : max <= 4 ? 4 : Math.ceil(max / 2) * 2;   // even, so the middle line is a whole number
+  const peak = Math.max(...series.map(s => s.n));
+  const bars = series.map(s => `<div class="ana-bar${s.n ? '' : ' zero'}${s.n && s.n === peak ? ' peak' : ''}" data-tip="${esc(s.tip)}: ${fmt(s.n)} click${s.n === 1 ? '' : 's'}" style="height:${s.n ? Math.max(3, s.n / top * 100) : 1.5}%"></div>`).join('');
+  const xs = series.map((s, i) => `<span>${(i % every === 0 || i === series.length - 1) && !(i === series.length - 1 && i % every !== 0 && i % every < every / 2) ? esc(labelFn(s)) : ''}</span>`).join('');
+  return `<div class="ana-chart"><div class="ana-y" style="height:${height}px"><span>${fmt(top)}</span><span>${fmt(Math.round(top / 2))}</span><span>0</span></div>
+    <div class="ana-plot" style="height:${height}px">${bars}</div></div><div class="ana-x">${xs}</div>`;
+}
+function weeklySeries(clicks, weeks) {
+  const out = [];
+  const end = new Date(); end.setHours(0, 0, 0, 0); end.setDate(end.getDate() + 1);
+  for (let i = weeks - 1; i >= 0; i--) {
+    const to = new Date(end.getTime() - i * 7 * DAY), from = new Date(to.getTime() - 7 * DAY);
+    out.push({ from, to, n: 0 });
+  }
+  clicks.forEach(c => { const t = new Date(c.at).getTime(); const w = out.find(o => t >= o.from.getTime() && t < o.to.getTime()); if (w) w.n++; });
+  return out;
+}
+function rankHtml(entries, total, labelFn, empty) {
+  if (!entries.length) return `<p class="dash-empty">${esc(empty)}</p>`;
+  const max = entries[0][1];
+  return `<div class="ana-rank">${entries.slice(0, 6).map(([k, n], i) => `<div class="ana-rank-row">
+    <span class="r">${i + 1}</span><span class="s">${esc(labelFn ? labelFn(k) : k)}</span><span class="n">${fmt(n)} · ${Math.round(n / total * 100)}%</span>
+    <span class="bar"><i style="width:${Math.max(3, n / max * 100)}%"></i></span></div>`).join('')}</div>`;
+}
+let anaRange = 30;
+function setAnaRange(d) { anaRange = d; showDashTab('analytics'); }
 let regionNames = null;
 try { regionNames = new Intl.DisplayNames(['en'], { type: 'region' }); } catch (_) {}
 const countryName = code => { try { return (regionNames && regionNames.of(code)) || code; } catch (_) { return code; } };
@@ -4408,7 +4494,8 @@ const dashPages = {
     const last7 = dash.clicks.filter(c => age(c) < 7 * DAY).length;
     const prev7 = dash.clicks.filter(c => age(c) >= 7 * DAY && age(c) < 14 * DAY).length;
     const delta = prev7 ? Math.round((last7 - prev7) / prev7 * 100) : null;
-    const top = countBy(dash.clicks, c => c.slug)[0];
+    const last30 = dash.clicks.filter(c => age(c) < 30 * DAY);
+    const top = countBy(last30, c => c.slug)[0];
     const page = window.LP && LP.myPage();
     return `
     <div class="dash-page-title">${esc(title)}</div>
@@ -4426,8 +4513,8 @@ const dashPages = {
         ${barsHtml(dailySeries(dash.clicks, 7), 90, true)}
       </div>
       <div class="dash-panel">
-        <div class="dash-panel-title">Where clicks come from</div>
-        ${breakdownHtml(countBy(dash.clicks, c => c.referrer || 'Direct'), dash.clicks.length, null, 'No clicks yet')}
+        <div class="dash-panel-title">Where clicks come from <span class="dash-panel-badge">30 days</span></div>
+        ${breakdownHtml(countBy(last30, c => c.referrer || 'Direct'), last30.length, null, 'No clicks yet')}
       </div>
     </div>
     <div class="dash-panel">
@@ -4463,37 +4550,75 @@ const dashPages = {
     </div>`;
   },
   analytics: () => {
-    if (!dash.loaded) return loadingHtml('Analytics', 'Your clicks over the last 30 days.');
-    const c = dash.clicks, total = c.length;
-    const today = c.filter(x => dayKey(x.at) === dayKey(Date.now())).length;
+    if (!dash.loaded) return loadingHtml('Analytics', 'How your links are doing.');
+    const days = anaRange, now = Date.now();
+    const age = c => now - new Date(c.at).getTime();
+    const c = dash.clicks.filter(x => age(x) < days * DAY);
+    const prev = dash.clicks.filter(x => age(x) >= days * DAY && age(x) < 2 * days * DAY);
+    const total = c.length;
+    const delta = prev.length ? Math.round((total - prev.length) / prev.length * 100) : null;
+    const today = c.filter(x => dayKey(x.at) === dayKey(now)).length;
     const sources = countBy(c, x => x.referrer || 'Direct');
     const devices = countBy(c, x => x.device || 'unknown');
     const countries = countBy(c, x => x.country);
     const mobile = c.filter(x => x.device === 'mobile').length;
-    const perLink = new Map(countBy(c, x => x.slug));
+    const perLink = countBy(c, x => x.slug);
+    const perLinkMap = new Map(perLink);
+    const label = { 7: '7 days', 30: '30 days', 90: '90 days' }[days];
+    // Chart: days for 7 and 30, weeks for 90
+    let series, labelFn, every;
+    if (days === 90) {
+      series = weeklySeries(c, 13).map(w => ({ ...w, tip: `Week of ${w.from.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}` }));
+      labelFn = w => w.from.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); every = 2;
+    } else {
+      series = dailySeries(c, days).map(d => ({ ...d, tip: d.date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) }));
+      labelFn = days === 7 ? d => d.date.toLocaleDateString(undefined, { weekday: 'short' }) : d => d.date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+      every = days === 7 ? 1 : 5;
+    }
+    const peak = series.reduce((a, b) => (b.n > a.n ? b : a), series[0]);
+    const hours = Array.from({ length: 24 }, (_, h) => ({ h, n: 0 }));
+    c.forEach(x => { hours[new Date(x.at).getHours()].n++; });
+    const busiest = hours.reduce((a, b) => (b.n > a.n ? b : a), hours[0]);
+    const hourLabel = h => new Date(2000, 0, 1, h).toLocaleTimeString(undefined, { hour: 'numeric' });
+    const hourSeries = hours.map(x => ({ n: x.n, tip: `${hourLabel(x.h)}–${hourLabel((x.h + 1) % 24)}`, h: x.h }));
     return `
-    <div class="dash-page-title">Analytics</div>
-    <div class="dash-page-sub">Your clicks over the last 30 days.</div>
+    <div class="ana-head">
+      <div><div class="dash-page-title">Analytics</div><div class="dash-page-sub">How your links are doing, from real clicks only.</div></div>
+      <div class="seg" role="group" aria-label="Time range">
+        ${[7, 30, 90].map(d => `<button type="button" aria-pressed="${d === days}" onclick="setAnaRange(${d})">${d} days</button>`).join('')}
+      </div>
+    </div>
     <div class="kpi-grid">
-      ${kpi('Clicks, 30 days', fmt(total), total ? `${fmt(Math.round(total / 30 * 10) / 10)} per day on average` : 'No clicks yet')}
-      ${kpi('Clicks today', fmt(today), new Date().toLocaleDateString(undefined, { weekday: 'long' }))}
+      ${kpi(`Clicks, ${label}`, fmt(total), delta === null ? (total ? 'No earlier data to compare' : 'No clicks yet') : `${delta >= 0 ? '↑' : '↓'} ${Math.abs(delta)}% vs the ${label} before`, delta === null ? '' : (delta >= 0 ? 'pos' : 'neg'))}
+      ${kpi('Daily average', fmt(Math.round(total / days * 10) / 10), `${fmt(today)} today`)}
       ${kpi('Top source', sources[0] ? sources[0][0] : '—', sources[0] ? `${Math.round(sources[0][1] / total * 100)}% of clicks` : 'No clicks yet')}
       ${kpi('On mobile', total ? Math.round(mobile / total * 100) + '%' : '—', total ? `${fmt(mobile)} of ${fmt(total)} clicks` : 'No clicks yet')}
     </div>
-    <div class="dash-row">
-      <div class="dash-panel">
-        <div class="dash-panel-title">Clicks per day</div>
-        ${barsHtml(dailySeries(c, 30), 110, false)}
-      </div>
-      <div class="dash-panel">
-        <div class="dash-panel-title">Sources</div>
-        ${breakdownHtml(sources, total, null, 'No clicks yet')}
+    <div class="dash-panel">
+      <div class="dash-panel-title">Clicks ${days === 90 ? 'per week' : 'per day'} <span class="dash-panel-badge">${label}</span></div>
+      ${anaChartHtml(series, 180, labelFn, every)}
+      <div class="ana-note">
+        <span>Total <b>${fmt(total)}</b></span>
+        <span>Best ${days === 90 ? 'week' : 'day'} <b>${total ? esc(peak.tip) + ' · ' + fmt(peak.n) : '—'}</b></span>
+        <span>Links clicked <b>${fmt(perLink.length)}</b> of ${fmt(dash.links.length)}</span>
+        <span>Countries <b>${fmt(countries.length)}</b></span>
       </div>
     </div>
     <div class="dash-row">
       <div class="dash-panel">
-        <div class="dash-panel-title">Countries</div>
-        ${breakdownHtml(countries, countries.reduce((a, [, n]) => a + n, 0), countryName, total ? 'Countries are recorded for clicks through your live site.' : 'No clicks yet')}
+        <div class="dash-panel-title">Top links <span class="dash-panel-badge">${label}</span></div>
+        ${rankHtml(perLink, total, k => DB.shortHost() + k, 'No clicks in this period')}
+      </div>
+      <div class="dash-panel">
+        <div class="dash-panel-title">Busiest hours</div>
+        ${anaChartHtml(hourSeries, 110, x => x.h % 6 === 0 ? hourLabel(x.h) : '', 1)}
+        <div class="ana-note"><span>Peak <b>${total ? esc(hourSeries[busiest.h].tip) : '—'}</b></span><span>Your local time</span></div>
+      </div>
+    </div>
+    <div class="dash-row">
+      <div class="dash-panel">
+        <div class="dash-panel-title">Sources</div>
+        ${breakdownHtml(sources, total, null, 'No clicks yet')}
       </div>
       <div class="dash-panel">
         <div class="dash-panel-title">Devices</div>
@@ -4501,11 +4626,15 @@ const dashPages = {
       </div>
     </div>
     <div class="dash-panel">
-      <div class="dash-panel-title">Per link</div>
+      <div class="dash-panel-title">Countries</div>
+      ${breakdownHtml(countries, countries.reduce((a, [, n]) => a + n, 0), countryName, total ? 'Countries are recorded for clicks through your live site.' : 'No clicks yet')}
+    </div>
+    <div class="dash-panel">
+      <div class="dash-panel-title">Per link <span class="dash-panel-badge">${label} · all time</span></div>
       ${dash.links.length ? `<div class="link-table">${dash.links.map(l => `<div class="link-row">
         <span class="slug">${esc(DB.shortHost() + l.slug)}</span>
         <span class="dest">${esc(l.destination)}</span>
-        <span class="clicks" title="Last 30 days">${fmt(perLink.get(l.slug) || 0)}</span>
+        <span class="clicks" title="Last ${label}">${fmt(perLinkMap.get(l.slug) || 0)}</span>
         <span class="dim-note" title="All time">${fmt(l.clicks)} total</span>
       </div>`).join('')}</div>` : '<p class="dash-empty">No short links yet.</p>'}
     </div>`;
@@ -4599,30 +4728,6 @@ const dashPages = {
         </form>
       </div>
 
-      <div class="dash-panel api-panel">
-        <div class="dash-panel-title">API keys <span class="dash-panel-badge">Developers</span></div>
-        <p class="api-lead">Create and manage short links from your own apps. Keep keys secret: anyone with a key can manage your links.</p>
-        <div id="api-new-key" hidden></div>
-        <form class="api-create" onsubmit="createApiKey(event)">
-          <input id="api-key-name" type="text" maxlength="40" placeholder="Key name, e.g. My app" aria-label="Key name">
-          <button type="submit" class="btn btn-primary">Create key</button>
-        </form>
-        <p class="acct-error" id="api-error" aria-live="polite"></p>
-        <div id="api-keys-list" class="api-keys"><p class="api-muted">Loading…</p></div>
-        <details class="api-docs">
-          <summary>How to use the API</summary>
-          <p>Base address: <code id="api-base"></code></p>
-          <pre id="api-example"></pre>
-          <ul>
-            <li><code>GET /links</code> your links · <code>POST /links</code> create one</li>
-            <li><code>GET /links/:slug</code> one link with 30-day clicks, countries and devices</li>
-            <li><code>PATCH /links/:slug</code> change <code>url</code> or <code>status</code> (active, paused, revoked)</li>
-            <li><code>DELETE /links/:slug</code> delete a link</li>
-          </ul>
-          <p class="api-muted">Limits: 600 requests per key per hour, 200 new links per account per hour.</p>
-        </details>
-      </div>
-
       <div class="dash-panel">
         <div class="dash-panel-title">Language</div>
         <select id="set-lang" aria-label="Language" onchange="i18n.setLang(this.value)"></select>
@@ -4633,6 +4738,42 @@ const dashPages = {
           <button class="btn btn-danger" onclick="deleteMyPage()">Delete my page</button>
           <button class="btn btn-danger" onclick="logoutUser()">Log out</button>
         </div>
+      </div>
+    </div>
+  `,
+  api: () => `
+    <div class="dash-page-title">API</div>
+    <div class="dash-page-sub">Create and manage short links from your own apps, scripts and bots.</div>
+    <div class="api-grid">
+      <div class="dash-panel">
+        <div class="dash-panel-title">Your API keys <span class="dash-panel-badge">Up to 5</span></div>
+        <form class="api-create" onsubmit="createApiKey(event)" autocomplete="off">
+          <div class="input-group"><label for="api-key-name">Key name</label><input id="api-key-name" type="text" maxlength="40" placeholder="e.g. My Discord bot"></div>
+          <button type="submit" class="btn btn-primary">Create key</button>
+        </form>
+        <p class="acct-error" id="api-error" aria-live="polite"></p>
+        <div id="api-new-key"></div>
+        <div id="api-keys-list" class="api-keys"><p class="api-muted">Loading your keys…</p></div>
+        <p class="api-muted" style="margin-top:12px">Keep keys secret, like a password: anyone with a key can manage your links. We only store a fingerprint, so a lost key can't be shown again. Just revoke it and make a new one.</p>
+      </div>
+      <div class="dash-panel">
+        <div class="dash-panel-title">Quick start</div>
+        <p class="api-base">Base address <code id="api-base"></code></p>
+        <div class="seg api-code-tabs" role="tablist" aria-label="Code language">
+          <button type="button" aria-pressed="true" data-lang="curl" onclick="paintApiCode('curl')">curl</button>
+          <button type="button" aria-pressed="false" data-lang="js" onclick="paintApiCode('js')">JavaScript</button>
+          <button type="button" aria-pressed="false" data-lang="py" onclick="paintApiCode('py')">Python</button>
+        </div>
+        <div style="position:relative"><pre class="api-code" id="api-code"></pre><button type="button" class="btn btn-ghost api-code-copy" onclick="copyApiCode()">Copy</button></div>
+        <div class="dash-panel-title" style="margin-top:20px">Endpoints</div>
+        <div class="api-endpoints">
+          <div class="api-ep"><span class="m get">GET</span><code>/links</code><span>Your links, newest first</span></div>
+          <div class="api-ep"><span class="m post">POST</span><code>/links</code><span>Create: url, alias, password, starts_at, expires_at, max_clicks</span></div>
+          <div class="api-ep"><span class="m get">GET</span><code>/links/:slug</code><span>One link with 30-day clicks, countries and devices</span></div>
+          <div class="api-ep"><span class="m patch">PATCH</span><code>/links/:slug</code><span>Change url, or status: active, paused, revoked</span></div>
+          <div class="api-ep"><span class="m delete">DELETE</span><code>/links/:slug</code><span>Delete a link</span></div>
+        </div>
+        <div class="api-limits"><span>600 requests / key / hour</span><span>200 new links / hour</span><span>Bearer key auth</span><span>JSON in, JSON out</span></div>
       </div>
     </div>
   `,
@@ -4848,29 +4989,72 @@ async function deleteShortLink(slug) {
   showDashTab(currentTab);
   showToast('Link deleted');
 }
-// ----- API keys (Settings) -----
-const apiBase = () => (/^https?:$/.test(location.protocol) && !/^go\./.test(location.hostname) ? location.origin : 'https://voids.wtf') + '/api/v1';
+// ----- API section -----
+const apiBase = () => (/^https?:$/.test(location.protocol) && !/^go\./.test(location.hostname) && !/^(localhost|127\.)/.test(location.hostname) ? location.origin : 'https://voids.wtf') + '/api/v1';
 const API_UPGRADE_MSG = 'The API needs a quick database upgrade: run supabase/upgrade-api.sql in Supabase.';
+const KEY_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 20 3M16 7l3 3M14 9l2 2"/></svg>';
+let apiSeq = 0, apiLang = 'curl';
+const ago = d => {
+  const s = (Date.now() - new Date(d).getTime()) / 1000;
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)} h ago`;
+  return new Date(d).toLocaleDateString();
+};
 async function loadApiKeys() {
   const box = document.getElementById('api-keys-list');
   if (!box) return;
-  const base = apiBase();
-  document.getElementById('api-base').textContent = base;
-  document.getElementById('api-example').textContent =
-`curl -X POST ${base}/links \\
-  -H "Authorization: Bearer YOUR_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{"url": "https://example.com/launch", "alias": "launch"}'`;
+  const seq = ++apiSeq;   // only the newest request may draw the list
   try {
     const keys = await DB.apiKeys();
+    if (seq !== apiSeq || !document.body.contains(box)) return;
     box.innerHTML = keys.length ? keys.map(k => `<div class="api-key">
-      <code>${esc(k.prefix)}…</code>
-      <span class="meta">${esc(k.name)} · created ${new Date(k.created_at).toLocaleDateString()} · ${k.last_used_at ? 'last used ' + new Date(k.last_used_at).toLocaleString() : 'never used'}</span>
+      <span class="k-icon">${KEY_SVG}</span>
+      <div style="min-width:0"><div class="k-name">${esc(k.name)}</div>
+        <div class="k-meta"><code>${esc(k.prefix)}…</code> · created ${esc(ago(k.created_at))} · ${k.last_used_at ? 'used ' + esc(ago(k.last_used_at)) : 'never used'}</div></div>
       <button type="button" class="btn btn-ghost" onclick="revokeApiKey('${k.id}')">Revoke</button>
-    </div>`).join('') : '<p class="api-muted">No keys yet.</p>';
+    </div>`).join('') : '<p class="api-muted">No keys yet. Give one a name and press Create key.</p>';
   } catch (e) {
+    if (seq !== apiSeq) return;
     box.innerHTML = `<p class="api-muted">${esc(/api_keys|relation|schema cache|PGRST/i.test((e && e.message) || '') ? API_UPGRADE_MSG : "Couldn't load your keys.")}</p>`;
   }
+}
+function paintApiCode(lang) {
+  if (lang) apiLang = lang;
+  const base = apiBase();
+  const baseEl = document.getElementById('api-base');
+  const code = document.getElementById('api-code');
+  if (!baseEl || !code) return;
+  baseEl.textContent = base;
+  document.querySelectorAll('.api-code-tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === apiLang));
+  code.textContent = {
+    curl: `curl -X POST ${base}/links \\
+  -H "Authorization: Bearer YOUR_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"url": "https://example.com/launch", "alias": "launch"}'`,
+    js: `const res = await fetch("${base}/links", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer YOUR_KEY",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ url: "https://example.com/launch", alias: "launch" }),
+});
+const { link } = await res.json();
+console.log(link.short_url);`,
+    py: `import requests
+
+res = requests.post(
+    "${base}/links",
+    headers={"Authorization": "Bearer YOUR_KEY"},
+    json={"url": "https://example.com/launch", "alias": "launch"},
+)
+print(res.json()["link"]["short_url"])`,
+  }[apiLang];
+}
+function copyApiCode() {
+  const c = document.getElementById('api-code');
+  if (c) navigator.clipboard.writeText(c.textContent).then(() => showToast('Code copied')).catch(() => {});
 }
 async function createApiKey(e) {
   e.preventDefault();
@@ -4879,12 +5063,13 @@ async function createApiKey(e) {
   err.textContent = ''; btn.disabled = true;
   try {
     const k = await DB.createApiKey(document.getElementById('api-key-name').value.trim());
-    const box = document.getElementById('api-new-key');
-    box.hidden = false;
-    box.innerHTML = `<div class="api-reveal"><strong>Copy your new key now. You won't see it again.</strong>
-      <div class="row"><code id="api-new-key-value">${esc(k.key)}</code><button type="button" class="btn btn-primary" onclick="copyApiKey()">Copy</button></div></div>`;
+    document.getElementById('api-new-key').innerHTML = `<div class="api-reveal">
+      <div class="r-title">${KEY_SVG} ${esc(k.name)} is ready</div>
+      <div class="r-sub">Copy it now and store it somewhere safe. For your security it won't be shown again.</div>
+      <div class="r-row"><code id="api-new-key-value">${esc(k.key)}</code><button type="button" class="btn btn-primary" onclick="copyApiKey()">Copy</button></div>
+    </div>`;
     document.getElementById('api-key-name').value = '';
-    loadApiKeys();
+    await loadApiKeys();
   } catch (e2) {
     const m = (e2 && e2.message) || '';
     err.textContent = /create_api_key|schema cache|PGRST/i.test(m) ? API_UPGRADE_MSG : (m || "Couldn't create a key.");
@@ -4898,6 +5083,8 @@ function copyApiKey() {
 async function revokeApiKey(id) {
   if (!confirm('Revoke this key? Apps using it stop working right away.')) return;
   try { await DB.revokeApiKey(id); showToast('Key revoked'); } catch (_) { showToast("Couldn't revoke. Try again."); }
+  const shown = document.getElementById('api-new-key');
+  if (shown) shown.innerHTML = '';
   loadApiKeys();
 }
 
@@ -5691,6 +5878,10 @@ function showDashTab(tab) {
   const content = document.getElementById('dash-content');
   if (!content) return;
   currentTab = tab;
+  // Remember where you are, so a refresh comes back here (#/dashboard/<tab>)
+  if (document.getElementById('dashboard-view').classList.contains('active') && location.hash !== '#/dashboard/' + tab) {
+    history.replaceState(null, '', location.pathname + location.search + '#/dashboard/' + tab);
+  }
   // Fetch your real numbers once, then re-render this tab when they arrive
   if (DATA_TABS.has(tab) && (!dash.loaded || dash.uid !== (currentUser && currentUser.id))) {
     if (dash.uid !== (currentUser && currentUser.id)) { dash.loaded = false; dash.auditLoaded = false; auditFilter = ''; auditActionFilter = ''; }
@@ -5703,7 +5894,8 @@ function showDashTab(tab) {
   content.innerHTML = dashPages[tab] ? dashPages[tab]() : dashPages.overview();
   content.scrollTop = 0;
   if (tab === 'page' && window.LP) LP.mountBuilder(document.getElementById('builder-slot'));
-  if (tab === 'settings') { fillSettings(); loadApiKeys(); }
+  if (tab === 'settings') fillSettings();
+  if (tab === 'api') { loadApiKeys(); paintApiCode(); }
   // Update active nav
   document.querySelectorAll('.dash-nav-item').forEach(item => item.classList.remove('active'));
   document.querySelectorAll('.dash-nav-item').forEach(item => {
@@ -5729,6 +5921,7 @@ function closeDashboard() {
   const dv = document.getElementById('dashboard-view');
   if (!dv.classList.contains('active')) return;
   dv.classList.remove('active');
+  if (/^#\/dashboard/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
   toggleUserMenu(false);
   if (window.LP) LP.unmountBuilder();
   setOverlay(false);
