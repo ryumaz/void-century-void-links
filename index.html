@@ -4396,6 +4396,13 @@ if (window.DB) {
     restoreDashboard();
   });
 }
+// The address bar shows the open dashboard tab (#/dashboard/<tab>), so a refresh comes back to it
+function syncDashHash() {
+  const dv = document.getElementById('dashboard-view');
+  if (!dv || !dv.classList.contains('active') || !currentTab) return;
+  const want = '#/dashboard/' + currentTab;
+  if (location.hash !== want) history.replaceState(null, '', location.pathname + location.search + want);
+}
 // After a refresh inside the dashboard, reopen the same tab once you're signed in
 let dashRestored = false;
 function restoreDashboard() {

@@ -595,8 +595,16 @@
       // A blurred picture has no fine detail, so the blur is drawn at half width and height
       // (a quarter of the pixels) and scaled back up: it looks the same, and phones keep up
       // even with a full-screen video. The 108% size hides the soft edge blur creates.
-      mediaEl.classList.toggle('bg-soft', !!b);
-      mediaEl.style.filter = b ? `blur(${(b / 2).toFixed(1)}px)` : '';
+      const soft = !!b;
+      const changed = mediaEl.classList.contains('bg-soft') !== soft;
+      mediaEl.classList.toggle('bg-soft', soft);
+      mediaEl.style.filter = soft ? `blur(${(b / 2).toFixed(1)}px)` : '';
+      // Switching blur on/off resizes the layer; Chrome can keep showing the old (blurred)
+      // video frame until something else repaints, so hide it for one frame to force a fresh one
+      if (changed) {
+        mediaEl.style.display = 'none';
+        requestAnimationFrame(() => { mediaEl.style.display = ''; if (mediaEl.tagName === 'VIDEO' && mediaEl.paused) mediaEl.play().catch(() => {}); });
+      }
     }
   }
 
@@ -1282,6 +1290,7 @@
     if (!window.DB) { toast(t('toast.offline')); return; }
     const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;
+    const wasLive = !!myPageCache;
     const working = () => t(myPageCache ? 'b.saving' : 'b.publishing');
     btn.textContent = working();
     try {
@@ -1333,7 +1342,7 @@
       $('pb-result-url').textContent = siteHost() + '/' + saved.username;
       $('pb-result').hidden = false;
       update();
-      toast(t('toast.published'));
+      toast(t(wasLive ? 'toast.saved' : 'toast.published'));
       document.dispatchEvent(new CustomEvent('pagepublished', { detail: saved.username }));
     } catch (e) {
       const msg = (e && (e.message || '')) + ' ' + (e && e.code || '');
@@ -1475,6 +1484,8 @@
     setOverlay(false);
     if (location.hash.startsWith('#@')) history.replaceState(null, '', location.pathname + location.search);
     else if (pathUser()) history.replaceState(null, '', '/');
+    // Back on the dashboard? Put its address back, so a refresh returns there
+    if (typeof syncDashHash === 'function') syncDashHash();
   }
 
   splash.addEventListener('click', () => { splash.hidden = true; applySound(true); $('pv-close').focus({ preventScroll: true }); });
