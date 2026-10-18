@@ -896,6 +896,11 @@
       padding: 20px;
     }
     .modal-overlay.active { display: flex; }
+    #unsaved-modal { z-index: 640; }
+    .unsaved-box { text-align: center; max-width: 420px; }
+    .unsaved-icon { width: 48px; height: 48px; margin: 0 auto 14px; border-radius: 14px; display: grid; place-items: center; background: rgba(255,190,90,0.12); color: #ffcf7a; border: 1px solid rgba(255,190,90,0.3); }
+    .unsaved-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+    .unsaved-actions .btn { width: 100%; justify-content: center; }
     .modal-box {
       background: rgba(8,8,10,0.86);
       border: 1px solid var(--border);
@@ -3156,6 +3161,20 @@
   </div>
 </footer>
 
+<!-- === UNSAVED CHANGES === -->
+<div class="modal-overlay" id="unsaved-modal" role="alertdialog" aria-modal="true" aria-labelledby="unsaved-title">
+  <div class="modal-box unsaved-box">
+    <div class="unsaved-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div>
+    <h2 class="modal-title" id="unsaved-title">Unsaved changes</h2>
+    <p class="modal-sub">You changed your page but haven't saved it yet. Save before you go, or your edits will be lost.</p>
+    <div class="unsaved-actions">
+      <button type="button" class="btn btn-primary" id="unsaved-save">Save changes</button>
+      <button type="button" class="btn btn-ghost" id="unsaved-discard">Discard changes</button>
+      <button type="button" class="btn btn-ghost" id="unsaved-stay">Keep editing</button>
+    </div>
+  </div>
+</div>
+
 <!-- === LOGIN MODAL === -->
 <div class="modal-overlay" id="login-modal">
   <div class="modal-box">
@@ -4375,11 +4394,12 @@ function dismissDashHint() {
   try { localStorage.setItem('lp-dash-hint-' + (currentUser && currentUser.id), '1'); } catch (_) {}
 }
 document.getElementById('user-pill').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDashboard(); } });
-async function logoutUser() {
+async function logoutUser(force) {
+  if (!force && editorDirty()) { askUnsaved(() => logoutUser(true)); return; }
   if (window.DB) await DB.signOut();
   currentUser = null;
   updateAuthUI();
-  closeDashboard();
+  closeDashboard(true);
   if (window.LP) LP.onAuthChange();
   showToast('Logged out');
 }
@@ -4396,6 +4416,38 @@ if (window.DB) {
     restoreDashboard();
   });
 }
+// ----- unsaved page edits: ask before leaving the editor -----
+let unsavedNext = null;
+const editorDirty = () => !!(window.LP && LP.isDirty && LP.isDirty());
+function askUnsaved(next) {
+  unsavedNext = next;
+  document.getElementById('unsaved-modal').classList.add('active');
+  setOverlay(true);
+  document.getElementById('unsaved-save').focus();
+}
+function closeUnsaved() {
+  document.getElementById('unsaved-modal').classList.remove('active');
+  setOverlay(!!document.querySelector('.modal-overlay.active, #dashboard-view.active, #profile-view.active'));
+}
+document.getElementById('unsaved-save').addEventListener('click', async e => {
+  const btn = e.currentTarget;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const ok = await LP.saveEdits();
+  btn.disabled = false; btn.textContent = 'Save changes';
+  closeUnsaved();
+  if (ok && unsavedNext) unsavedNext();   // if saving failed, stay in the editor (a toast says why)
+  unsavedNext = null;
+});
+document.getElementById('unsaved-discard').addEventListener('click', () => {
+  LP.discardEdits();
+  closeUnsaved();
+  if (unsavedNext) unsavedNext();
+  unsavedNext = null;
+});
+document.getElementById('unsaved-stay').addEventListener('click', () => { closeUnsaved(); unsavedNext = null; });
+document.getElementById('unsaved-modal').addEventListener('click', e => { if (e.target.id === 'unsaved-modal') { closeUnsaved(); unsavedNext = null; } });
+document.getElementById('unsaved-modal').addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); closeUnsaved(); unsavedNext = null; } });
+
 // The address bar shows the open dashboard tab (#/dashboard/<tab>), so a refresh comes back to it
 function syncDashHash() {
   const dv = document.getElementById('dashboard-view');
@@ -5944,9 +5996,13 @@ dashPages.audit = () => {
 
 let currentTab = 'overview';
 const DATA_TABS = new Set(['overview', 'links', 'audit', 'analytics', 'qr', 'ai']);
-function showDashTab(tab) {
+function showDashTab(tab, force) {
   const content = document.getElementById('dash-content');
   if (!content) return;
+  if (!force && currentTab === 'page' && tab !== 'page' && document.getElementById('dashboard-view').classList.contains('active') && editorDirty()) {
+    askUnsaved(() => showDashTab(tab, true));
+    return;
+  }
   currentTab = tab;
   // Remember where you are, so a refresh comes back here (#/dashboard/<tab>)
   if (document.getElementById('dashboard-view').classList.contains('active') && location.hash !== '#/dashboard/' + tab) {
@@ -5987,9 +6043,10 @@ function openDashboard(tab = 'overview') {
   updateAuthUI();
   showDashTab(tab);
 }
-function closeDashboard() {
+function closeDashboard(force) {
   const dv = document.getElementById('dashboard-view');
   if (!dv.classList.contains('active')) return;
+  if (!force && currentTab === 'page' && editorDirty()) { askUnsaved(() => closeDashboard(true)); return; }
   dv.classList.remove('active');
   if (/^#\/dashboard/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
   toggleUserMenu(false);
@@ -6179,7 +6236,11 @@ userMenu.addEventListener('click', e => {
   toggleUserMenu(false);
   const page = LP.myPage();
   switch (act.dataset.act) {
-    case 'view': page ? (location.hash = '@' + page.username) : showDashTab('page'); break;
+    case 'view': {
+      const go = () => (page ? (location.hash = '@' + page.username) : showDashTab('page'));
+      if (currentTab === 'page' && editorDirty()) askUnsaved(go); else go();
+      break;
+    }
     case 'page': showDashTab('page'); break;
     case 'copy': page ? LP.copyLink(page.username) : showToast('Publish your page first'); break;
     case 'settings': showDashTab('settings'); break;

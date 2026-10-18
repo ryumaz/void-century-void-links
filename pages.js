@@ -18,6 +18,8 @@
   // ---------- storage ----------
   // The signed-in user's own page (one per account), as last loaded from the database
   let myPageCache = null;
+  // Unsaved changes: a fingerprint of the editor as last saved (or loaded)
+  let savedSnap = '';
   let syncing = Promise.resolve();
   const takenCache = {};   // username → owner id, from availability checks
 
@@ -1278,6 +1280,16 @@
     } catch (_) { return blob; }
   }
 
+  function editorSnap() {
+    const d = currentData();
+    delete d.views;
+    return JSON.stringify([d, draft.avatarUrl, draft.bgUrl, draft.audioUrl, draft.cursorUrl, iconUrls()]);
+  }
+  function markSaved() { savedSnap = editorSnap(); }
+  function isDirty() { return !!(me() && savedSnap && editorSnap() !== savedSnap); }
+  // Warn before closing or reloading the tab with unsaved edits
+  window.addEventListener('beforeunload', e => { if (isDirty()) { e.preventDefault(); e.returnValue = ''; } });
+
   // "Publish page" the first time; "Save changes" once the page is live
   function syncPublishBtn() {
     const btn = form && form.querySelector('button[type="submit"]');
@@ -1290,6 +1302,7 @@
     if (!window.DB) { toast(t('toast.offline')); return; }
     const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;
+    let ok = false;
     const wasLive = !!myPageCache;
     const working = () => t(myPageCache ? 'b.saving' : 'b.publishing');
     btn.textContent = working();
@@ -1343,6 +1356,8 @@
       $('pb-result').hidden = false;
       update();
       toast(t(wasLive ? 'toast.saved' : 'toast.published'));
+      markSaved();
+      ok = true;
       document.dispatchEvent(new CustomEvent('pagepublished', { detail: saved.username }));
     } catch (e) {
       const msg = (e && (e.message || '')) + ' ' + (e && e.code || '');
@@ -1351,6 +1366,7 @@
       btn.disabled = false;
       syncPublishBtn();
     }
+    return ok;
   }
 
   form.addEventListener('submit', e => {
@@ -1360,7 +1376,10 @@
   });
 
   $('pb-copy').addEventListener('click', () => copyLink(cleanUser(fUser.value)));
-  $('pb-open').addEventListener('click', () => { location.hash = '@' + cleanUser(fUser.value); });
+  $('pb-open').addEventListener('click', () => {
+    const go = () => { const u = cleanUser(fUser.value); if (u) location.hash = '@' + u; };
+    if (isDirty() && typeof askUnsaved === 'function') askUnsaved(go); else go();
+  });
 
   function copyLink(user) {
     if (!user) return;
@@ -1621,6 +1640,7 @@
     delete takenCache[myPageCache.username];
     myPageCache = null;
     resetBuilder();
+    markSaved();
     syncPublishBtn();
   }
   // Called whenever someone signs in or out: load (or clear) their page
@@ -1629,6 +1649,7 @@
       try { myPageCache = me() && window.DB ? await DB.getMyPage() : null; } catch (_) { myPageCache = null; }
       if (myPageCache) loadIntoBuilder(myPageCache);
       else resetBuilder();
+      markSaved();
       syncPublishBtn();
       if (typeof updateAuthUI === 'function') updateAuthUI();
     })();
@@ -1641,7 +1662,13 @@
     update();
   }
 
-  window.LP = { onAuthChange, useAvatar, mountBuilder, unmountBuilder, setUsername, myPage, deletePage, pageUrl, copyLink, claimUsername, resolveLink, iconSvg };
+  // Unsaved-changes dialog actions (index.html)
+  const saveEdits = () => (me() && window.DB ? publish() : Promise.resolve(false));
+  function discardEdits() {
+    if (myPageCache) loadIntoBuilder(myPageCache); else resetBuilder();
+    markSaved();
+  }
+  window.LP = { isDirty, saveEdits, discardEdits, onAuthChange, useAvatar, mountBuilder, unmountBuilder, setUsername, myPage, deletePage, pageUrl, copyLink, claimUsername, resolveLink, iconSvg };
 
   document.addEventListener('langchange', () => {
     builder.querySelectorAll('[data-i18n-ph]').forEach(i => { i.placeholder = t(i.dataset.i18nPh); });
