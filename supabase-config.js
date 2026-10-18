@@ -10,9 +10,10 @@ window.SUPABASE_CONFIG = {
   // Add each one after you set it up, e.g. ['github', 'google', 'discord'].
   oauth: ['github', 'discord', 'google'],
 
-  // Your live address once deployed, e.g. 'https://voidlinks.netlify.app'.
-  // Short links, page links and QR codes use it. Leave '' to use the current address.
-  siteUrl: 'https://voidlinks.netlify.app',
+  // The live address. Short links, page links and QR codes use it.
+  // On the live domain or a host's preview address (Cloudflare *.pages.dev, the old
+  // *.netlify.app) the site uses the address it was opened on, so every copy works.
+  siteUrl: /^(voids\.wtf|[\w-]+\.pages\.dev|[\w-]+\.netlify\.app)$/.test(location.host) ? location.origin : 'https://voids.wtf',
 
   // Spotify app Client ID (developer.spotify.com/dashboard) for "Connect Spotify".
   // The Client ID is public; the Client Secret is NOT needed and must not go here.

@@ -1,5 +1,5 @@
 -- =====================================================================
--- Void Links upgrade: clean profile addresses (voidlinks.netlify.app/<name>)
+-- Void Links upgrade: clean profile addresses (voids.wtf/<name>)
 -- Run AFTER upgrade-links-cursors.sql. Supabase → SQL Editor → New query →
 -- paste → Run. Safe to run more than once.
 --

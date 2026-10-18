@@ -2,7 +2,7 @@
 // Everything the site saves or loads goes through window.DB:
 //   auth (email/password + social), profiles, pages + their media files,
 //   page views and support tickets. Tables and rules: supabase/schema.sql.
-// The address people see for this site ("voidlinks.netlify.app"): siteUrl from the
+// The address people see for this site ("voids.wtf"): siteUrl from the
 // config once deployed, otherwise wherever the site is running right now.
 window.siteHost = () => {
   const cfg = window.SUPABASE_CONFIG || {};
@@ -90,7 +90,6 @@ window.siteHost = () => {
   const filesOf = p => (p ? [p.avatarPath, p.bgPath, p.bgPosterPath, p.audioPath, p.cursorPath, ...(p.links || []).map(l => l.iconPath)].filter(Boolean) : []);
 
   // Public address of the site, used for short links and page links.
-  // Set `siteUrl` in supabase-config.js once the site is on Netlify.
   const siteBase = () => {
     if (cfg.siteUrl) return cfg.siteUrl.replace(/\/?$/, '/');
     if (/^https?:$/.test(location.protocol)) return location.origin + '/';
@@ -232,7 +231,7 @@ window.siteHost = () => {
 
     // ---------- addresses ----------
     siteBase,
-    // With siteUrl set (Netlify): clean addresses like site/abc and site/name.
+    // With siteUrl set (live site): clean addresses like site/abc and site/name.
     // Without it they still work anywhere: site/go.html?s=abc and index.html#@name.
     // ("@name" means a profile page; on the live site the @ is dropped.)
     shortUrl: slug => {

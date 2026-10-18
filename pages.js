@@ -137,7 +137,7 @@
   // ---------- Spotify "now playing" ----------
   // Uses Spotify's Authorization Code + PKCE flow, so no client secret is needed in the browser.
   // Setup: create an app at https://developer.spotify.com/dashboard, add this page's address
-  // (e.g. https://yoursite.netlify.app/) as a Redirect URI, and put the Client ID in supabase-config.js.
+  // (e.g. https://voids.wtf/) as a Redirect URI, and put the Client ID in supabase-config.js.
   // It can't run from file:// because Spotify needs a web address to send you back to.
   // Until the backend exists the token lives in this browser, so only you see your live song;
   // a Supabase function holding your token will let every visitor see it.

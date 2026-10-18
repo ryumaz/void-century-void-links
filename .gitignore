@@ -19,3 +19,7 @@ desktop.ini
 # Never commit secrets
 .env
 .env.*
+
+# Cloudflare local dev
+.wrangler/
+node_modules/

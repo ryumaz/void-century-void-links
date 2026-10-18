@@ -1,0 +1,23 @@
+# Security and caching headers. Read by both Cloudflare Pages and Netlify.
+# CSP: only our own scripts plus the CDN we use can run; data only goes to Supabase,
+# Spotify and Lanyard; only Spotify may be embedded. Images may come from any https
+# address (profile photos from Google/GitHub/Discord, Spotify album art).
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' data: blob: https://agbsbbkrinewplajdwax.supabase.co; connect-src 'self' data: blob: https://agbsbbkrinewplajdwax.supabase.co wss://agbsbbkrinewplajdwax.supabase.co https://api.lanyard.rest https://accounts.spotify.com https://api.spotify.com https://cdn.jsdelivr.net; frame-src https://open.spotify.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
+
+# Big static files rarely change: let browsers cache them
+/assets/*
+  Cache-Control: public, max-age=604800
+
+/admin*
+  X-Robots-Tag: noindex
+
+# Server code and setup files are not pages
+/functions/*
+  X-Robots-Tag: noindex
