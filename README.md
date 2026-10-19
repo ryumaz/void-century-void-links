@@ -31,6 +31,14 @@ Void Links puts all of this in one free place with one account:
 3. **A profile page that feels like yours.** A page at voids.wtf/yourname with a moving background, music, your own icons and cursor, and live Spotify and Discord status.
 4. **Reports you can share.** One click turns any link's stats into a read-only page for a client or team. It needs no account and never shows single visitors.
 
+### Why short links *and* a profile page?
+
+Think about how people share themselves today: a bio that says "IG: …, YT: …, Discord: …", or the same five links pasted one by one into every chat, comment and email. It's long, it breaks across apps, and you never know which link anyone actually opened.
+
+Void Links cuts that down to **one link**. Put everything on your profile at `voids.wtf/yourname` and share that instead. When you paste it into WhatsApp, Discord or X, it unfolds into a **profile card** with your name, bio and photo, so people know what they're opening before they tap.
+
+And because it's the same account as your short links, it gets the same treatment: your page has a view counter, your links have click stats, and both live in one dashboard. A short link is for one thing you want to share; your profile page is for **everything** you share.
+
 ---
 
 ## Features
