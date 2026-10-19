@@ -212,14 +212,15 @@
   ['uRes', 'uTime', 'uScroll', 'uMouse', 'uOffset', 'uDim'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
 
   // ---- Resolution ----
-  // The look is soft, so render a fixed pixel budget (~0.5 MP) and let CSS upscale.
-  // It only ever steps down if frames are being dropped; it never ramps up, so the
-  // canvas is not reallocated over and over (that caused hitching on fast screens).
-  const PIXEL_BUDGET = window.innerWidth < 700 ? 0.22e6 : 0.5e6;
+  // Render close to the screen's real sharpness (up to 1.25x on high-DPI screens), within a
+  // pixel budget. It only ever steps down if frames are being dropped; it never ramps up, so
+  // the canvas is not reallocated over and over (that caused hitching on fast screens).
+  const PIXEL_BUDGET = window.innerWidth < 700 ? 0.5e6 : 1.6e6;
+  const Q_MAX = Math.min(window.devicePixelRatio || 1, 1.25);
   let quality = 1, Q_MIN = 0.3;
   function budgetQuality() {
     const css = window.innerWidth * window.innerHeight;
-    return Math.min(1, Math.sqrt(PIXEL_BUDGET / css));
+    return Math.min(Q_MAX, Math.sqrt(PIXEL_BUDGET / css));
   }
   quality = budgetQuality();
 
@@ -286,9 +287,9 @@
     gl.uniform1f(U.uDim, dim);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-    // Every 90 frames: if we're clearly dropping frames, step resolution down once
+    // Every 45 frames: if we're clearly dropping frames, step resolution down once
     frameAcc += dt; frames++;
-    if (frames >= 90) {
+    if (frames >= 45) {
       const avg = frameAcc / frames;
       if (avg > 0.022 && quality > Q_MIN) { quality = Math.max(Q_MIN, quality * 0.85); resize(); }
       frames = 0; frameAcc = 0;
