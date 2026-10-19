@@ -59,7 +59,7 @@ async function profilePage(context, profile, url) {
   const desc = (profile.bio || `${who}'s links, all in one place.`).slice(0, 200);
   const photo = profile.avatar_path
     ? (profile.avatar_path.startsWith('site:') ? `${url.origin}/${profile.avatar_path.slice(5)}` : `${SUPABASE_URL}/storage/v1/object/public/media/${profile.avatar_path}`)
-    : `${url.origin}/assets/brand/og-image.jpg`;
+    : `${url.origin}/assets/brand/og-image-v2.jpg`;
   const set = (value) => ({ element(el) { el.setAttribute('content', value); } });
   return new HTMLRewriter()
     .on('title', { element(el) { el.setInnerContent(title); } })
