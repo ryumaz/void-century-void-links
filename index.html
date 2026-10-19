@@ -488,12 +488,8 @@
     .peek-phone::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.28); }
     .peek-phone.ph1 { left: 0; top: 96px; background: #000 url(assets/showcase/broken-bg.webp) center / cover; }
     .peek-phone.ph2 { left: 118px; top: 48px; background: #000 url(assets/showcase/vagabond-bg.webp) center / cover; }
-    .peek-phone.ph3 { left: 236px; top: 0; background: #000 url(assets/showcase/ryuma-bg.webp) 45% center / cover; }
-    /* Ryuma's card: no avatar, the site name sits on top instead */
-    .pp-top { font-family: 'Michroma', 'Geist', sans-serif; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
-    .ph3 .pp-handle { margin-bottom: 10px; }
-    .peek-phone.ph3 { align-items: flex-end; padding-bottom: 20px; }   /* photo stays visible above the card */
-    .ph3 .pp-card { padding-top: 14px; }
+    .peek-phone.ph3 { left: 236px; top: 0; background: #000 url(assets/showcase/ryuma-bg.webp) center / cover; }
+    .ph3 .pp-np { margin: 10px 0 12px; }
     .pp-card { position: relative; width: 84%; padding: 18px 12px; border-radius: 18px; background: rgba(10,10,14,0.42); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(6px); }
     .pp-avatar { width: 58px; height: 58px; margin: 0 auto 8px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 22px; color: #000; background: #222 center / cover; box-shadow: 0 0 0 3px rgba(255,255,255,0.18); }
     .pp-name { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 17px; }
@@ -3051,11 +3047,11 @@
         </div>
         <div class="peek-phone ph3">
           <div class="pp-card">
-            <div class="pp-top">voids.wtf</div>
+            <div class="pp-avatar" style="background-image:url(assets/showcase/ryuma-av.webp)"></div>
             <div class="pp-name">Ryuma</div>
             <div class="pp-handle">@ryuma<span>&#9673; 3,914</span></div>
-            <div class="pp-icons"><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.8-3.6-13.8zM8.3 15.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9L1 2h7l4.8 6.4zm-1.2 18h1.9L7.1 4H5.1z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9.5c3.5-1 7-.6 10 1M7.5 12.8c3-.8 5.6-.4 8 .9M8 15.8c2.3-.5 4.3-.3 6 .7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></i></div>
             <div class="pp-np"><span class="pp-disc"></span><span class="pp-np-text"><b>Midnight Drive</b><small>Listening on Spotify</small></span><span class="pp-bars"><i></i><i></i><i></i></span></div>
+            <div class="pp-icons"><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.8-3.6-13.8zM8.3 15.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9L1 2h7l4.8 6.4zm-1.2 18h1.9L7.1 4H5.1z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9.5c3.5-1 7-.6 10 1M7.5 12.8c3-.8 5.6-.4 8 .9M8 15.8c2.3-.5 4.3-.3 6 .7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></i></div>
           </div>
         </div>
       </div>
