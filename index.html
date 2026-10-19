@@ -591,6 +591,21 @@
     .vl-player-head button { width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.08); color: var(--text); cursor: pointer; }
     .vl-player iframe { border-radius: 12px; display: block; }
     .vl-player-note { font-size: 0.72rem; color: var(--text-dim); margin: 8px 2px 0; }
+    .vl-player-btns { display: flex; gap: 6px; }
+    .vl-player-head #vl-player-min { font-size: 1rem; line-height: 1; }
+    /* Minimized: a round bubble with the song's cover, docked to the side (the music keeps playing) */
+    .vl-bubble { display: none; }
+    .vl-player.mini { width: 62px; height: 62px; padding: 0; border-radius: 50%; overflow: visible; background: transparent; border: 0; box-shadow: none; backdrop-filter: none; }
+    .vl-player.mini > :not(.vl-bubble):not(#vl-player-host) { display: none; }
+    /* the player stays loaded (so the sound continues), just out of sight */
+    .vl-player.mini #vl-player-host { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+    .vl-player.mini .vl-bubble { display: block; position: relative; width: 62px; height: 62px; padding: 0; border-radius: 50%; border: 2px solid rgba(255,255,255,0.85); background: #111; box-shadow: 0 10px 30px rgba(0,0,0,0.6); cursor: pointer; touch-action: none; }
+    .vl-bubble-art { position: absolute; inset: 0; border-radius: 50%; background: #222 center / cover no-repeat; animation: ppSpin 6s linear infinite; }
+    .vl-bubble-art::after { content: ''; position: absolute; inset: 39%; border-radius: 50%; background: #0b0b0d; box-shadow: 0 0 0 2px rgba(220,220,220,0.8); }
+    .vl-bubble i { position: absolute; right: -1px; bottom: 2px; width: 14px; height: 14px; border-radius: 50%; background: #1db954; border: 2px solid #0b0b0d; }
+    .vl-player.mini.dragging .vl-bubble { cursor: grabbing; transform: scale(1.08); }
+    .vl-player.snapping { transition: left .25s ease, top .25s ease; }
+    @media (prefers-reduced-motion: reduce) { .vl-bubble-art { animation: none; } }
     .pp-sp-song:hover b { text-decoration: underline; }
     .pp-sp-row { display: flex; align-items: center; gap: 9px; }
     .pp-sp-disc { position: relative; width: 44px; height: 44px; flex: none; border-radius: 50%; background: #222 center / cover; box-shadow: 0 0 0 1px rgba(255,255,255,0.15); animation: ppSpin 6s linear infinite; }
@@ -3846,7 +3861,8 @@
 
 <!-- === RADIO PLAYER (home page preview card) === -->
 <div class="vl-player" id="vl-player" hidden>
-  <div class="vl-player-head"><span>Playing from Void Walker's page</span><button type="button" id="vl-player-close" aria-label="Close player">✕</button></div>
+  <div class="vl-player-head"><span>Playing from Void Walker's page</span><span class="vl-player-btns"><button type="button" id="vl-player-min" aria-label="Minimize player" title="Minimize">–</button><button type="button" id="vl-player-close" aria-label="Close player" title="Close">✕</button></span></div>
+  <button type="button" class="vl-bubble" id="vl-bubble" aria-label="Show the player" title="Tap to open · drag to move"><span class="vl-bubble-art"></span><i aria-hidden="true"></i></button>
   <div id="vl-player-host"></div>
   <p class="vl-player-note">Drag me anywhere. Not signed in to Spotify? You'll hear a 30-second preview.</p>
 </div>
@@ -4093,7 +4109,69 @@ function setOverlay(on) {
         open = false;
         radio.classList.remove('on-air');
       }
-      document.getElementById('vl-player-close').addEventListener('click', stop);
+      document.getElementById('vl-player-close').addEventListener('click', () => { setMini(false); stop(); });
+
+      // ---- Minimize to a bubble (like a chat head) ----
+      const bubble = document.getElementById('vl-bubble');
+      const BUBBLE_POS = 'vl-bubble-pos';
+      let full = null;   // where the big player was, to put it back
+      function setArt() { bubble.querySelector('.vl-bubble-art').style.backgroundImage = `url("${onAir().track.art}")`; }
+      function placeBubble(x, y) {
+        const s = 62, m = 12;
+        x = Math.min(Math.max(m, x), window.innerWidth - s - m);
+        y = Math.min(Math.max(m, y), window.innerHeight - s - m);
+        Object.assign(box.style, { left: x + 'px', top: y + 'px', right: 'auto', bottom: 'auto' });
+      }
+      function snapBubble() {
+        const r = box.getBoundingClientRect();
+        const left = r.left + r.width / 2 < window.innerWidth / 2;
+        box.classList.add('snapping');
+        placeBubble(left ? 12 : window.innerWidth - 62 - 12, r.top);
+        setTimeout(() => box.classList.remove('snapping'), 260);
+        try { localStorage.setItem(BUBBLE_POS, JSON.stringify({ left, y: r.top / window.innerHeight })); } catch (_) {}
+      }
+      function setMini(on) {
+        if (on === box.classList.contains('mini')) return;
+        if (on) {
+          const r = box.getBoundingClientRect();
+          full = { x: r.left, y: r.top };
+          setArt();
+          box.classList.add('mini');
+          let s = null;
+          try { s = JSON.parse(localStorage.getItem(BUBBLE_POS) || 'null'); } catch (_) {}
+          if (s) placeBubble(s.left ? 12 : window.innerWidth - 74, s.y * window.innerHeight);
+          else placeBubble(window.innerWidth - 74, window.innerHeight * 0.18);   // top right, like a chat head
+          bubble.focus({ preventScroll: true });
+        } else {
+          box.classList.remove('mini');
+          if (full) place(full.x, full.y); else restore();
+        }
+      }
+      document.getElementById('vl-player-min').addEventListener('click', () => setMini(true));
+      let bdrag = null;
+      bubble.addEventListener('pointerdown', e => {
+        if (e.button !== 0) return;
+        const r = box.getBoundingClientRect();
+        bdrag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, dx: e.clientX - r.left, dy: e.clientY - r.top, moved: false };
+        bubble.setPointerCapture(e.pointerId);
+      });
+      bubble.addEventListener('pointermove', e => {
+        if (!bdrag || e.pointerId !== bdrag.id) return;
+        if (!bdrag.moved && Math.hypot(e.clientX - bdrag.sx, e.clientY - bdrag.sy) < 6) return;
+        bdrag.moved = true;
+        box.classList.add('dragging');
+        placeBubble(e.clientX - bdrag.dx, e.clientY - bdrag.dy);
+      });
+      const bend = e => {
+        if (!bdrag || e.pointerId !== bdrag.id) return;
+        const moved = bdrag.moved;
+        bdrag = null;
+        box.classList.remove('dragging');
+        if (moved) snapBubble(); else setMini(false);   // a tap opens the player again
+      };
+      bubble.addEventListener('pointerup', bend);
+      bubble.addEventListener('pointercancel', bend);
+      bubble.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMini(false); } });
 
       // Drag the player anywhere by its top bar; each browser remembers the spot
       const POS = 'vl-player-pos';
@@ -4128,7 +4206,7 @@ function setOverlay(on) {
       };
       head.addEventListener('pointerup', end);
       head.addEventListener('pointercancel', end);
-      window.addEventListener('resize', () => { if (!box.hidden) restore(); });
+      window.addEventListener('resize', () => { if (box.hidden) return; if (box.classList.contains('mini')) snapBubble(); else restore(); });
 
       return {
         toggle() {
@@ -4141,6 +4219,7 @@ function setOverlay(on) {
         },
         next(track) {
           if (!open) return;
+          if (box.classList.contains('mini')) setArt();
           const now = onAir();
           if (now.track.id !== current) play(now);
         },
