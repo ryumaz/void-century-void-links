@@ -12,7 +12,7 @@ const SUPABASE_URL = 'https://agbsbbkrinewplajdwax.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_eKJmkapRV3BNWNehHcRVMw_Go_JQkdg';
 const NAME = /^\/([A-Za-z0-9_-]{2,40})\/?$/;
 const OLD_PROFILE = /^\/@([a-z0-9_.-]{2,20})\/?$/i;
-const RESERVED = new Set(['admin', 'go', 'index', 'assets', 'api', 'login', 'signup', 'dashboard', 'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify', 'functions']);
+const RESERVED = new Set(['admin', 'go', 'index', 'assets', 'api', 'login', 'signup', 'dashboard', 'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify', 'functions', 'report']);
 const headers = { 'Content-Type': 'application/json', apikey: SUPABASE_KEY };
 
 // Serve one of the site's own pages while keeping the visitor's address

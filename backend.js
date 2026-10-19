@@ -103,7 +103,7 @@ window.siteHost = () => {
   const linkBase = () => (cfg.siteUrl && cfg.linkUrl ? cfg.linkUrl.replace(/\/?$/, '/') : siteBase());
   const SLUG_RE = /^[A-Za-z0-9_-]{2,40}$/;
   // Paths the site itself uses, so they can't become short links
-  const RESERVED = new Set(['admin', 'go', 'index', 'assets', 'api', 'login', 'signup', 'dashboard', 'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify', 'functions']);
+  const RESERVED = new Set(['admin', 'go', 'index', 'assets', 'api', 'login', 'signup', 'dashboard', 'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify', 'functions', 'report']);
   // Link columns the browser may read (the password hash stays on the server)
   const LINK_COLS = 'slug, destination, clicks, created_at, starts_at, expires_at, max_clicks, status, has_password, updated_at';
   const MISSING_COLUMN = /42703|PGRST204|column/i;
@@ -327,7 +327,7 @@ window.siteHost = () => {
       fail((await sb.rpc('unshare_link_report', { p_slug: slug })).error);
     },
     // The public report address; the secret is after # so it never reaches server logs
-    reportUrl(token) { return siteBase() + 'report.html#' + token; },
+    reportUrl(token) { return siteBase() + 'report#' + token; },
     // ---------- API keys (public API, supabase/upgrade-api.sql) ----------
     async apiKeys() {
       const { data, error } = await sb.from('api_keys').select('id, name, prefix, created_at, last_used_at')
