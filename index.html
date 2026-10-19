@@ -3829,7 +3829,7 @@
 <div class="vl-player" id="vl-player" hidden>
   <div class="vl-player-head"><span>Playing from Void Walker's page</span><button type="button" id="vl-player-close" aria-label="Close player">✕</button></div>
   <div id="vl-player-host"></div>
-  <p class="vl-player-note">Not signed in to Spotify? You'll hear a 30-second preview.</p>
+  <p class="vl-player-note">Press play in the player. Not signed in to Spotify? You'll hear a 30-second preview.</p>
 </div>
 
 <!-- === BACKGROUND TEMPLATES === -->
@@ -4012,7 +4012,7 @@ function setOverlay(on) {
         const bar = $r('.pp-sp-bar i');
         bar.style.transition = 'none';
         requestAnimationFrame(() => { bar.style.transition = ''; });
-        if (shown !== -1) player.next(x, now.pos);   // the radio moved on: so does the player
+        if (shown !== -1) player.next(x);   // the radio moved on: so does the player
         shown = now.i;
       }
       $r('.pp-sp-bar i').style.width = (now.pos / now.track.ms * 100).toFixed(2) + '%';
@@ -4021,67 +4021,42 @@ function setOverlay(on) {
     // Lyrics follow the radio too (the viewer asks for the current song every 15 s)
     radio._refresh = async () => npFor(onAir());
 
-    // ---- Spotify player (Spotify's own embed, loaded only when someone presses play) ----
+    // ---- Spotify player: Spotify's own embedded player for the song on air ----
+    // (Spotify's controllable player API needs eval(), which our security policy blocks on
+    // purpose, so this uses the plain embed: the listener presses play inside it.)
     const player = (() => {
       const box = document.getElementById('vl-player');
-      let api = null, ctrl = null, playing = false, wantSeek = 0, ready = null;
-      // Spotify's player API; gives up after 6 s (blocked script, offline…) so we can fall back
-      const loadApi = () => ready || (ready = new Promise((resolve, reject) => {
-        window.onSpotifyIframeApiReady = IFrameAPI => resolve(IFrameAPI);
-        const s = document.createElement('script');
-        s.src = 'https://open.spotify.com/embed/iframe-api/v1';
-        s.async = true;
-        s.onerror = () => reject(new Error('blocked'));
-        document.head.appendChild(s);
-        setTimeout(() => reject(new Error('timeout')), 6000);
-      }));
-      // Backup: Spotify's plain embedded player (no auto-follow, the listener presses play)
-      let plain = false;
-      function plainPlayer(track) {
-        plain = true;
-        const host = document.getElementById('vl-player-host');
+      const host = document.getElementById('vl-player-host');
+      let open = false, current = '';
+      function show(track) {
+        if (current === track.id) return;
+        current = track.id;
         host.textContent = '';
         const f = document.createElement('iframe');
         f.src = 'https://open.spotify.com/embed/track/' + track.id + '?utm_source=generator&theme=0';
-        f.width = '100%'; f.height = '152'; f.loading = 'lazy';
+        f.width = '100%'; f.height = '152';
         f.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
         f.style.border = '0';
-        f.title = 'Spotify player: ' + track.song;
+        f.title = 'Spotify player: ' + track.song + ' by ' + track.artist;
         host.appendChild(f);
       }
-      function setPlaying(on) { playing = on; radio.classList.toggle('on-air', on); }
-      async function start(track, pos) {
-        box.hidden = false;
-        wantSeek = Math.floor(pos / 1000);
-        setPlaying(true);
-        if (ctrl) { ctrl.loadUri('spotify:track:' + track.id); ctrl.play(); return; }
-        if (plain) { plainPlayer(track); return; }
-        try { api = api || await loadApi(); } catch (_) { plainPlayer(track); return; }
-        api.createController(document.getElementById('vl-player-host'), { uri: 'spotify:track:' + track.id, width: '100%', height: 152 }, c => {
-          ctrl = c;
-          c.addListener('ready', () => c.play());
-          c.addListener('playback_update', e => {
-            const d = e.data || {};
-            // Jump to where the radio is (works for Spotify listeners; previews start at 0)
-            if (wantSeek && !d.isPaused && d.position > 0) { const s = wantSeek; wantSeek = 0; if (s > 3) c.seek(s); }
-            radio.classList.toggle('on-air', !d.isPaused);
-          });
-        });
-      }
       function stop() {
-        if (ctrl) ctrl.pause();
-        if (plain) document.getElementById('vl-player-host').textContent = '';   // removing the player stops the sound
+        host.textContent = '';   // removing the player stops the sound
+        current = '';
         box.hidden = true;
-        setPlaying(false);
+        open = false;
+        radio.classList.remove('on-air');
       }
       document.getElementById('vl-player-close').addEventListener('click', stop);
       return {
-        toggle() { const now = onAir(); if (playing && !box.hidden) stop(); else start(now.track, now.pos); },
-        next(track, pos) {
-          if (!playing) return;
-          if (ctrl) { wantSeek = Math.floor(pos / 1000); ctrl.loadUri('spotify:track:' + track.id); ctrl.play(); }
-          else if (plain) plainPlayer(track);
+        toggle() {
+          if (open) { stop(); return; }
+          open = true;
+          box.hidden = false;
+          radio.classList.add('on-air');
+          show(onAir().track);
         },
+        next(track) { if (open) show(track); },
       };
     })();
 
