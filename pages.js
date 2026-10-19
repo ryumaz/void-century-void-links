@@ -347,20 +347,39 @@
   async function fetchLyrics(np) {
     const key = (np.artist + '|' + np.song).toLowerCase();
     if (lyricsCache.has(key)) return lyricsCache.get(key);
-    const first = np.artist.split(',')[0].trim();
-    const q = new URLSearchParams({ track_name: np.song, artist_name: first });
+    // Artist names can contain commas ("Peter, Paul and Mary", "Tyler, The Creator"), and
+    // Spotify also joins several artists with commas, so try the full name first, then the first artist
+    const full = np.artist.trim();
+    const first = full.split(',')[0].trim();
+    const secs = np.duration ? Math.round(np.duration / 1000) : 0;
+    // Prefer time-synced lyrics from the version whose length is closest to this song
+    const pick = list => {
+      const ok = (list || []).filter(x => x && (x.syncedLyrics || x.plainLyrics));
+      const near = x => (secs && x.duration ? Math.abs(x.duration - secs) : 0);
+      ok.sort((a, b) => (!!b.syncedLyrics - !!a.syncedLyrics) || near(a) - near(b));
+      return ok[0] || null;
+    };
+    const search = async params => {
+      const r = await fetch('https://lrclib.net/api/search?' + new URLSearchParams(params));
+      return r.ok ? r.json() : [];
+    };
     let out = null;
     try {
-      const exact = new URLSearchParams(q);
+      const exact = new URLSearchParams({ track_name: np.song, artist_name: full });
       if (np.album) exact.set('album_name', np.album);
-      if (np.duration) exact.set('duration', String(Math.round(np.duration / 1000)));
-      let r = await fetch('https://lrclib.net/api/get?' + exact);
+      if (secs) exact.set('duration', String(secs));
+      const r = await fetch('https://lrclib.net/api/get?' + exact);
       if (r.ok) out = await r.json();
       // No timestamps on the exact match? Look for a version that has them
       if (!out || !out.syncedLyrics) {
-        r = await fetch('https://lrclib.net/api/search?' + q);
-        const list = r.ok ? await r.json() : [];
-        out = list.find(x => x.syncedLyrics) || (out && out.plainLyrics ? out : list.find(x => x.plainLyrics)) || null;
+        const tries = [{ track_name: np.song, artist_name: full }];
+        if (first && first !== full) tries.push({ track_name: np.song, artist_name: first });
+        tries.push({ q: np.song + ' ' + full });
+        for (const params of tries) {
+          const found = pick(await search(params));
+          if (found && (found.syncedLyrics || !out)) out = found;
+          if (out && out.syncedLyrics) break;
+        }
       }
     } catch (_) { out = 'error'; }
     const lines = [];
@@ -1869,7 +1888,9 @@
     if (myPageCache) loadIntoBuilder(myPageCache); else resetBuilder();
     markSaved();
   }
-  window.LP = { isDirty, saveEdits, discardEdits, onAuthChange, useAvatar, mountBuilder, unmountBuilder, setUsername, myPage, deletePage, pageUrl, copyLink, claimUsername, resolveLink, iconSvg };
+  // Lyrics for any song card (used by the dashboard preview on the home page)
+  function showLyricsFor(card, np) { card._np = np; openLyrics(card); }
+  window.LP = { showLyrics: showLyricsFor, isDirty, saveEdits, discardEdits, onAuthChange, useAvatar, mountBuilder, unmountBuilder, setUsername, myPage, deletePage, pageUrl, copyLink, claimUsername, resolveLink, iconSvg };
 
   document.addEventListener('langchange', () => {
     builder.querySelectorAll('[data-i18n-ph]').forEach(i => { i.placeholder = t(i.dataset.i18nPh); });

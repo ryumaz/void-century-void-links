@@ -560,7 +560,11 @@
     .pp-sp { margin: 2px 0 12px; padding: 8px 9px 9px; border-radius: 12px; background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.12); text-align: left; }
     .pp-sp-head { display: flex; align-items: center; gap: 5px; font-size: 8.5px; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 7px; }
     .pp-sp-head span { margin-right: auto; }
-    .pp-sp-head i { width: 17px; height: 17px; border-radius: 5px; display: grid; place-items: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); }
+    .pp-sp-btn { width: 17px; height: 17px; padding: 0; border-radius: 5px; display: grid; place-items: center; color: inherit; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: background .15s, transform .15s; }
+    .pp-sp-btn:hover, .pp-sp-btn:focus-visible { background: rgba(255,255,255,0.22); transform: scale(1.12); outline: none; }
+    .pp-sp-disc { cursor: pointer; }
+    .pp-sp-song { color: inherit; text-decoration: none; }
+    .pp-sp-song:hover b { text-decoration: underline; }
     .pp-sp-row { display: flex; align-items: center; gap: 9px; }
     .pp-sp-disc { position: relative; width: 44px; height: 44px; flex: none; border-radius: 50%; background: #222 center / cover; box-shadow: 0 0 0 1px rgba(255,255,255,0.15); animation: ppSpin 6s linear infinite; }
     .pp-sp-disc::after { content: ''; position: absolute; inset: 35%; border-radius: 50%; background: #0b0b0d; box-shadow: 0 0 0 3px rgba(200,200,200,0.75); }
@@ -3090,9 +3094,9 @@
     <h2 class="section-title reveal" id="peek-title" data-i18n-html="peek.title">One dashboard.<br>Every link, every click.</h2>
     <p class="section-sub reveal" data-i18n="peek.sub">Shorten links, build your page and watch the clicks come in, all from one place.</p>
   </div>
-  <div class="peek-stage" aria-hidden="true">
+  <div class="peek-stage">
     <div class="peek-scene">
-      <div class="peek-dash">
+      <div class="peek-dash" aria-hidden="true">
         <aside class="pd-side">
           <div class="pd-logo"><span class="pd-mark"></span>VOID LINKS</div>
           <ul class="pd-nav"><li class=on><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Overview</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>My Page</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><span>My Links</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 12 7 12 10 4 14 20 17 12 21 12"/></svg><span>Analytics</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 20h1M17 20h1M20 17h1"/></svg><span>QR Codes</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg><span>API</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span>Settings</span></li></ul>
@@ -3123,7 +3127,7 @@
         </div>
       </div>
       <div class="peek-phones">
-        <div class="peek-phone ph1">
+        <div class="peek-phone ph1" aria-hidden="true">
           <div class="pp-card">
             <div class="pp-avatar" style="background-image:url(assets/showcase/ryuma-av.webp)"></div>
             <div class="pp-name">Ryuma</div>
@@ -3131,7 +3135,7 @@
             <div class="pp-icons"><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.8-3.6-13.8zM8.3 15.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9L1 2h7l4.8 6.4zm-1.2 18h1.9L7.1 4H5.1z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9.5c3.5-1 7-.6 10 1M7.5 12.8c3-.8 5.6-.4 8 .9M8 15.8c2.3-.5 4.3-.3 6 .7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></i></div>
           </div>
         </div>
-        <div class="peek-phone ph2">
+        <div class="peek-phone ph2" aria-hidden="true">
           <div class="pp-card">
             <div class="pp-avatar" style="background-image:url(assets/showcase/vagabond-av.webp)"></div>
             <div class="pp-name">Vagabond</div>
@@ -3148,10 +3152,10 @@
             <div class="pp-bio">Lost somewhere past the event horizon.</div>
             <div class="pp-sp" data-at="48" data-len="163">
               <div class="pp-sp-head"><svg width="11" height="11" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9.5c3.5-1 7-.6 10 1M7.5 12.8c3-.8 5.6-.4 8 .9M8 15.8c2.3-.5 4.3-.3 6 .7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Listening to Spotify</span>
-                <i><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 6h11M3 11h11M3 16h6"/><path d="M17 18V8l4-1.5"/><circle cx="15" cy="18" r="2"/></svg></i><i><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M21 3l-9 9"/><path d="M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></svg></i></div>
+                <button type="button" class="pp-sp-btn" data-sp="lyrics" title="Lyrics" aria-label="Show lyrics for 500 Miles"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 6h11M3 11h11M3 16h6"/><path d="M17 18V8l4-1.5"/><circle cx="15" cy="18" r="2"/></svg></button><a class="pp-sp-btn" href="https://open.spotify.com/search/500%20Miles%20Peter%20Paul%20and%20Mary" target="_blank" rel="noopener noreferrer" title="Listen on Spotify" aria-label="Listen to 500 Miles on Spotify"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M21 3l-9 9"/><path d="M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></svg></a></div>
               <div class="pp-sp-row">
-                <span class="pp-sp-disc" style="background-image:url(https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/42/09/6f/42096f1a-5d6f-8507-7a2c-dc034f13385b/075992715768.jpg/200x200bb.jpg)"></span>
-                <span class="pp-sp-text"><b>500 Miles</b><small>Peter, Paul and Mary</small><small class="dim">Peter, Paul and Mary</small>
+                <span class="pp-sp-disc" data-sp="lyrics" title="Lyrics" style="background-image:url(https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/42/09/6f/42096f1a-5d6f-8507-7a2c-dc034f13385b/075992715768.jpg/200x200bb.jpg)"></span>
+                <span class="pp-sp-text"><a class="pp-sp-song" href="https://open.spotify.com/search/500%20Miles%20Peter%20Paul%20and%20Mary" target="_blank" rel="noopener noreferrer"><b>500 Miles</b></a><small>Peter, Paul and Mary</small><small class="dim">Peter, Paul and Mary</small>
                   <span class="pp-sp-bar"><i></i></span><span class="pp-sp-time"><em>0:48</em><em>2:42</em></span></span>
               </div>
             </div>
@@ -3958,6 +3962,17 @@ function setOverlay(on) {
     const paint = () => { bar.style.width = (at / len * 100).toFixed(2) + '%'; now.textContent = mmss(at); };
     paint();
     setInterval(() => { at = at >= len ? 0 : at + 1; if (!at) bar.style.transition = 'none'; paint(); if (!at) requestAnimationFrame(() => { bar.style.transition = ''; }); }, 1000);
+    // Lyrics button or disc: the same karaoke lyrics viewer as on profile pages
+    sp.addEventListener('click', e => {
+      if (!e.target.closest('[data-sp="lyrics"]') || !window.LP || !LP.showLyrics) return;
+      const disc = sp.querySelector('.pp-sp-disc');
+      const art = (disc.style.backgroundImage.match(/url\("?(.*?)"?\)/) || [])[1] || '';
+      LP.showLyrics(sp, {
+        song: '500 Miles', artist: 'Peter, Paul and Mary', album: 'Peter, Paul and Mary',
+        art: art.replace('200x200bb', '600x600bb'), url: sp.querySelector('.pp-sp-song').href,
+        playing: true, progress: at * 1000, duration: len * 1000, at: Date.now(),
+      });
+    });
   }
   window.addEventListener('resize', () => { fit(); tilt(); });
   window.addEventListener('scroll', tilt, { passive: true });
