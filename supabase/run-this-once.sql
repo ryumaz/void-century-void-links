@@ -150,7 +150,7 @@ grant execute on function public.admin_list_users() to authenticated;
 -- First admin (you). Replace the email, then run.
 -- ---------------------------------------------------------------------
 insert into public.staff (user_id, email, role)
-select id, lower(email), 'admin' from auth.users where lower(email) = lower('nirajmehtamain@gmail.com')
+select id, lower(email), 'admin' from auth.users where lower(email) = lower('YOUR-ADMIN-EMAIL@example.com')
 on conflict (user_id) do update set role = 'admin';
 
 -- =====================================================================
