@@ -9,6 +9,20 @@
   <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
   <meta name="theme-color" content="#000000">
   <meta name="description" content="Void Links by Void Century: short links with live analytics, QR codes and link-in-bio pages.">
+  <!-- Link preview card (WhatsApp, Discord, X, iMessage…). Profile pages swap these in functions/_middleware.js -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Void Links">
+  <meta property="og:title" content="Void Links · Shorter links. Longer reach.">
+  <meta property="og:description" content="Short links you can lock, schedule and track, plus one page for all your links. Free while in beta.">
+  <meta property="og:url" content="https://voids.wtf/">
+  <meta property="og:image" content="https://voids.wtf/assets/brand/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Void Links home page: Shorter links. Longer reach.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Void Links · Shorter links. Longer reach.">
+  <meta name="twitter:description" content="Short links you can lock, schedule and track, plus one page for all your links.">
+  <meta name="twitter:image" content="https://voids.wtf/assets/brand/og-image.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Michroma&display=swap" rel="stylesheet">
@@ -1445,6 +1459,8 @@
       font-size: 0.85rem;
     }
     .link-row:last-child { border-bottom: none; }
+    .link-row .favicon-wrap img { width: 16px; height: 16px; border-radius: 3px; display: block; }
+    .link-row .favicon-wrap.is-brand { color: var(--text); }
     .link-row .favicon-wrap {
       width: 28px; height: 28px;
       border-radius: 7px;
@@ -5092,12 +5108,37 @@ const kpi = (label, value, note, tone) => `<div class="kpi-big">
 </div>`;
 const loadingHtml = (title, sub) => `<div class="dash-page-title">${esc(title)}</div><div class="dash-page-sub">${esc(sub)}</div><p class="dash-empty">Loading your data…</p>`;
 const hostOf = url => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch (_) { return ''; } };
+// The little logo in front of each link: our own icon for well-known sites, the site's real
+// logo (via DuckDuckGo's icon service) for everything else, and its first letter as a fallback
+const BRAND_HOSTS = {
+  'github.com': 'github', 'youtube.com': 'youtube', 'youtu.be': 'youtube', 'instagram.com': 'instagram',
+  'x.com': 'x', 'twitter.com': 'x', 'discord.com': 'discord', 'discord.gg': 'discord', 'discordapp.com': 'discord',
+  'spotify.com': 'spotify', 'spotify.link': 'spotify', 'tiktok.com': 'tiktok', 'twitch.tv': 'twitch',
+  't.me': 'telegram', 'telegram.me': 'telegram', 'telegram.org': 'telegram', 'linkedin.com': 'linkedin', 'lnkd.in': 'linkedin',
+};
+function linkIconHtml(host) {
+  const h = (host || '').toLowerCase();
+  const brand = Object.keys(BRAND_HOSTS).find(d => h === d || h.endsWith('.' + d));
+  if (brand && window.LP && LP.iconSvg) return `<div class="favicon-wrap is-brand" title="${esc(h)}">${LP.iconSvg(BRAND_HOSTS[brand], 15)}</div>`;
+  const letter = esc(((h.match(/[a-z0-9]/) || ['?'])[0]).toUpperCase());
+  if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(h)) return `<div class="favicon-wrap">${letter}</div>`;
+  return `<div class="favicon-wrap" data-letter="${letter}" title="${esc(h)}"><img src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(h)}.ico" alt="" width="16" height="16" loading="lazy" decoding="async"></div>`;
+}
+// No logo for that site? Show its first letter instead
+document.addEventListener('error', e => {
+  const img = e.target;
+  if (img && img.tagName === 'IMG' && img.parentElement && img.parentElement.classList.contains('favicon-wrap')) {
+    const wrap = img.parentElement;
+    img.remove();
+    wrap.textContent = wrap.dataset.letter || '?';
+  }
+}, true);
 function linkRowsHtml(links) {
   if (!links.length) return `<p class="dash-empty">No short links yet. Create one above or paste a URL in the box at the top of the site.</p>`;
   return links.map(l => {
     const host = hostOf(l.destination);
     return `<div class="link-row${linkState(l).key === 'active' ? '' : ' is-off'}">
-      <div class="favicon-wrap">${esc((host[0] || '?').toUpperCase())}</div>
+      ${linkIconHtml(host)}
       <a class="slug" href="${esc(DB.shortUrl(l.slug))}" target="_blank" rel="noopener">${esc(DB.shortHost() + l.slug)}</a>
       <span class="lk-badges">${linkBadges(l)}</span>
       <span class="dest" title="${esc(l.destination)}">${esc(l.destination)}</span>

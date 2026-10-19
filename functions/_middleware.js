@@ -43,10 +43,40 @@ async function openLink(context, name) {
   return null;
 }
 
-async function isProfile(name) {
-  const p = await fetch(`${SUPABASE_URL}/rest/v1/pages?select=username&username=eq.${encodeURIComponent(name.toLowerCase())}`, { headers });
+// The profile with this name (only what a link preview needs), or null
+async function findProfile(name) {
+  const p = await fetch(`${SUPABASE_URL}/rest/v1/pages?select=username,name,bio,avatar_path&username=eq.${encodeURIComponent(name.toLowerCase())}`, { headers });
   const rows = p.ok ? await p.json() : [];
-  return Array.isArray(rows) && rows.length > 0;
+  return Array.isArray(rows) && rows.length ? rows[0] : null;
+}
+
+// Serve the app for a profile, with a link preview card made for that person:
+// sharing voids.wtf/name in WhatsApp, Discord or X shows their name, bio and photo
+async function profilePage(context, profile, url) {
+  const res = await page(context, '/');
+  const who = (profile.name || profile.username).slice(0, 60);
+  const title = `${who} (@${profile.username}) · Void Links`;
+  const desc = (profile.bio || `${who}'s links, all in one place.`).slice(0, 200);
+  const photo = profile.avatar_path
+    ? (profile.avatar_path.startsWith('site:') ? `${url.origin}/${profile.avatar_path.slice(5)}` : `${SUPABASE_URL}/storage/v1/object/public/media/${profile.avatar_path}`)
+    : `${url.origin}/assets/brand/og-image.jpg`;
+  const set = (value) => ({ element(el) { el.setAttribute('content', value); } });
+  return new HTMLRewriter()
+    .on('title', { element(el) { el.setInnerContent(title); } })
+    .on('meta[name="description"]', set(desc))
+    .on('meta[property="og:type"]', set('profile'))
+    .on('meta[property="og:title"]', set(title))
+    .on('meta[property="og:description"]', set(desc))
+    .on('meta[property="og:url"]', set(`${url.origin}/${profile.username}`))
+    .on('meta[property="og:image"]', set(photo))
+    .on('meta[property="og:image:width"]', { element(el) { if (profile.avatar_path) el.remove(); } })
+    .on('meta[property="og:image:height"]', { element(el) { if (profile.avatar_path) el.remove(); } })
+    .on('meta[property="og:image:alt"]', set(`${who}'s profile photo`))
+    .on('meta[name="twitter:card"]', set(profile.avatar_path ? 'summary' : 'summary_large_image'))
+    .on('meta[name="twitter:title"]', set(title))
+    .on('meta[name="twitter:description"]', set(desc))
+    .on('meta[name="twitter:image"]', set(photo))
+    .transform(res);
 }
 
 export async function onRequest(context) {
@@ -92,7 +122,8 @@ export async function onRequest(context) {
   if (m && !RESERVED.has(m[1].toLowerCase())) {
     try {
       // 1. A profile page? Serve the app at this address; it opens the page itself.
-      if (await isProfile(m[1])) return page(context, '/');
+      const profile = await findProfile(m[1]);
+      if (profile) return profilePage(context, profile, url);
       // 2. Links shared before go.voids.wtf existed (voids.wtf/abc) keep working
       const res = await openLink(context, m[1]);
       if (res) return res;
