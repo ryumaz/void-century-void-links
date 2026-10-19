@@ -330,7 +330,7 @@
       font-size: clamp(3rem, 8vw, 6.5rem);
       font-weight: 700;
       line-height: 1.0;
-      letter-spacing: -0.05em;
+      letter-spacing: -0.035em;
       color: var(--text);
       max-width: 900px;
       margin-bottom: 24px;
@@ -898,7 +898,15 @@
       flex: 1;
       border-radius: 4px 4px 0 0;
       transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
     }
+    /* Click count on top of each bar; hover lifts it into a small bubble */
+    .chart-bars { padding-top: 22px; box-sizing: content-box; }
+    .chart-n { position: absolute; left: 50%; bottom: calc(100% + 5px); transform: translateX(-50%); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); font-variant-numeric: tabular-nums; pointer-events: none; transition: color .15s, transform .15s; }
+    .chart-bar:hover { filter: brightness(1.15); }
+    .chart-bar:hover .chart-n { color: var(--text); transform: translateX(-50%) translateY(-2px); }
+    .chart-bar[data-tip]:hover::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 26px); transform: translateX(-50%); background: #fff; color: #000; font-size: 0.74rem; font-weight: 600; padding: 5px 10px; border-radius: 8px; white-space: nowrap; z-index: 3; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    .chart-bar.empty[data-tip]:hover::after { bottom: calc(100% + 6px); }
     .chart-days {
       display: flex;
       gap: 5px;
@@ -2617,6 +2625,15 @@
       justify-content: center;
     }
     .qr-box canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+    button.qr-box { border: 0; padding: 0; font: inherit; cursor: zoom-in; transition: transform .2s, box-shadow .2s; }
+    button.qr-box:hover, button.qr-box:focus-visible { transform: scale(1.03); box-shadow: 0 10px 40px rgba(255,255,255,0.12); outline: none; }
+    .modal-box.qr-zoom { max-width: 440px; text-align: center; }
+    .qr-zoom-box { width: min(340px, 72vw); aspect-ratio: 1; margin: 6px auto 14px; padding: 14px; background: #fff; border-radius: 18px; animation: qrPop .28s cubic-bezier(.2,.9,.3,1.3); }
+    .qr-zoom-box canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+    .qr-zoom-url { font-weight: 700; margin-bottom: 14px; word-break: break-all; }
+    .qr-zoom-actions { justify-content: center; }
+    @keyframes qrPop { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .qr-zoom-box { animation: none; } }
     .qr-box.qr-offline { background: rgba(255,255,255,0.06); }
     .qr-url { font-family: 'Geist', sans-serif; font-weight: 600; font-size: 1rem; }
     .qr-meta { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 12px; }
@@ -3899,6 +3916,21 @@
   </div>
 </div>
 
+<!-- === QR ZOOM === -->
+<div class="modal-overlay" id="qr-modal">
+  <div class="modal-box qr-zoom" role="dialog" aria-modal="true" aria-labelledby="qr-zoom-title">
+    <button class="modal-close" onclick="closeModal('qr-modal')" aria-label="Close">✕</button>
+    <h2 class="modal-title" id="qr-zoom-title">QR code</h2>
+    <div class="qr-zoom-box"><canvas id="qr-zoom-canvas" width="640" height="640" role="img"></canvas></div>
+    <div class="qr-zoom-url" id="qr-zoom-url"></div>
+    <div class="qr-actions qr-zoom-actions">
+      <button class="btn btn-primary" id="qr-zoom-dl">Download</button>
+      <button class="btn btn-ghost" id="qr-zoom-copy">Copy link</button>
+      <button class="btn btn-ghost" id="qr-zoom-share">Share</button>
+    </div>
+  </div>
+</div>
+
 <!-- === MANAGE LINK === -->
 <div class="modal-overlay" id="link-modal">
   <div class="modal-box lm-box" role="dialog" aria-modal="true" aria-labelledby="lm-title">
@@ -5147,7 +5179,7 @@ function dailySeries(clicks, days) {
 }
 function barsHtml(series, height, labels) {
   const max = Math.max(1, ...series.map(s => s.n));
-  const bars = series.map(s => `<div class="chart-bar${s.n ? '' : ' empty'}" title="${s.date.toLocaleDateString()}: ${s.n} click${s.n === 1 ? '' : 's'}" style="height:${s.n ? Math.max(6, s.n / max * 100) : 3}%;"></div>`).join('');
+  const bars = series.map(s => `<div class="chart-bar${s.n ? '' : ' empty'}" data-tip="${fmt(s.n)} click${s.n === 1 ? '' : 's'}" aria-label="${fmt(s.n)} click${s.n === 1 ? '' : 's'}" style="height:${s.n ? Math.max(6, s.n / max * 100) : 3}%;">${s.n ? `<span class="chart-n">${fmt(s.n)}</span>` : ''}</div>`).join('');
   const days = labels ? `<div class="chart-days">${series.map(s => `<div class="chart-day">${s.date.toLocaleDateString(undefined, { weekday: 'short' })}</div>`).join('')}</div>` : '';
   return `<div class="chart-bars" style="height:${height}px;">${bars}</div>${days}`;
 }
@@ -5239,7 +5271,7 @@ function linkRowsHtml(links) {
       <div class="link-actions">
         <button class="btn-icon" title="Manage: password, schedule, uses, pause" aria-label="Manage link" data-act="manage" data-slug="${esc(l.slug)}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
         <button class="btn-icon" title="Copy link" aria-label="Copy link" data-act="copy" data-slug="${esc(l.slug)}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-        <button class="btn-icon" title="QR code" aria-label="QR code" data-act="qr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg></button>
+        <button class="btn-icon" title="Show QR code" aria-label="Show QR code" data-act="qr" data-slug="${esc(l.slug)}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg></button>
         <button class="btn-icon" title="Delete" aria-label="Delete link" data-act="delete" data-slug="${esc(l.slug)}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
       </div>
     </div>`;
@@ -5436,7 +5468,7 @@ const dashPages = {
       ${items.map(i => `
       <div class="dash-panel qr-card">
         <span class="qr-kind">${i.kind}</span>
-        <div class="qr-box"><canvas data-qr="${i.slug}" width="232" height="232" role="img" aria-label="QR code for ${esc(DB.prettyUrl(i.slug))}"></canvas></div>
+        <button type="button" class="qr-box qr-zoomable" data-act="qr" data-slug="${i.slug}" title="Show bigger" aria-label="Show the QR code for ${esc(DB.prettyUrl(i.slug))} bigger"><canvas data-qr="${i.slug}" width="232" height="232" role="img" aria-label="QR code for ${esc(DB.prettyUrl(i.slug))}"></canvas></button>
         <div class="qr-url">${esc(DB.prettyUrl(i.slug))}</div>
         <div class="qr-meta">${i.meta}</div>
         <div class="qr-actions">
@@ -5697,6 +5729,23 @@ async function drawQRs() {
     try { paintQR(c, DB.shortUrl(c.dataset.qr), 232); } catch (e) { console.error('QR', e); c.closest('.qr-box').classList.add('qr-offline'); }
   });
 }
+// Big QR in a pop-up (from the QR tab or a link's QR button)
+let qrZoomSlug = null;
+async function openQR(slug) {
+  qrZoomSlug = slug;
+  document.getElementById('qr-zoom-url').textContent = DB.prettyUrl(slug);
+  const c = document.getElementById('qr-zoom-canvas');
+  c.setAttribute('aria-label', 'QR code for ' + DB.prettyUrl(slug));
+  document.getElementById('qr-modal').classList.add('active');
+  setOverlay(true);
+  try { await loadQrLib(); paintQR(c, DB.shortUrl(slug), 640); }
+  catch (_) { showToast('QR codes need an internet connection the first time'); }
+  document.getElementById('qr-zoom-dl').focus({ preventScroll: true });
+}
+document.getElementById('qr-zoom-dl').addEventListener('click', () => qrZoomSlug && qrDownload(qrZoomSlug));
+document.getElementById('qr-zoom-copy').addEventListener('click', () => qrZoomSlug && qrCopy(qrZoomSlug));
+document.getElementById('qr-zoom-share').addEventListener('click', () => qrZoomSlug && qrShare(qrZoomSlug));
+document.getElementById('qr-modal').addEventListener('click', e => { if (e.target.id === 'qr-modal') closeModal('qr-modal'); });
 async function qrBlob(slug) {
   await loadQrLib();
   const c = document.createElement('canvas');
@@ -6015,7 +6064,7 @@ document.getElementById('dash-content').addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
   if (!b) return;
   if (b.dataset.act === 'copy') { navigator.clipboard.writeText(DB.shortUrl(b.dataset.slug)).then(() => showToast('Link copied')).catch(() => {}); }
-  if (b.dataset.act === 'qr') showDashTab('qr');
+  if (b.dataset.act === 'qr') { if (b.dataset.slug) openQR(b.dataset.slug); else showDashTab('qr'); }
   if (b.dataset.act === 'delete') deleteShortLink(b.dataset.slug);
   if (b.dataset.act === 'manage') openLinkManager(b.dataset.slug);
 });
