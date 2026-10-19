@@ -34,6 +34,8 @@ https://<your-project-ref>.supabase.co/auth/v1/callback
    | 6 | `supabase/upgrade-api.sql` | Public API keys |
    | 7 | `supabase/upgrade-views.sql` | Page views count once a day per visitor |
    | 8 | `supabase/upgrade-reports.sql` | Shareable link reports |
+   | 9 | `supabase/upgrade-moderation.sql` | Background templates, blocked links and websites |
+   | 10 | `supabase/upgrade-hardening.sql` | View counts owners can't edit, size limits |
 
    Before running file 4, replace `YOUR-ADMIN-EMAIL@example.com` near the end with the email you'll sign up with. That account becomes the first admin. Every file is safe to run again.
 3. **Project Settings → API**: copy the **Project URL** and the **publishable** key into `supabase-config.js` (`url` and `key`).
@@ -116,7 +118,7 @@ The song shows to everyone who visits once the owner adds their **Discord ID** i
 
 ## Part F: Checklist before a demo
 
-- [ ] All eight SQL files from Part A have been run, with your email in `run-this-once.sql`.
+- [ ] All ten SQL files from Part A have been run, with your email in `run-this-once.sql`.
 - [ ] Sign-in URLs and redirect URLs point at voids.wtf (Part C).
 - [ ] An email sender is set up, or "Confirm email" is off for the demo.
 - [ ] Open the Supabase project in the days before: free projects pause after 7 days without activity.

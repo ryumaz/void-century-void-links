@@ -145,7 +145,7 @@ npx wrangler pages dev . --port 8788
 
 ### How voids.wtf is deployed
 
-1. **Supabase:** the database is set up by running these files in **SQL Editor**, in this order: `schema.sql`, `admin.sql`, `upgrade-links-cursors.sql`, `run-this-once.sql` (replace the admin email placeholder first), `upgrade-go-links.sql`, `upgrade-api.sql`, `upgrade-views.sql`, `upgrade-reports.sql`.
+1. **Supabase:** the database is set up by running these files in **SQL Editor**, in this order: `schema.sql`, `admin.sql`, `upgrade-links-cursors.sql`, `run-this-once.sql` (replace the admin email placeholder first), `upgrade-go-links.sql`, `upgrade-api.sql`, `upgrade-views.sql`, `upgrade-reports.sql`, `upgrade-moderation.sql`, `upgrade-hardening.sql`.
 2. **Settings:** `supabase-config.js` holds the Supabase URL and the **publishable** key. The secret (service_role) key is never in any website file.
 3. **Cloudflare Pages:** deploys from this repo on every push to `main`, with no build command. `voids.wtf` serves the site and pages; `go.voids.wtf` serves short links.
 4. **Sign-in:** Supabase → Authentication → URL Configuration points at `https://voids.wtf`.
