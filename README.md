@@ -136,34 +136,35 @@ supabase-config.js    Public settings: Supabase URL, publishable key, Spotify Cl
 
 ## Setup
 
-How voids.wtf is built and deployed is described in **[SETUP.md](SETUP.md)**. The short version:
+Void Links is live at **https://voids.wtf**: nothing to install to try it.
 
-### Run it on your computer
-
-The site has no build step. To look at the pages:
-
-```bash
-python -m http.server 8790
-```
-
-Then open http://localhost:8790. Short-link redirects, clean profile addresses and the API run as Cloudflare Pages Functions. To run those too:
+To look at it locally, the site has no build step:
 
 ```bash
 npx wrangler pages dev . --port 8788
 ```
 
-### How voids.wtf is deployed
+Then open http://localhost:8788. (A plain static server such as `python -m http.server` also works for the pages, but short links and the API need the Cloudflare Pages Functions that `wrangler` runs.)
 
-1. **Supabase:** the database is set up by running these files in **SQL Editor**, in this order: `schema.sql`, `admin.sql`, `upgrade-links-cursors.sql`, `run-this-once.sql` (replace the admin email placeholder first), `upgrade-go-links.sql`, `upgrade-api.sql`, `upgrade-views.sql`, `upgrade-reports.sql`, `upgrade-moderation.sql`, `upgrade-hardening.sql`.
-2. **Settings:** `supabase-config.js` holds the Supabase URL and the **publishable** key. The secret (service_role) key is never in any website file.
-3. **Cloudflare Pages:** deploys from this repo on every push to `main`, with no build command. `voids.wtf` serves the site and pages; `go.voids.wtf` serves short links.
-4. **Sign-in:** Supabase → Authentication → URL Configuration points at `https://voids.wtf`.
+---
 
-### Security notes
+## Security
 
-- `supabase-config.js` only holds values that are meant to be public. The publishable key can do nothing that Row Level Security doesn't allow.
-- OAuth client secrets and the Supabase secret key live only in the Supabase dashboard, never in this repository.
-- `.env` files are ignored by `.gitignore`.
+What we did to keep accounts, links and data safe:
+
+- **Row Level Security on every table.** Each person can only read and change their own links, pages and stats. We tested it with the public key: private tables return nothing, and staff-only functions answer "Staff only".
+- **No secrets in the code.** The site only ships the Supabase *publishable* key, which can't do anything Row Level Security doesn't allow. The secret key and sign-in provider secrets live only in the Supabase dashboard. We checked every file and the full git history for leaked keys.
+- **Link rules are enforced on the server.** Passwords, opening/closing times, use limits, pause and revoke are all checked inside the database when a link opens, so nobody can skip them by editing the page.
+- **Link passwords are hashed with bcrypt** and never stored in plain text. Guessing is limited to 8 tries per 10 minutes per visitor, and each wrong guess is slowed down.
+- **Rate limits against spam:** 200 new links per hour per account, 600 API calls per key per hour, and limits on support tickets, reports and shared templates.
+- **API keys are stored only as SHA-256 fingerprints**, so even we can't see a key after it's created. Keys can be revoked any time.
+- **Honest numbers.** Page views count once per visitor per day (using a scrambled fingerprint of the visitor's IP, never the IP itself), and page owners can't edit their own view counts.
+- **Audit log.** Every change to a link is recorded by database triggers and can't be edited from the website.
+- **Moderation tools.** Visitors can report pages; staff can block single links or whole websites (links to blocked sites can't be created and stop opening) and remove shared backgrounds.
+- **Safe uploads.** Only images, video and audio, up to 50 MB, and each person can only write to their own folder.
+- **Protection against injected scripts (XSS).** Everything people type is shown as plain text, and usernames and link names only allow letters, numbers and a few symbols.
+- **Security headers on every page:** a Content Security Policy (only our scripts and a few trusted sources may run, and `eval` is blocked), HTTPS-only with HSTS, no embedding by other sites, `nosniff`, a strict referrer policy and a permissions policy. The one part that needs Spotify's player code runs on its own origin (`go.voids.wtf/radio`) so it can't touch the main site.
+- **Privacy:** no tracking cookies and no third-party analytics.
 
 ---
 
