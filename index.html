@@ -284,6 +284,9 @@
     .hero-title, .hero-sub, .hero-shortener { margin-left: auto; margin-right: auto; }
     /* No scrim over the black hole: the text carries its own soft shadow instead */
     .hero-title, .hero-sub, .section-title, .section-sub, .hero-points { text-shadow: 0 1px 18px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.6); }
+    /* The black hole's bright ring sits right behind these lines: a stronger shadow keeps them readable */
+    .hero-title { text-shadow: 0 2px 30px rgba(0,0,0,0.85), 0 0 3px rgba(0,0,0,0.5); }
+    .hero-sub { text-shadow: 0 1px 12px #000, 0 0 3px #000, 0 0 1px #000; }
     @keyframes pulse-dot {
       0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0.5); }
       50% { opacity: 0.7; box-shadow: 0 0 0 5px rgba(255,255,255,0); }
@@ -301,7 +304,7 @@
       animation: fadeUp 0.9s 0.35s forwards;
     }
     .hero-title .word-accent { color: var(--text); }
-    .hero-title .word-dim { color: var(--text-muted); }
+    .hero-title .word-dim { color: #e4e6ee; }
     .hero-sub {
       font-size: 1.15rem;
       color: rgba(245,245,247,0.84);
@@ -1933,7 +1936,7 @@
     .pc-spotify iframe { width: 100%; border: 0; border-radius: 12px; display: block; }
 
     /* Profile view: sound + click to enter */
-    .profile-top-right { display: flex; gap: 8px; }
+    .profile-top-right { display: flex; gap: 8px; margin-left: auto; }
     .profile-sound { display: inline-flex; align-items: center; padding: 9px 12px; }
     .profile-sound[hidden] { display: none; }
     .profile-sound .snd-off, .profile-sound.muted .snd-on { display: none; }
@@ -2227,7 +2230,7 @@
     @media (max-width: 640px) {
       .features-grid { grid-template-columns: 1fr; }
       .dash-sidebar { width: 60px; overflow: hidden; }
-      .dash-sidebar .logo span, .dash-nav-item span, .dash-user-info { display: none; }
+      .dash-sidebar .logo span, .dash-sidebar .logo .beta-tag, .dash-nav-item span, .dash-user-info { display: none; }
       #hero { padding: 110px 16px 80px; }
       .shortener-wrap input { min-width: 0; padding: 10px; }
       .container { padding: 0 16px; }
@@ -3490,7 +3493,6 @@
         <svg class="snd-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
         <svg class="snd-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
       </button>
-      <button type="button" class="profile-chip" id="pv-copy" data-i18n="p.copy">Copy link</button>
       <button type="button" class="profile-chip profile-report-btn" id="pv-report" title="Report this page" aria-label="Report this page">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
       </button>
@@ -3587,10 +3589,6 @@
       <a class="dash-nav-item" href="#" onclick="showDashTab('api');return false;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
         <span>API</span>
-      </a>
-      <a class="dash-nav-item" href="#" onclick="showDashTab('ai');return false;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-        <span>AI Assistant</span>
       </a>
       <a class="dash-nav-item" href="#" onclick="showDashTab('settings');return false;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -4463,7 +4461,7 @@ function restoreDashboard() {
   const m = location.hash.match(/^#\/dashboard(?:\/([a-z]+))?\/?$/);
   if (!m) return;
   dashRestored = true;
-  openDashboard(m[1] && dashPages[m[1]] ? m[1] : 'overview');
+  openDashboard(m[1] && dashPages[m[1]] && m[1] !== 'ai' ? m[1] : 'overview');   // the AI tab moved into the Vortex helper
 }
 updateAuthUI();
 handleAuthReturn();
@@ -4797,14 +4795,14 @@ const dashPages = {
   `,
   settings: () => `
     <div class="dash-page-title">Settings</div>
-    <div class="dash-page-sub">Your account on this device. Sign-in and sync arrive with the backend.</div>
+    <div class="dash-page-sub">Your photo, name, email and password.</div>
     <div class="settings-grid">
       <div class="dash-panel">
         <div class="dash-panel-title">Profile</div>
         <div class="acct-avatar-row">
           <div class="acct-avatar" id="set-avatar"></div>
           <div class="acct-avatar-actions">
-            <label class="btn btn-ghost" for="set-avatar-file">Upload photo</label>
+            <label class="btn btn-ghost" for="set-avatar-file" id="set-avatar-pick">Upload photo</label>
             <input id="set-avatar-file" type="file" accept="image/*" hidden onchange="setAccountAvatar(this.files[0]); this.value='';">
             <button type="button" class="btn btn-ghost" id="set-avatar-use" onclick="useAvatarOnPage()">Use on my page</button>
             <button type="button" class="btn btn-ghost" id="set-avatar-remove" onclick="setAccountAvatar(null)">Remove</button>
@@ -6198,6 +6196,7 @@ function paintAccountAvatar() {
   fillAvatar(box);
   document.getElementById('set-avatar-remove').hidden = !currentUser.avatar;
   document.getElementById('set-avatar-use').hidden = !currentUser.avatar;
+  document.getElementById('set-avatar-pick').textContent = currentUser.avatar ? 'Change photo' : 'Upload photo';
 }
 async function useAvatarOnPage() {
   if (!currentUser.avatar || !window.LP) return;

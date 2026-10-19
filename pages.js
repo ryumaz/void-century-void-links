@@ -1567,22 +1567,30 @@
         viewAudio = new Audio(page.audioUrl);
         viewAudio.loop = true;
       }
-      // Count the visit (not when the owner looks at their own page)
-      const own = myPageCache && myPageCache.username === user;
-      if (!own) page.views += 1;
+      // Count the visit once a day per visitor (not refreshes, and not the owner's own looks)
+      const own = (myPageCache && myPageCache.username === user) || (me() && page.owner && me().id === page.owner);
+      const seenKey = 'vl_seen_' + user;
+      let fresh = !own;
+      try {
+        if (fresh && Date.now() - Number(localStorage.getItem(seenKey) || 0) < 864e5) fresh = false;
+        if (fresh) localStorage.setItem(seenKey, String(Date.now()));
+      } catch (_) {}
+      if (fresh) page.views += 1;
       renderProfile(view, page, media);
-      if (!own) DB.countView(user).then(v => { if (v != null && viewPage === page) { page.views = v; renderProfile(view, page, media); } });
+      if (fresh) DB.countView(user).then(v => { if (v != null && viewPage === page) { page.views = v; renderProfile(view, page, media); } });
       if (/^\d{17,20}$/.test(page.discordId || '') || page.nowPlaying) {
         discordTimer = setInterval(() => renderProfile(view, page, media), 15000);
       }
     }
     const sound = hasSound(page);
+    $('pv-close').hidden = !openedInApp;
     soundBtn.hidden = !sound;
     splash.hidden = !sound;
     view.classList.add('active');
     setOverlay(true);
     applySound(false);
-    (sound ? splash : $('pv-close')).focus({ preventScroll: true });
+    if (sound) splash.focus({ preventScroll: true });
+    else if (openedInApp) $('pv-close').focus({ preventScroll: true });
   }
 
   function closeMedia() {
@@ -1607,7 +1615,7 @@
     if (typeof syncDashHash === 'function') syncDashHash();
   }
 
-  splash.addEventListener('click', () => { splash.hidden = true; applySound(true); $('pv-close').focus({ preventScroll: true }); });
+  splash.addEventListener('click', () => { splash.hidden = true; applySound(true); });
   soundBtn.addEventListener('click', () => {
     try { localStorage.setItem(MUTE_KEY, isMuted() ? '0' : '1'); } catch (_) {}
     applySound(splash.hidden);
@@ -1648,9 +1656,10 @@
       toast('Thanks. Our team will review this page.');
     } catch (e) { toast(/too many/i.test((e && e.message) || '') ? 'Too many reports from you. Please wait a bit.' : "Couldn't send the report. Try again."); }
   });
-  $('pv-copy').addEventListener('click', () => copyLink(view.dataset.user));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeIconMenu(); closeProfile(); } });
-  window.addEventListener('hashchange', route);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeIconMenu(); if (openedInApp) closeProfile(); } });
+  // Pages opened by clicking around the site get a way back; a visitor arriving on a link doesn't need one
+  let openedInApp = false;
+  window.addEventListener('hashchange', () => { openedInApp = true; route(); });
 
   // ---------- landing showcase (static demo profile) ----------
   const demoPhone = $('demo-phone');
