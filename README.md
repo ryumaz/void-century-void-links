@@ -4,6 +4,8 @@
 
 Made by **Team Void Century**.
 
+> **This code is shown for viewing and judging only.** It is not licensed for reuse: see [LICENSE](LICENSE).
+
 **Live site:** https://voids.wtf
 **Short links:** https://go.voids.wtf/&lt;name&gt; · **Profile pages:** https://voids.wtf/&lt;username&gt;
 
@@ -125,7 +127,7 @@ supabase-config.js    Public settings: Supabase URL, publishable key, Spotify Cl
 
 ## Setup
 
-Full step-by-step guide: **[SETUP.md](SETUP.md)**. The short version:
+How voids.wtf is built and deployed is described in **[SETUP.md](SETUP.md)**. The short version:
 
 ### Run it on your computer
 
@@ -141,12 +143,12 @@ Then open http://localhost:8790. Short-link redirects, clean profile addresses a
 npx wrangler pages dev . --port 8788
 ```
 
-### Your own copy
+### How voids.wtf is deployed
 
-1. **Supabase:** create a project, then run these files in **SQL Editor**, in this order: `schema.sql`, `admin.sql`, `upgrade-links-cursors.sql`, `run-this-once.sql` (replace the admin email placeholder first), `upgrade-go-links.sql`, `upgrade-api.sql`, `upgrade-views.sql`, `upgrade-reports.sql`.
-2. **Settings:** put your Supabase URL and **publishable** key in `supabase-config.js`. Never put the secret (service_role) key in any website file.
-3. **Cloudflare Pages:** connect the GitHub repo. There is no build command and the output folder is `/`. Add your domain, plus a `go.` subdomain for short links.
-4. **Sign-in:** in Supabase → Authentication → URL Configuration, set your site address and add it to the redirect URLs.
+1. **Supabase:** the database is set up by running these files in **SQL Editor**, in this order: `schema.sql`, `admin.sql`, `upgrade-links-cursors.sql`, `run-this-once.sql` (replace the admin email placeholder first), `upgrade-go-links.sql`, `upgrade-api.sql`, `upgrade-views.sql`, `upgrade-reports.sql`.
+2. **Settings:** `supabase-config.js` holds the Supabase URL and the **publishable** key. The secret (service_role) key is never in any website file.
+3. **Cloudflare Pages:** deploys from this repo on every push to `main`, with no build command. `voids.wtf` serves the site and pages; `go.voids.wtf` serves short links.
+4. **Sign-in:** Supabase → Authentication → URL Configuration points at `https://voids.wtf`.
 
 ### Security notes
 
@@ -159,3 +161,7 @@ npx wrangler pages dev . --port 8788
 ## Team
 
 **Void Century**
+
+## License
+
+Copyright (c) 2026 Void Century. All rights reserved. The code is public only so it can be viewed and judged; copying, reusing or hosting it needs our written permission. See [LICENSE](LICENSE).

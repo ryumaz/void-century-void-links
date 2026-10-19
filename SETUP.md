@@ -1,9 +1,10 @@
-# Void Links: setup guide
+# How Void Links is set up
 
-How to run your own copy of Void Links: database, hosting, social login and Spotify.
-Do the parts in order. Each step says where to click.
+How voids.wtf is built and deployed: database, hosting, social login and Spotify.
+It's written for our team and for judges reviewing the project, so the setup can be
+checked or rebuilt by us if needed.
 
-Replace `voids.wtf` with your own domain everywhere below.
+This is not permission to run a copy: the code is not licensed for reuse (see [LICENSE](LICENSE)).
 
 **Rules for secrets**
 - `supabase-config.js` only holds public values: the Supabase URL, the **publishable** key and the Spotify **Client ID**.
@@ -20,7 +21,7 @@ https://<your-project-ref>.supabase.co/auth/v1/callback
 
 ## Part A: Database (Supabase)
 
-1. Create a free project at **supabase.com**.
+1. The project runs on **supabase.com** (free plan).
 2. Open **SQL Editor → New query**. For each file below, paste the whole file, press **Run**, and check it says *Success*. Go in this order:
 
    | # | File | What it adds |
@@ -42,15 +43,15 @@ https://<your-project-ref>.supabase.co/auth/v1/callback
 
 ## Part B: Hosting (Cloudflare Pages)
 
-1. Push this folder to a GitHub repository.
+1. The code lives in this GitHub repository.
 2. **dash.cloudflare.com → Workers & Pages → Create → Pages → Connect to Git**, then pick the repo.
 3. Build settings:
    - **Framework preset:** None
    - **Build command:** leave empty
    - **Build output directory:** `/`
 4. **Save and Deploy.** Each push to `main` redeploys the site by itself.
-5. **Custom domains** (in the Pages project): add your domain (for example `voids.wtf`) and a `go.` subdomain (`go.voids.wtf`). Short links live on `go.`; profile pages live on the main domain.
-6. If you use different domains, update `siteUrl` and `linkUrl` in `supabase-config.js`.
+5. **Custom domains** (in the Pages project): `voids.wtf` and `go.voids.wtf`. Short links live on `go.`; profile pages live on the main domain.
+6. Those addresses are set as `siteUrl` and `linkUrl` in `supabase-config.js`.
 
 What runs where:
 - `functions/_middleware.js` sends short links (`go.voids.wtf/abc`) to their destination, opens profile pages (`voids.wtf/name`) and serves the staff portal at `/admin` (the portal itself checks that you are staff).
@@ -58,7 +59,7 @@ What runs where:
 - `_routes.json` makes plain files (scripts, images, pages) skip the functions, so they load fast.
 - `_headers` sets the security headers, including the Content Security Policy.
 
-### Run it on your computer
+### Run it locally (for reviewing)
 
 ```bash
 npx wrangler pages dev . --port 8788
@@ -89,7 +90,7 @@ Each provider gives you a **Client ID** and a **Client Secret**. Both go into **
 
 ### Google
 1. **console.cloud.google.com** → new project → **OAuth consent screen** (External).
-2. **Authorized domains:** `supabase.co` and your domain.
+2. **Authorized domains:** `supabase.co` and `voids.wtf`.
 3. **Clients → Create client → Web application**:
    - **Authorized JavaScript origins:** `https://voids.wtf`
    - **Authorized redirect URIs:** your Supabase callback URL
@@ -116,7 +117,7 @@ The song shows to everyone who visits once the owner adds their **Discord ID** i
 ## Part F: Checklist before a demo
 
 - [ ] All eight SQL files from Part A have been run, with your email in `run-this-once.sql`.
-- [ ] Sign-in URLs and redirect URLs point at your domain (Part C).
+- [ ] Sign-in URLs and redirect URLs point at voids.wtf (Part C).
 - [ ] An email sender is set up, or "Confirm email" is off for the demo.
 - [ ] Open the Supabase project in the days before: free projects pause after 7 days without activity.
 - [ ] Test everything once on the live site in a private window: sign up, publish a page, shorten a link and open it, share a report, use the help bot, check the staff portal at `/admin`.
