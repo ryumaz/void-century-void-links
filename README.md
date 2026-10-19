@@ -168,6 +168,8 @@ npx wrangler pages dev . --port 8788
 ---
 
 ## Team
+- Niraj Singh Mehta: team lead, design, full-stack development and deployment
+
 
 **Void Century**
 
