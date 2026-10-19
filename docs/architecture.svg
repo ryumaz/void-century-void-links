@@ -28,7 +28,7 @@
 
   <!-- Title -->
   <text x="60" y="72" font-size="38" font-weight="700" fill="#fff">Void Links · system architecture</text>
-  <text x="60" y="108" class="sub">Static frontend on Netlify · Supabase backend (Auth, Postgres with Row Level Security, Storage) · no server of our own to run</text>
+  <text x="60" y="108" class="sub">Static frontend on Cloudflare Pages · Supabase backend (Auth, Postgres with Row Level Security, Storage) · no server of our own to run</text>
 
   <!-- ================= COLUMN 1: USERS ================= -->
   <rect class="col" x="40" y="150" width="420" height="700" rx="22"/>
@@ -37,8 +37,8 @@
 
   <rect class="box" x="70" y="260" width="360" height="150" rx="16"/>
   <text class="t" x="96" y="306">Visitors</text>
-  <text class="d" x="96" y="340">Open short links (voidlinks/abc)</text>
-  <text class="d" x="96" y="368">and bio pages (voidlinks/@name)</text>
+  <text class="d" x="96" y="340">Open short links (go.voids.wtf/abc)</text>
+  <text class="d" x="96" y="368">and bio pages (voids.wtf/name)</text>
   <text class="d" x="96" y="396">No account needed</text>
 
   <rect class="box" x="70" y="430" width="360" height="190" rx="16"/>
@@ -56,12 +56,12 @@
 
   <!-- ================= COLUMN 2: NETLIFY ================= -->
   <rect class="col" x="560" y="150" width="600" height="700" rx="22"/>
-  <text class="head" x="590" y="200">NETLIFY · FRONTEND</text>
-  <text class="sub" x="590" y="228">Global CDN, deployed from GitHub</text>
+  <text class="head" x="590" y="200">CLOUDFLARE PAGES · FRONTEND</text>
+  <text class="sub" x="590" y="228">Global network, deployed from GitHub</text>
 
   <rect class="hot" x="590" y="260" width="540" height="150" rx="16"/>
-  <text class="t" x="616" y="306">Edge Function · shortlink.ts</text>
-  <text class="d" x="616" y="340">Runs at the edge, close to the visitor</text>
+  <text class="t" x="616" y="306">Pages Function · _middleware.js</text>
+  <text class="d" x="616" y="340">Runs on Cloudflare, close to the visitor</text>
   <text class="d" x="616" y="368">Instant 302 redirect + visitor's country</text>
   <text class="d" x="616" y="396">Anything else falls through to go.html</text>
 
@@ -159,9 +159,9 @@
   <!-- ================= FOOTER: request flow ================= -->
   <text x="60" y="935" font-size="22" font-weight="700" fill="#fff">Short-link flow</text>
   <circle cx="290" cy="928" r="16" fill="#fff"/><text class="n" x="290" y="934" text-anchor="middle">1</text>
-  <text class="d" x="316" y="935">Visitor opens voidlinks/abc</text>
+  <text class="d" x="316" y="935">Visitor opens a short link</text>
   <circle cx="580" cy="928" r="16" fill="#fff"/><text class="n" x="580" y="934" text-anchor="middle">2</text>
-  <text class="d" x="606" y="935">Edge Function calls open_short_link()</text>
+  <text class="d" x="606" y="935">The function calls open_short_link()</text>
   <circle cx="1000" cy="928" r="16" fill="#fff"/><text class="n" x="1000" y="934" text-anchor="middle">3</text>
   <text class="d" x="1026" y="935">Postgres checks password, schedule, limit, status</text>
   <circle cx="1520" cy="928" r="16" fill="#fff"/><text class="n" x="1520" y="934" text-anchor="middle">4</text>

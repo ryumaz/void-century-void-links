@@ -1,203 +1,122 @@
 # Void Links: setup guide
 
-Everything you need to put Void Links online and switch on social login and Spotify.
-Do the parts in order. Each step says exactly where to click.
+How to run your own copy of Void Links: database, hosting, social login and Spotify.
+Do the parts in order. Each step says where to click.
 
-**Your Supabase callback URL** (you'll paste it in several places):
+Replace `voids.wtf` with your own domain everywhere below.
+
+**Rules for secrets**
+- `supabase-config.js` only holds public values: the Supabase URL, the **publishable** key and the Spotify **Client ID**.
+- Never put the Supabase **secret (service_role) key** or any OAuth **Client Secret** in a website file. They only go into the Supabase dashboard.
+- `.env` files are ignored by `.gitignore`.
+
+**Your Supabase callback URL** (used for social login):
 
 ```
-https://agbsbbkrinewplajdwax.supabase.co/auth/v1/callback
+https://<your-project-ref>.supabase.co/auth/v1/callback
 ```
 
-Never paste a **Client Secret** or the Supabase **secret key** into any website file.
-Secrets only go into the Supabase dashboard.
+---
+
+## Part A: Database (Supabase)
+
+1. Create a free project at **supabase.com**.
+2. Open **SQL Editor → New query**. For each file below, paste the whole file, press **Run**, and check it says *Success*. Go in this order:
+
+   | # | File | What it adds |
+   |---|---|---|
+   | 1 | `supabase/schema.sql` | Tables, Row Level Security, storage bucket |
+   | 2 | `supabase/admin.sql` | Staff portal, page reports |
+   | 3 | `supabase/upgrade-links-cursors.sql` | Passwords, schedules, use limits, audit log, page cursors |
+   | 4 | `supabase/run-this-once.sql` | Clean addresses, reserved names, rate limits, first admin |
+   | 5 | `supabase/upgrade-go-links.sql` | Short links and pages can share a name |
+   | 6 | `supabase/upgrade-api.sql` | Public API keys |
+   | 7 | `supabase/upgrade-views.sql` | Page views count once a day per visitor |
+   | 8 | `supabase/upgrade-reports.sql` | Shareable link reports |
+
+   Before running file 4, replace `YOUR-ADMIN-EMAIL@example.com` near the end with the email you'll sign up with. That account becomes the first admin. Every file is safe to run again.
+3. **Project Settings → API**: copy the **Project URL** and the **publishable** key into `supabase-config.js` (`url` and `key`).
+4. Optional, for adding staff from the portal: **Edge Functions → Create a function** named `admin-staff`, paste `supabase/functions/admin-staff/index.ts`, and **Deploy**. It reads the secret key from Supabase's own settings, never from this repo.
 
 ---
 
-## Part A: Put the code in a private GitHub repo
+## Part B: Hosting (Cloudflare Pages)
 
-You don't need to know Git commands: GitHub Desktop does it with buttons.
+1. Push this folder to a GitHub repository.
+2. **dash.cloudflare.com → Workers & Pages → Create → Pages → Connect to Git**, then pick the repo.
+3. Build settings:
+   - **Framework preset:** None
+   - **Build command:** leave empty
+   - **Build output directory:** `/`
+4. **Save and Deploy.** Each push to `main` redeploys the site by itself.
+5. **Custom domains** (in the Pages project): add your domain (for example `voids.wtf`) and a `go.` subdomain (`go.voids.wtf`). Short links live on `go.`; profile pages live on the main domain.
+6. If you use different domains, update `siteUrl` and `linkUrl` in `supabase-config.js`.
 
-1. Go to **desktop.github.com**, download **GitHub Desktop**, install it, and sign in with your
-   GitHub account (create one at github.com if you don't have it).
-2. In GitHub Desktop: **File → Add local repository… → Choose…** and pick
-   `C:\Users\Omen\Desktop\Hackathon`.
-3. It says *"This directory does not appear to be a Git repository"*. Click the blue
-   **create a repository** link.
-   - **Name:** `void-links`
-   - **Git ignore:** leave as *None* (the project already has a `.gitignore`)
-   - Click **Create repository**.
-4. On the left you'll see your files. At the bottom left, type a summary like `First version`
-   and click **Commit to main**.
-5. Click **Publish repository** at the top.
-   - Keep the name `void-links`.
-   - Make sure **Keep this code private** is ticked.
-   - Click **Publish repository**.
+What runs where:
+- `functions/_middleware.js` sends short links (`go.voids.wtf/abc`) to their destination, opens profile pages (`voids.wtf/name`) and serves the staff portal at `/admin` (the portal itself checks that you are staff).
+- `functions/api/v1/` is the public REST API.
+- `_routes.json` makes plain files (scripts, images, pages) skip the functions, so they load fast.
+- `_headers` sets the security headers, including the Content Security Policy.
 
-**Every time you change code later:** open GitHub Desktop → type a short summary →
-**Commit to main** → **Push origin**. Netlify then updates the live site by itself.
+### Run it on your computer
 
-The old copies (`index_before_blackhole.html`, `index_yellow_version.html`, `preview.html`, the
-two `.txt` notes) are listed in `.gitignore`, so they stay on your computer and don't go online.
+```bash
+npx wrangler pages dev . --port 8788
+```
 
----
-
-## Part B: Host it on Netlify (free)
-
-1. Go to **app.netlify.com** and choose **Sign up with GitHub**.
-2. Click **Add new project** (or **Add new site**) → **Import an existing project** → **GitHub**.
-3. Netlify asks for access to GitHub. Choose **Only select repositories**, pick **void-links**,
-   and click **Install / Save**.
-4. Pick the **void-links** repo. On the settings screen:
-   - **Branch to deploy:** `main`
-   - **Build command:** leave **empty**
-   - **Publish directory:** `.` (a single dot; `netlify.toml` already says this)
-   - Click **Deploy**.
-5. Wait about a minute until it says **Published**.
-6. Give it a nicer address: **Project configuration → Change project name** → for example
-   `voidlinks`. Your site is now `https://voidlinks.netlify.app`.
-7. Tell the code its address: open `supabase-config.js` and set
-   ```js
-   siteUrl: 'https://voidlinks.netlify.app',
-   ```
-   Then commit and push in GitHub Desktop (see Part A). Netlify redeploys automatically.
-8. Tell Supabase the address: **Supabase → Authentication → URL Configuration**
-   - **Site URL:** `https://voidlinks.netlify.app`
-   - **Redirect URLs → Add URL:** `https://voidlinks.netlify.app/**`
-     (keep `http://localhost:5517/**` for testing on your computer)
-   - **Save**.
-9. Test: open the site, sign up, publish your page, create a short link, then open the short
-   link in a private/incognito window. It should jump to the long URL and count a click.
-
-Because you deploy from GitHub, the fast redirect function in `netlify/edge-functions/` runs
-too, so clicks also record the visitor's country.
-
-**Addresses on the live site**
-
-| What | Address |
-|---|---|
-| Home | `https://voidlinks.netlify.app` |
-| A profile page | `https://voidlinks.netlify.app/@jefry` |
-| A short link | `https://voidlinks.netlify.app/abc123` |
-| Staff portal | `https://voidlinks.netlify.app/admin` |
+Then open http://localhost:8788. To look at the pages without the redirect functions, `python -m http.server 8790` also works.
 
 ---
 
-## Part C: Google, GitHub and Discord login
+## Part C: Sign-in settings
 
-Each provider gives you a **Client ID** and a **Client Secret**. Both go into
-**Supabase → Authentication → Sign In / Providers**, never into the website files.
-After each one works, add its name to `oauth` in `supabase-config.js`, for example
-`oauth: ['github', 'google', 'discord'],` and push.
+**Supabase → Authentication → URL Configuration**
+- **Site URL:** `https://voids.wtf`
+- **Redirect URLs:** add `https://voids.wtf/**` (and `http://localhost:8788/**` for testing).
 
-Social login only works on the live site (or `http://localhost:5517`), not on a page
-opened by double-clicking the file.
+**Emails:** set up an SMTP sender in **Authentication → Emails → SMTP**, otherwise Supabase sends only a few sign-up emails per hour. Paste the templates from `supabase/email-templates/`.
 
-### GitHub (easiest, about 3 minutes)
+---
 
-1. github.com → your avatar → **Settings → Developer settings → OAuth Apps → New OAuth App**.
-2. Fill in:
-   - **Application name:** `Void Links`
-   - **Homepage URL:** `https://voidlinks.netlify.app`
-   - **Authorization callback URL:** the Supabase callback URL at the top of this guide
-3. **Register application**. Copy the **Client ID**.
-4. Click **Generate a new client secret** and copy it (it's shown only once).
-5. Supabase → **Authentication → Sign In / Providers → GitHub** → turn it on, paste both, **Save**.
-6. Add `'github'` to `oauth` in `supabase-config.js`.
+## Part D: Google, GitHub and Discord login
+
+Each provider gives you a **Client ID** and a **Client Secret**. Both go into **Supabase → Authentication → Sign In / Providers**, never into the website files. Once a provider works, add its name to `oauth` in `supabase-config.js`, for example `oauth: ['github', 'google', 'discord']`.
+
+### GitHub
+1. github.com → **Settings → Developer settings → OAuth Apps → New OAuth App**.
+2. **Homepage URL:** `https://voids.wtf`. **Authorization callback URL:** your Supabase callback URL.
+3. Copy the **Client ID**, generate a **client secret**, and paste both into Supabase → **GitHub**.
 
 ### Google
-
-1. Go to **console.cloud.google.com** → top bar project picker → **New project** → name it
-   `Void Links` → **Create**, then make sure it's selected.
-2. Menu → **APIs & Services → OAuth consent screen** (may be called **Google Auth Platform**)
-   → **Get started**:
-   - **App name:** `Void Links`, **User support email:** your email
-   - **Audience:** **External**
-   - **Contact email:** your email → agree → **Create**.
-3. **Branding** page → **Authorized domains → Add domain:** `supabase.co` and `netlify.app` → **Save**.
-4. **Clients → Create client**:
-   - **Application type:** Web application, **Name:** `Void Links web`
-   - **Authorized JavaScript origins:** `https://voidlinks.netlify.app` and
-     `http://localhost:5517`
-   - **Authorized redirect URIs:** the Supabase callback URL
-   - **Create**, then copy the **Client ID** and **Client secret**.
-5. **Audience** page: while it says **Testing**, only people you add under **Test users** can
-   log in. Add your Gmail and any judges' emails, or click **Publish app** so anyone can sign in
-   (email and profile access don't need Google's review).
-6. Supabase → **Sign In / Providers → Google** → turn on, paste both, **Save**.
-7. Add `'google'` to `oauth`.
+1. **console.cloud.google.com** → new project → **OAuth consent screen** (External).
+2. **Authorized domains:** `supabase.co` and your domain.
+3. **Clients → Create client → Web application**:
+   - **Authorized JavaScript origins:** `https://voids.wtf`
+   - **Authorized redirect URIs:** your Supabase callback URL
+4. Paste the Client ID and secret into Supabase → **Google**. Publish the app (or add test users) so others can sign in.
 
 ### Discord
-
-1. Go to **discord.com/developers/applications** → **New Application** → name `Void Links` → **Create**.
-2. **OAuth2** in the left menu → **Redirects → Add Redirect** → paste the Supabase callback URL →
-   **Save Changes**.
-3. Copy the **Client ID**. Click **Reset Secret**, confirm, and copy the secret.
-4. Supabase → **Sign In / Providers → Discord** → turn on, paste both, **Save**.
-5. Add `'discord'` to `oauth`.
+1. **discord.com/developers/applications → New Application**.
+2. **OAuth2 → Redirects:** add your Supabase callback URL.
+3. Paste the Client ID and secret into Supabase → **Discord**.
 
 ---
 
-## Part D: Spotify ("Connect Spotify" on your page)
+## Part E: Spotify ("Connect Spotify" on profile pages)
 
-1. Go to **developer.spotify.com/dashboard**, log in with your Spotify account, accept the terms,
-   and click **Create app**.
-2. Fill in:
-   - **App name:** `Void Links`, **App description:** `Shows what I'm listening to on my Void Links page`
-   - **Website:** `https://voidlinks.netlify.app`
-   - **Redirect URIs** (add each one):
-     - `https://voidlinks.netlify.app/`
-     - `https://voidlinks.netlify.app/index.html`
-     - `http://127.0.0.1:5517/index.html` (for testing on your computer: Spotify doesn't allow
-       the word "localhost", so open the site as `http://127.0.0.1:5517/index.html`)
-   - **Which API/SDKs:** tick **Web API**.
-   - Agree to the terms → **Save**.
-3. Open the app → **Settings** → copy the **Client ID**. You do **not** need the Client Secret.
-4. Put it in `supabase-config.js`:
-   ```js
-   spotifyClientId: 'paste-the-client-id-here',
-   ```
-   and push.
-5. **User Management** (in the app's settings): new Spotify apps are in *Development mode*,
-   so only the accounts listed here can connect. Add your own Spotify email (and anyone else
-   who should be able to connect).
-6. On the site: **Dashboard → My Page → Connect Spotify**, approve, then tick
-   **Show what I'm listening to**.
+1. **developer.spotify.com/dashboard → Create app**, and tick **Web API**.
+2. **Redirect URIs:** add `https://voids.wtf/`. For local testing, add `http://127.0.0.1:8788/` (Spotify doesn't allow the word "localhost").
+3. Copy the **Client ID** into `spotifyClientId` in `supabase-config.js`. The Client Secret is **not** needed: sign-in uses PKCE.
+4. New Spotify apps are in *Development mode*: add each Spotify account that should connect under **User Management**.
 
-Right now the live song shows to you on your device. Showing it to every visitor needs one
-more small Supabase function that keeps your Spotify login on the server.
+The song shows to everyone who visits once the owner adds their **Discord ID** in the page editor (after joining the Lanyard Discord server). Without it, it shows only on the owner's own device.
 
 ---
 
-## Part F: Turn on advanced links, the audit log and page cursors (2 minutes)
+## Part F: Checklist before a demo
 
-Password-protected links, start/end times, use limits, pausing/revoking, the **Audit log** tab
-and custom cursors on profile pages all need one extra database file. Until you run it, links
-keep working as before and those options show a short "needs an upgrade" note.
-
-1. Open your project on **supabase.com** → **SQL Editor** → **New query**.
-2. Open `supabase/upgrade-links-cursors.sql` from this folder in Notepad, copy everything, paste it in.
-3. Click **Run**. It should say *Success. No rows returned*. Running it again later is safe.
-4. Reload the site.
-
-How it works, in case a judge asks:
-- A link password is hashed with bcrypt inside the database; the plain password is never stored
-  and the browser can only see *whether* a link has one.
-- Every rule (password, schedule, number of uses, paused, revoked) is checked by the database
-  function `open_short_link`, so nobody can skip it by editing the page.
-- The audit log is written by database triggers, so every change is recorded and can't be
-  edited or deleted from the website.
-
----
-
-## Part E: Before the judges see it
-
-- [ ] `supabase/admin.sql` has been run, with your email on the last line (staff portal + reports).
-- [ ] `supabase/upgrade-links-cursors.sql` has been run (advanced link options, audit log, page cursors).
-- [ ] Email sender set up (Supabase → Authentication → Emails → SMTP), otherwise only a few
-      sign-up emails per hour get sent. Or turn off "Confirm email" for the demo.
-- [ ] Email templates pasted from `supabase/email-templates/`.
-- [ ] Open the Supabase project in the days before judging: free projects pause after 7 days
-      with no activity.
-- [ ] Try everything once on the live site in a private window: sign up, publish a page,
-      shorten a link, open it, use the help bot, report a page, check the staff portal.
+- [ ] All eight SQL files from Part A have been run, with your email in `run-this-once.sql`.
+- [ ] Sign-in URLs and redirect URLs point at your domain (Part C).
+- [ ] An email sender is set up, or "Confirm email" is off for the demo.
+- [ ] Open the Supabase project in the days before: free projects pause after 7 days without activity.
+- [ ] Test everything once on the live site in a private window: sign up, publish a page, shorten a link and open it, share a report, use the help bot, check the staff portal at `/admin`.
