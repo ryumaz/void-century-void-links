@@ -170,7 +170,7 @@ npx wrangler pages dev . --port 8788
 ## Team
 - Niraj Singh Mehta: team lead, design, full-stack development and deployment
 - Naval Panda : Pitch
-
+- Urvashi Bhatt: Pitch
 **Void Century**
 
 ## License
