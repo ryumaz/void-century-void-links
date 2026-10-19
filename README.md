@@ -169,10 +169,14 @@ What we did to keep accounts, links and data safe:
 ---
 
 ## Team
-- Niraj Singh Mehta: team lead, design, full-stack development and deployment
-- Naval Panda : Pitch
-- Urvashi Bhatt: Pitch
+
 **Void Century**
+
+- Niraj Singh Mehta: team lead, design, full-stack development and deployment
+- Udit Saklani: testing and QA on mobile and desktop
+- Naval Panda: pitch
+- Urvashi Bhatt: pitch
+- Mitali Loshali: pitch
 
 ## License
 
