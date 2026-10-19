@@ -115,6 +115,17 @@
     td .actions { display: flex; gap: 6px; flex-wrap: wrap; }
     td .btn { padding: 6px 10px; font-size: 0.8rem; }
     .empty { padding: 28px; text-align: center; color: var(--dim); }
+    .sub-h { font-size: 1.1rem; margin: 34px 0 6px; }
+    .cell-url { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cell-url a { color: var(--muted); }
+    #domain-form input { min-width: 180px; }
+    .pill.blocked { background: rgba(244,120,120,0.16); color: #f4a4a4; }
+    .tpl-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+    .tpl-card { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--panel); }
+    .tpl-card .thumb { aspect-ratio: 4 / 3; background: #111 center / cover no-repeat; position: relative; }
+    .tpl-card video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .tpl-card .meta { padding: 10px 12px; display: grid; gap: 4px; font-size: 0.84rem; }
+    .tpl-card .actions { padding: 0 12px 12px; }
 
     /* staff */
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin: 16px 0 24px; }
@@ -163,6 +174,8 @@
       <button data-tab="tickets" aria-selected="true">Tickets <span class="badge-count" id="count-tickets" hidden></span></button>
       <button data-tab="reports" aria-selected="false">Reports <span class="badge-count" id="count-reports" hidden></span></button>
       <button data-tab="users" aria-selected="false">Users</button>
+      <button data-tab="links" aria-selected="false">Links</button>
+      <button data-tab="templates" aria-selected="false">Templates</button>
       <button data-tab="staff" aria-selected="false" id="tab-staff" hidden>Staff</button>
     </nav>
     <div class="me">
@@ -224,6 +237,47 @@
         <thead><tr><th>Email</th><th>Name</th><th>Page</th><th>Views</th><th>Sign-in</th><th>Joined</th><th>Last seen</th><th>Actions</th></tr></thead>
         <tbody id="user-rows"></tbody>
       </table></div>
+    </section>
+
+    <!-- Links: every short link, switch off single links or block whole websites -->
+    <section data-view="links" hidden>
+      <h1>Links</h1>
+      <p class="muted">Every short link on Void Links. Switch off a single link, or block a website so no link can point to it.</p>
+      <div class="toolbar">
+        <input id="link-search" type="search" placeholder="Search name, destination or owner email" aria-label="Search links">
+        <span class="dim" id="link-count"></span>
+        <button class="btn" id="link-refresh">Refresh</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Link</th><th>Goes to</th><th>Owner</th><th>Clicks</th><th>Created</th><th>State</th><th>Actions</th></tr></thead>
+        <tbody id="link-rows"></tbody>
+      </table></div>
+      <h2 class="sub-h">Blocked websites</h2>
+      <p class="muted">Links to these websites (and their subdomains) can't be created, and existing ones show a "blocked" page instead of opening.</p>
+      <form class="toolbar" id="domain-form" novalidate>
+        <input name="domain" type="text" placeholder="example.com" aria-label="Website to block" autocomplete="off" spellcheck="false">
+        <input name="reason" type="text" placeholder="Reason (only staff see it)" aria-label="Reason" maxlength="200" autocomplete="off">
+        <button class="btn btn-danger" type="submit">Block website</button>
+      </form>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Website</th><th>Reason</th><th>Blocked</th><th>Actions</th></tr></thead>
+        <tbody id="domain-rows"></tbody>
+      </table></div>
+    </section>
+
+    <!-- Templates: backgrounds people shared -->
+    <section data-view="templates" hidden>
+      <h1>Background templates</h1>
+      <p class="muted">Backgrounds people shared for others to use. Ban hides one from the gallery (pages already using it keep it). Delete removes the file too.</p>
+      <div class="toolbar">
+        <div class="seg" id="tpl-filter">
+          <button data-v="active" aria-pressed="true">Live</button>
+          <button data-v="banned" aria-pressed="false">Banned</button>
+          <button data-v="all" aria-pressed="false">All</button>
+        </div>
+        <button class="btn" id="tpl-refresh">Refresh</button>
+      </div>
+      <div class="tpl-admin" id="tpl-admin"></div>
     </section>
 
     <!-- Staff (admins only) -->

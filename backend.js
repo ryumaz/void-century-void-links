@@ -36,7 +36,9 @@ window.siteHost = () => {
     const { data } = await sb.auth.getSession();   // reads the local session, no network call
     return data.session ? data.session.user.id : null;
   };
-  const publicUrl = path => (path ? sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl : '');
+  const publicUrl = path => (!path ? '' : path.startsWith('site:') ? new URL(path.slice(5), location.origin + '/').href : sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl);
+  // Files that must never be cleaned up when a page changes: the site's own templates and shared templates
+  const keepFile = p => !p || p.startsWith('site:') || /\/template-/.test(p);
   const EXT = {
     'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp',
     'video/mp4': 'mp4', 'video/webm': 'webm',
@@ -175,7 +177,7 @@ window.siteHost = () => {
       return { path, url: publicUrl(path) };
     },
     async removeFiles(paths) {
-      paths = paths.filter(Boolean);
+      paths = paths.filter(p => !keepFile(p));
       if (paths.length) await sb.storage.from(BUCKET).remove(paths);
     },
     publicUrl,
@@ -311,6 +313,34 @@ window.siteHost = () => {
     async deleteLink(slug) {
       fail((await sb.from('short_links').delete().eq('slug', slug)).error);
     },
+    // ---------- Background templates (supabase/upgrade-moderation.sql) ----------
+    // Shared templates, newest first; null when the upgrade hasn't been run yet
+    async templates(limit = 60) {
+      const { data, error } = await sb.from('bg_templates').select('id, path, kind, title, uploader, created_at')
+        .eq('status', 'active').order('created_at', { ascending: false }).limit(limit);
+      if (error) { if (/PGRST205|does not exist|Could not find/i.test(error.code + ' ' + error.message)) return null; fail(error); }
+      return (data || []).map(t => ({ ...t, url: publicUrl(t.path) }));
+    },
+    // Share a background as a template: a copy is stored, so later page changes never break it
+    async shareTemplate({ blob, url, kind, title }) {
+      const id = await userId();
+      if (!id) throw new Error('Not signed in');
+      if (!blob) {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error("Couldn't read that background. Try uploading it again.");
+        blob = await r.blob();
+      }
+      const path = `${id}/template-${Date.now().toString(36)}.${EXT[blob.type] || (kind === 'video' ? 'mp4' : 'webp')}`;
+      fail((await sb.storage.from(BUCKET).upload(path, blob, { contentType: blob.type || undefined, cacheControl: '31536000', upsert: false })).error);
+      const { data, error } = await sb.from('bg_templates').insert({ path, kind: kind === 'video' ? 'video' : 'image', title: (title || '').slice(0, 40) || null }).select().single();
+      if (error) { sb.storage.from(BUCKET).remove([path]).catch(() => {}); fail(error); }
+      return { ...data, url: publicUrl(path) };
+    },
+    async removeTemplate(t) {
+      fail((await sb.from('bg_templates').delete().eq('id', t.id)).error);
+      sb.storage.from(BUCKET).remove([t.path]).catch(() => {});
+    },
+
     // ---------- Shareable reports (supabase/upgrade-reports.sql) ----------
     // { slug: token } for your shared links, or null when the upgrade hasn't been run yet
     async reportShares() {

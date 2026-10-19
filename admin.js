@@ -115,7 +115,7 @@
     tab = name;
     document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
     document.querySelectorAll('[data-view]').forEach(v => { v.hidden = v.dataset.view !== name; });
-    ({ tickets: loadTickets, reports: loadReports, users: loadUsers, staff: loadStaff })[name]();
+    ({ tickets: loadTickets, reports: loadReports, users: loadUsers, staff: loadStaff, links: loadLinks, templates: loadTemplates })[name]();
   }
   document.querySelector('nav').addEventListener('click', e => {
     const b = e.target.closest('button[data-tab]');
@@ -325,6 +325,154 @@
   }
   $('user-search').addEventListener('input', renderUsers);
   $('user-refresh').addEventListener('click', loadUsers);
+
+  // Friendly note when the moderation upgrade hasn't been run yet
+  const needsUpgrade = err => /PGRST20[25]|does not exist|Could not find/i.test((err && (err.code + ' ' + err.message)) || '');
+  const UPGRADE_NOTE = 'Run supabase/upgrade-moderation.sql in Supabase → SQL Editor first.';
+  function emptyRow(body, cols, text) {
+    const tr = el('tr');
+    const td = el('td', 'empty', text);
+    td.colSpan = cols;
+    tr.appendChild(td);
+    body.appendChild(tr);
+  }
+
+  // ---------- links (every short link) ----------
+  let links = [];
+  let linkTimer = null;
+  const shortBase = () => (cfg.linkUrl || 'https://go.voids.wtf').replace(/\/?$/, '/');
+  async function loadLinks() {
+    const q = $('link-search').value.trim();
+    const { data, error } = await sb.rpc('admin_list_links', { p_search: q || null, p_limit: 300 });
+    const body = $('link-rows');
+    body.textContent = '';
+    if (error) { emptyRow(body, 7, needsUpgrade(error) ? UPGRADE_NOTE : "Couldn't load links: " + error.message); return; }
+    links = data;
+    $('link-count').textContent = `${data.length} shown${data.length === 300 ? ' (newest 300)' : ''}`;
+    if (!data.length) emptyRow(body, 7, 'No links found');
+    data.forEach(l => {
+      const tr = el('tr');
+      const name = el('td');
+      const a1 = el('a', '', l.slug);
+      a1.href = shortBase() + l.slug; a1.target = '_blank'; a1.rel = 'noopener noreferrer';
+      name.appendChild(a1);
+      const dest = el('td', 'cell-url');
+      const a2 = el('a', '', l.destination);
+      a2.href = l.destination; a2.target = '_blank'; a2.rel = 'noopener noreferrer nofollow';
+      a2.title = l.destination;
+      dest.appendChild(a2);
+      const state = el('td');
+      const blocked = l.blocked || l.site_blocked;
+      state.appendChild(el('span', 'pill ' + (blocked ? 'blocked' : l.status), l.blocked ? 'blocked' : l.site_blocked ? 'site blocked' : l.status));
+      if (l.block_reason) state.title = l.block_reason;
+      const act = el('td');
+      const actions = el('div', 'actions');
+      if (l.blocked) actions.appendChild(btn('Unblock link', '', () => unblockLink(l.slug)));
+      else actions.appendChild(btn('Block link', 'btn-danger', () => blockLink(l.slug)));
+      if (!l.site_blocked) actions.appendChild(btn('Block website', 'btn-danger', () => blockDomain(hostOf(l.destination))));
+      act.appendChild(actions);
+      tr.append(name, dest, el('td', 'dim', l.owner_email || '—'), el('td', '', String(l.clicks || 0)), el('td', 'dim', ago(l.created_at)), state, act);
+      body.appendChild(tr);
+    });
+    loadDomains();
+  }
+  function hostOf(url) {
+    try { return new URL(url).hostname.toLowerCase().replace(/^www\./, ''); } catch (_) { return ''; }
+  }
+  async function blockLink(slug) {
+    const reason = prompt(`Block ${slug}? It will show a "blocked" page instead of opening.\n\nReason (only staff see it):`, '');
+    if (reason === null) return;
+    const { error } = await sb.from('blocked_links').upsert({ slug, reason: reason.trim() || null });
+    toast(error ? error.message : 'Link blocked');
+    loadLinks();
+  }
+  async function unblockLink(slug) {
+    const { error } = await sb.from('blocked_links').delete().eq('slug', slug);
+    toast(error ? error.message : 'Link unblocked');
+    loadLinks();
+  }
+  async function blockDomain(domain, reason) {
+    domain = String(domain || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split(/[/?#:]/)[0];
+    if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) { toast('Enter a website like example.com'); return false; }
+    if (reason === undefined) {
+      reason = prompt(`Block every link to ${domain} (and its subdomains)?\n\nReason (only staff see it):`, '');
+      if (reason === null) return false;
+    }
+    const { error } = await sb.from('blocked_domains').upsert({ domain, reason: (reason || '').trim() || null });
+    toast(error ? (needsUpgrade(error) ? UPGRADE_NOTE : error.message) : domain + ' blocked');
+    if (!error) loadLinks();
+    return !error;
+  }
+  async function loadDomains() {
+    const { data, error } = await sb.from('blocked_domains').select('*').order('created_at', { ascending: false });
+    const body = $('domain-rows');
+    body.textContent = '';
+    if (error) { emptyRow(body, 4, needsUpgrade(error) ? UPGRADE_NOTE : error.message); return; }
+    if (!data.length) { emptyRow(body, 4, 'No blocked websites'); return; }
+    data.forEach(d => {
+      const tr = el('tr');
+      const act = el('td');
+      act.appendChild(btn('Unblock', '', async () => {
+        const { error: e } = await sb.from('blocked_domains').delete().eq('domain', d.domain);
+        toast(e ? e.message : d.domain + ' unblocked');
+        loadLinks();
+      }));
+      tr.append(el('td', '', d.domain), el('td', 'muted', d.reason || '—'), el('td', 'dim', ago(d.created_at)), act);
+      body.appendChild(tr);
+    });
+  }
+  $('link-search').addEventListener('input', () => { clearTimeout(linkTimer); linkTimer = setTimeout(loadLinks, 350); });
+  $('link-refresh').addEventListener('click', loadLinks);
+  $('domain-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const f = e.target;
+    if (await blockDomain(f.domain.value, f.reason.value)) f.reset();
+  });
+
+  // ---------- background templates ----------
+  const mediaUrl = path => (path.startsWith('site:') ? path.slice(5) : sb.storage.from('media').getPublicUrl(path).data.publicUrl);
+  async function loadTemplates() {
+    const { data, error } = await sb.rpc('admin_list_templates');
+    const box = $('tpl-admin');
+    box.textContent = '';
+    if (error) { box.appendChild(el('p', 'empty', needsUpgrade(error) ? UPGRADE_NOTE : "Couldn't load templates: " + error.message)); return; }
+    const f = segValue('tpl-filter');
+    const rows = data.filter(t => f === 'all' || t.status === f);
+    if (!rows.length) { box.appendChild(el('p', 'empty', 'No templates here')); return; }
+    rows.forEach(t => {
+      const card = el('div', 'tpl-card');
+      const thumb = el('div', 'thumb');
+      if (t.kind === 'video') {
+        const v = el('video');
+        Object.assign(v, { src: mediaUrl(t.path) + '#t=0.5', muted: true, preload: 'metadata', playsInline: true, controls: true });
+        thumb.appendChild(v);
+      } else {
+        thumb.style.backgroundImage = `url("${mediaUrl(t.path)}")`;
+      }
+      const meta = el('div', 'meta');
+      const top = el('div', 'item-top');
+      top.append(el('strong', '', t.title || 'Untitled'), el('span', 'pill ' + (t.status === 'banned' ? 'blocked' : 'live'), t.status === 'banned' ? 'banned' : 'live'));
+      meta.append(top, el('span', 'dim', (t.uploader_email || 'unknown') + ' · ' + ago(t.created_at)));
+      const actions = el('div', 'actions');
+      actions.appendChild(btn(t.status === 'banned' ? 'Unban' : 'Ban', t.status === 'banned' ? '' : 'btn-danger', async () => {
+        const { error: e } = await sb.from('bg_templates').update({ status: t.status === 'banned' ? 'active' : 'banned' }).eq('id', t.id);
+        toast(e ? e.message : t.status === 'banned' ? 'Template is live again' : 'Template banned');
+        loadTemplates();
+      }));
+      actions.appendChild(btn('Delete', 'btn-danger', async () => {
+        if (!confirm('Delete this template and its file? Pages using it lose that background.')) return;
+        const { error: e } = await sb.from('bg_templates').delete().eq('id', t.id);
+        if (e) { toast(e.message); return; }
+        await sb.storage.from('media').remove([t.path]);
+        toast('Template deleted');
+        loadTemplates();
+      }));
+      card.append(thumb, meta, actions);
+      box.appendChild(card);
+    });
+  }
+  wireSeg('tpl-filter', loadTemplates);
+  $('tpl-refresh').addEventListener('click', loadTemplates);
 
   // ---------- staff (admins) ----------
   async function loadStaff() {

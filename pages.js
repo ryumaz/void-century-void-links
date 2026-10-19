@@ -1219,6 +1219,7 @@
     usernameNote();
 
     $('pb-bg-name').textContent = draft.bgName;
+    $('pb-tpl-strip').querySelectorAll('.tpl-tile').forEach(x => x.classList.remove('on'));
     drop.classList.toggle('has-file', !!draft.bgUrl);
     $('pb-bg-remove').hidden = !draft.bgUrl;
     $('pb-bg-note').hidden = !!draft.bgUrl;
@@ -1303,6 +1304,97 @@
     zone.addEventListener('drop', e => acceptFile(e.dataTransfer.files[0], kind));
   });
   $('pb-bg-remove').addEventListener('click', () => { setBlob('bg', null); fBg.value = ''; update(); });
+
+  // ---------- background templates ----------
+  // Built in (site files) + shared by people (bg_templates). Picking one just points the page at that file.
+  const BUILTIN_TEMPLATES = [
+    ['void-walker', 'Void Walker'], ['snowfall-ronin', 'Snowfall ronin'], ['two-swords', 'Two swords'],
+    ['halftone-city', 'Halftone city'], ['forest-sight', 'Forest sight'],
+  ].map(([id, title]) => ({ id: 'site-' + id, path: `site:assets/templates/${id}.webp`, thumb: `assets/templates/${id}-thumb.webp`, kind: 'image', title, builtin: true }));
+  let communityTemplates;   // undefined = not loaded, null = database not upgraded
+  const tplUrl = t => (window.DB ? DB.publicUrl(t.path) : t.path.replace(/^site:/, ''));
+  function tplTile(tp, opts = {}) {
+    const b = el('button', 'tpl-tile' + (draft.bgPath === tp.path ? ' on' : ''));
+    b.type = 'button';
+    b.setAttribute('role', 'listitem');
+    b.title = tp.title || t('b.tpl');
+    if (tp.kind === 'video') {
+      const v = el('video');
+      Object.assign(v, { src: tplUrl(tp) + '#t=0.5', muted: true, preload: 'metadata', playsInline: true });
+      b.appendChild(v);
+    } else b.style.backgroundImage = `url("${tp.thumb || tplUrl(tp)}")`;
+    b.appendChild(el('span', '', tp.title || (tp.builtin ? '' : t('b.tpl_shared'))));
+    b.addEventListener('click', e => {
+      if (e.target.closest('.tpl-x')) return;
+      setBlob('bg', null, tp.title || t('b.tpl'), { url: tplUrl(tp), path: tp.path, type: tp.kind });
+      fBg.value = '';
+      if (tp.kind === 'video' && segValue(segSound) === 'none') seg(segSound, 'video');
+      update();
+      paintTemplates();
+      if (opts.close) closeModal('tpl-modal');
+      toast(t('b.tpl_picked'));
+    });
+    const mine = !tp.builtin && me() && tp.uploader === me().id;
+    if (mine) {
+      const x = el('button', 'tpl-x', '✕');
+      x.type = 'button';
+      x.setAttribute('aria-label', t('b.tpl_remove'));
+      x.title = t('b.tpl_remove');
+      x.addEventListener('click', async () => {
+        if (!confirm(t('b.tpl_remove_q'))) return;
+        try { await DB.removeTemplate(tp); communityTemplates = communityTemplates.filter(x2 => x2.id !== tp.id); paintTemplates(); toast(t('b.tpl_removed')); }
+        catch (e2) { toast(e2.message || 'Something went wrong. Try again.'); }
+      });
+      b.appendChild(x);
+    }
+    return b;
+  }
+  async function loadTemplates(force) {
+    if (!window.DB || (communityTemplates !== undefined && !force)) return;
+    try { communityTemplates = await DB.templates(); } catch (_) { communityTemplates = []; }
+    paintTemplates();
+  }
+  function paintTemplates() {
+    const strip = $('pb-tpl-strip');
+    const all = BUILTIN_TEMPLATES.concat(communityTemplates || []);
+    strip.textContent = '';
+    all.slice(0, 5).forEach(tp => strip.appendChild(tplTile(tp)));
+    const modal = $('tpl-modal');
+    if (!modal.classList.contains('active')) return;
+    const bi = $('tpl-builtin'), cm = $('tpl-community');
+    bi.textContent = ''; cm.textContent = '';
+    BUILTIN_TEMPLATES.forEach(tp => bi.appendChild(tplTile(tp, { close: true })));
+    if (communityTemplates === undefined) cm.appendChild(el('p', 'tpl-note', '…'));
+    else if (communityTemplates === null) cm.appendChild(el('p', 'tpl-note', t('b.tpl_upgrade')));
+    else if (!communityTemplates.length) cm.appendChild(el('p', 'tpl-note', t('b.tpl_none')));
+    else communityTemplates.forEach(tp => cm.appendChild(tplTile(tp, { close: true })));
+    // Sharing: needs your own background (an upload, not a template) and the upgrade
+    const own = draft.bgUrl && (draft.bgBlob || (draft.bgPath && !draft.bgPath.startsWith('site:') && !/\/template-/.test(draft.bgPath)));
+    const form = $('tpl-share');
+    form.hidden = communityTemplates === null;
+    $('tpl-share-btn').disabled = !own || !me();
+    $('tpl-share-note').textContent = !me() ? t('b.tpl_need_login') : own ? t('b.tpl_share_ready') : t('b.tpl_share_need');
+  }
+  $('pb-tpl-more').addEventListener('click', () => {
+    $('tpl-modal').classList.add('active');
+    setOverlay(true);
+    paintTemplates();
+    loadTemplates(true);
+  });
+  $('tpl-share').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = $('tpl-share-btn');
+    btn.disabled = true;
+    try {
+      const made = await DB.shareTemplate({ blob: draft.bgBlob, url: draft.bgUrl, kind: draft.bgType, title: $('tpl-share-title').value.trim() });
+      communityTemplates = [made].concat(communityTemplates || []);
+      $('tpl-share-title').value = '';
+      toast(t('b.tpl_shared_ok'));
+    } catch (e2) { toast(e2.message || 'Something went wrong. Try again.'); }
+    paintTemplates();
+  });
+  paintTemplates();
+  loadTemplates();
   fCursor.addEventListener('change', async () => {
     const file = fCursor.files[0];
     fCursor.value = '';

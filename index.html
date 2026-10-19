@@ -909,6 +909,26 @@
     .cta-box .section-title { margin-bottom: 16px; }
     .cta-box p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 40px; }
 
+    /* Background templates (page editor) */
+    .tpl-block { margin: 6px 0 14px; }
+    .tpl-head { display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+    .tpl-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; margin-bottom: 18px; }
+    .tpl-tile { position: relative; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #111 center / cover no-repeat; cursor: pointer; padding: 0; color: #fff; transition: transform .15s, border-color .15s; }
+    .tpl-tile:hover, .tpl-tile:focus-visible { transform: translateY(-2px); border-color: rgba(255,255,255,0.5); outline: none; }
+    .tpl-tile.on { border-color: #fff; box-shadow: 0 0 0 2px #fff inset; }
+    .tpl-tile video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+    .tpl-tile span { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 7px; font-size: 0.72rem; font-weight: 600; text-align: left; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tpl-tile .tpl-x { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%; border: 0; background: rgba(0,0,0,0.7); color: #fff; font-size: 0.8rem; cursor: pointer; display: grid; place-items: center; }
+    .modal-box.tpl-box { max-width: 760px; width: calc(100vw - 32px); max-height: calc(100vh - 40px); overflow-y: auto; }
+    .tpl-h { font-size: 0.9rem; margin: 14px 0 10px; }
+    .tpl-note { font-size: 0.8rem; color: var(--text-muted); margin: 0 0 10px; }
+    .tpl-note.dim { color: var(--text-dim); margin-top: 8px; }
+    .tpl-share { border-top: 1px solid var(--border); padding-top: 4px; }
+    .tpl-share-row { display: flex; gap: 8px; }
+    .tpl-share-row input { flex: 1; min-width: 0; }
+    @media (max-width: 520px) { .tpl-strip { grid-template-columns: repeat(4, 1fr); } .tpl-strip .tpl-tile:nth-child(5) { display: none; } }
+
     /* Shareable report (Manage panel) */
     #lm-share { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
     #lm-share .adv-note { margin: 0 0 10px; }
@@ -1651,7 +1671,7 @@
       background: #000;
       box-shadow: 0 30px 80px rgba(0,0,0,0.55);
     }
-    .phone.show-void { background: rgba(0,0,0,0.2); }
+    .phone.show-void { background: #000; }
 
     /* Shared profile layers (preview + full page) */
     .profile-bg { position: absolute; inset: 0; overflow: hidden; background: #000 center / cover no-repeat; contain: strict; transform: translateZ(0); }
@@ -1759,7 +1779,7 @@
       background: #000;
     }
     #profile-view.active { display: block; animation: fadeIn 0.35s ease; }
-    #profile-view.show-void { background: rgba(0,0,0,0.25); }
+    #profile-view.show-void { background: #000; }
     #profile-view .profile-card {
       max-width: 460px;
       margin: 0 auto;
@@ -2912,8 +2932,7 @@
     .how-step p, .feature-card p, .footer-links a, .footer-up { color: rgba(245,245,247,0.88); }
 
     /* Profile card polish */
-    .show-void .profile-bg { background-color: transparent; }   /* let the black hole show through */
-    .phone.show-void { background: #000 url("assets/demo/void-preview.webp") center / cover no-repeat; }
+    .phone.show-void { background: #000; }
     .pc-avatar { box-shadow: 0 0 0 2px rgba(255,255,255,0.85), 0 0 0 7px rgba(255,255,255,0.08), 0 12px 40px rgba(0,0,0,0.6); }
     .pc-link { background: rgba(8,8,10,0.58); border-color: rgba(255,255,255,0.14); box-shadow: 0 8px 26px rgba(0,0,0,0.35); }
     .pc-link:hover { transform: translateY(-2px); }
@@ -3602,8 +3621,12 @@
             <span class="dropzone-file" id="pb-bg-name"></span>
           </label>
           <div class="bg-tools">
-            <p class="field-note" id="pb-bg-note" data-i18n="b.void">No background: your page floats over the black hole.</p>
+            <p class="field-note" id="pb-bg-note" data-i18n="b.void">No background yet: your page is plain black. Upload one or pick a template.</p>
             <button type="button" class="link-btn" id="pb-bg-remove" hidden data-i18n="b.remove">Remove</button>
+          </div>
+          <div class="tpl-block">
+            <div class="tpl-head"><span data-i18n="b.tpl">Templates</span><button type="button" class="link-btn" id="pb-tpl-more" data-i18n="b.tpl_more">More templates</button></div>
+            <div class="tpl-strip" id="pb-tpl-strip" role="list"></div>
           </div>
           <label class="range-row">
             <span data-i18n="b.dim">Background dim</span>
@@ -3788,6 +3811,28 @@
   </div>
 </div>
 
+<!-- === BACKGROUND TEMPLATES === -->
+<div class="modal-overlay" id="tpl-modal">
+  <div class="modal-box tpl-box" role="dialog" aria-modal="true" aria-labelledby="tpl-title">
+    <button class="modal-close" onclick="closeModal('tpl-modal')" aria-label="Close">✕</button>
+    <h2 class="modal-title" id="tpl-title" data-i18n="b.tpl_title">Background templates</h2>
+    <p class="modal-sub" data-i18n="b.tpl_sub">Pick one for your page, or share your own background so others can use it.</p>
+    <h3 class="tpl-h" data-i18n="b.tpl_ours">From Void Links</h3>
+    <div class="tpl-grid" id="tpl-builtin" role="list"></div>
+    <h3 class="tpl-h" data-i18n="b.tpl_people">Shared by people</h3>
+    <div class="tpl-grid" id="tpl-community" role="list"></div>
+    <form class="tpl-share" id="tpl-share" novalidate>
+      <h3 class="tpl-h" data-i18n="b.tpl_share">Share your background</h3>
+      <p class="tpl-note" id="tpl-share-note"></p>
+      <div class="tpl-share-row">
+        <input id="tpl-share-title" type="text" maxlength="40" placeholder="Name it (optional)" autocomplete="off">
+        <button type="submit" class="btn btn-primary" id="tpl-share-btn" data-i18n="b.tpl_share_btn">Share</button>
+      </div>
+      <p class="tpl-note dim" data-i18n="b.tpl_rules">Only share images you made or are allowed to use. Staff remove anything that breaks the rules.</p>
+    </form>
+  </div>
+</div>
+
 <!-- === MANAGE LINK === -->
 <div class="modal-overlay" id="link-modal">
   <div class="modal-box lm-box" role="dialog" aria-modal="true" aria-labelledby="lm-title">
@@ -3883,7 +3928,7 @@ function setOverlay(on) {
   const open = document.querySelector('.modal-overlay.active, #dashboard-view.active, #profile-view.active');
   const lock = on || !!open;
   document.body.style.overflow = lock ? 'hidden' : '';
-  document.body.classList.toggle('bg-paused', lock && !document.querySelector('#profile-view.active.show-void'));
+  document.body.classList.toggle('bg-paused', lock);
 }
 
 // ===== DASHBOARD PREVIEW: fit to the screen, straighten a little as it scrolls in =====

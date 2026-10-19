@@ -220,6 +220,7 @@
     paused: ['This link is paused', 'The owner has paused it for now. Try again later.', '<path d="M9 5v14M15 5v14"/>'],
     expired: ['This link has expired', 'It was only available until a set time.', '<circle cx="12" cy="13" r="8"/><path d="M12 9v4M9 2h6"/>'],
     used_up: ['This link has been used up', 'It could only be opened a limited number of times, and they’re all taken.', '<path d="M4 19h16M7 15l3-4 3 2 4-6"/>'],
+    blocked: ['This link was blocked', 'It broke the Void Links rules, so our team switched it off.', '<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 9l6 6M15 9l-6 6"/>'],
     error: ["Couldn't open this link", 'Check your connection and try again.', '<path d="M12 8v5M12 16h.01"/><circle cx="12" cy="12" r="9"/>'],
   };
   const show = id => ['wait', 'soon', 'locked', 'stopped'].forEach(x => { $(x).hidden = x !== id; });
