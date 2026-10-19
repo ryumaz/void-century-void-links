@@ -4025,20 +4025,38 @@ function setOverlay(on) {
     const player = (() => {
       const box = document.getElementById('vl-player');
       let api = null, ctrl = null, playing = false, wantSeek = 0, ready = null;
-      const loadApi = () => ready || (ready = new Promise(resolve => {
+      // Spotify's player API; gives up after 6 s (blocked script, offline…) so we can fall back
+      const loadApi = () => ready || (ready = new Promise((resolve, reject) => {
         window.onSpotifyIframeApiReady = IFrameAPI => resolve(IFrameAPI);
         const s = document.createElement('script');
         s.src = 'https://open.spotify.com/embed/iframe-api/v1';
         s.async = true;
+        s.onerror = () => reject(new Error('blocked'));
         document.head.appendChild(s);
+        setTimeout(() => reject(new Error('timeout')), 6000);
       }));
+      // Backup: Spotify's plain embedded player (no auto-follow, the listener presses play)
+      let plain = false;
+      function plainPlayer(track) {
+        plain = true;
+        const host = document.getElementById('vl-player-host');
+        host.textContent = '';
+        const f = document.createElement('iframe');
+        f.src = 'https://open.spotify.com/embed/track/' + track.id + '?utm_source=generator&theme=0';
+        f.width = '100%'; f.height = '152'; f.loading = 'lazy';
+        f.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+        f.style.border = '0';
+        f.title = 'Spotify player: ' + track.song;
+        host.appendChild(f);
+      }
       function setPlaying(on) { playing = on; radio.classList.toggle('on-air', on); }
       async function start(track, pos) {
         box.hidden = false;
         wantSeek = Math.floor(pos / 1000);
         setPlaying(true);
         if (ctrl) { ctrl.loadUri('spotify:track:' + track.id); ctrl.play(); return; }
-        api = api || await loadApi();
+        if (plain) { plainPlayer(track); return; }
+        try { api = api || await loadApi(); } catch (_) { plainPlayer(track); return; }
         api.createController(document.getElementById('vl-player-host'), { uri: 'spotify:track:' + track.id, width: '100%', height: 152 }, c => {
           ctrl = c;
           c.addListener('ready', () => c.play());
@@ -4052,13 +4070,18 @@ function setOverlay(on) {
       }
       function stop() {
         if (ctrl) ctrl.pause();
+        if (plain) document.getElementById('vl-player-host').textContent = '';   // removing the player stops the sound
         box.hidden = true;
         setPlaying(false);
       }
       document.getElementById('vl-player-close').addEventListener('click', stop);
       return {
         toggle() { const now = onAir(); if (playing && !box.hidden) stop(); else start(now.track, now.pos); },
-        next(track, pos) { if (playing && ctrl) { wantSeek = Math.floor(pos / 1000); ctrl.loadUri('spotify:track:' + track.id); ctrl.play(); } },
+        next(track, pos) {
+          if (!playing) return;
+          if (ctrl) { wantSeek = Math.floor(pos / 1000); ctrl.loadUri('spotify:track:' + track.id); ctrl.play(); }
+          else if (plain) plainPlayer(track);
+        },
       };
     })();
 
