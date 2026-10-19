@@ -563,7 +563,17 @@
     .pp-sp-btn { width: 17px; height: 17px; padding: 0; border-radius: 5px; display: grid; place-items: center; color: inherit; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: background .15s, transform .15s; }
     .pp-sp-btn:hover, .pp-sp-btn:focus-visible { background: rgba(255,255,255,0.22); transform: scale(1.12); outline: none; }
     .pp-sp-disc { cursor: pointer; }
-    .pp-sp-song { color: inherit; text-decoration: none; }
+    .pp-sp-song { color: inherit; text-decoration: none; background: none; border: 0; padding: 0; font: inherit; text-align: left; cursor: pointer; display: block; max-width: 100%; }
+    .pp-sp-song b { display: block; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pp-sp-play .ic-pause, .on-air .pp-sp-play .ic-play { display: none; }
+    .on-air .pp-sp-play .ic-pause { display: block; }
+    .on-air .pp-sp-play { background: #1db954; border-color: #1db954; color: #000; }
+    /* Mini player for the home page radio */
+    .vl-player { position: fixed; left: 16px; bottom: 16px; z-index: 600; width: min(360px, calc(100vw - 32px)); padding: 10px; border-radius: 16px; background: rgba(10,10,12,0.94); border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 20px 60px rgba(0,0,0,0.6); backdrop-filter: blur(12px); }
+    .vl-player-head { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); margin: 0 2px 8px; }
+    .vl-player-head button { width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.08); color: var(--text); cursor: pointer; }
+    .vl-player iframe { border-radius: 12px; display: block; }
+    .vl-player-note { font-size: 0.72rem; color: var(--text-dim); margin: 8px 2px 0; }
     .pp-sp-song:hover b { text-decoration: underline; }
     .pp-sp-row { display: flex; align-items: center; gap: 9px; }
     .pp-sp-disc { position: relative; width: 44px; height: 44px; flex: none; border-radius: 50%; background: #222 center / cover; box-shadow: 0 0 0 1px rgba(255,255,255,0.15); animation: ppSpin 6s linear infinite; }
@@ -3150,13 +3160,13 @@
             <div class="pp-name">Void Walker</div>
             <div class="pp-handle">@voidwalker<span>&#9673; 2,481</span></div>
             <div class="pp-bio">Lost somewhere past the event horizon.</div>
-            <div class="pp-sp" data-at="48" data-len="163">
+            <div class="pp-sp" id="vl-radio">
               <div class="pp-sp-head"><svg width="11" height="11" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9.5c3.5-1 7-.6 10 1M7.5 12.8c3-.8 5.6-.4 8 .9M8 15.8c2.3-.5 4.3-.3 6 .7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Listening to Spotify</span>
-                <button type="button" class="pp-sp-btn" data-sp="lyrics" title="Lyrics" aria-label="Show lyrics for 500 Miles"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 6h11M3 11h11M3 16h6"/><path d="M17 18V8l4-1.5"/><circle cx="15" cy="18" r="2"/></svg></button><a class="pp-sp-btn" href="https://open.spotify.com/search/500%20Miles%20Peter%20Paul%20and%20Mary" target="_blank" rel="noopener noreferrer" title="Listen on Spotify" aria-label="Listen to 500 Miles on Spotify"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M21 3l-9 9"/><path d="M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></svg></a></div>
+                <button type="button" class="pp-sp-btn pp-sp-play" data-sp="play" title="Play this song" aria-label="Play this song"><svg class="ic-play" width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg><svg class="ic-pause" width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg></button><button type="button" class="pp-sp-btn" data-sp="lyrics" title="Lyrics" aria-label="Show lyrics"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 6h11M3 11h11M3 16h6"/><path d="M17 18V8l4-1.5"/><circle cx="15" cy="18" r="2"/></svg></button><a class="pp-sp-btn pp-sp-open" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer" title="Open in Spotify" aria-label="Open this song in Spotify"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M21 3l-9 9"/><path d="M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></svg></a></div>
               <div class="pp-sp-row">
-                <span class="pp-sp-disc" data-sp="lyrics" title="Lyrics" style="background-image:url(https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/42/09/6f/42096f1a-5d6f-8507-7a2c-dc034f13385b/075992715768.jpg/200x200bb.jpg)"></span>
-                <span class="pp-sp-text"><a class="pp-sp-song" href="https://open.spotify.com/search/500%20Miles%20Peter%20Paul%20and%20Mary" target="_blank" rel="noopener noreferrer"><b>500 Miles</b></a><small>Peter, Paul and Mary</small><small class="dim">Peter, Paul and Mary</small>
-                  <span class="pp-sp-bar"><i></i></span><span class="pp-sp-time"><em>0:48</em><em>2:42</em></span></span>
+                <span class="pp-sp-disc" data-sp="play" title="Play this song"></span>
+                <span class="pp-sp-text"><button type="button" class="pp-sp-song" data-sp="play"><b></b></button><small class="pp-sp-artist"></small><small class="dim pp-sp-album"></small>
+                  <span class="pp-sp-bar"><i></i></span><span class="pp-sp-time"><em>0:00</em><em>0:00</em></span></span>
               </div>
             </div>
             <div class="pp-icons"><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.8-3.6-13.8zM8.3 15.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9.5c3.5-1 7-.6 10 1M7.5 12.8c3-.8 5.6-.4 8 .9M8 15.8c2.3-.5 4.3-.3 6 .7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path fill="currentColor" d="M10 9l5 3-5 3z"/></svg></i></div>
@@ -3815,6 +3825,13 @@
   </div>
 </div>
 
+<!-- === RADIO PLAYER (home page preview card) === -->
+<div class="vl-player" id="vl-player" hidden>
+  <div class="vl-player-head"><span>Playing from Void Walker's page</span><button type="button" id="vl-player-close" aria-label="Close player">✕</button></div>
+  <div id="vl-player-host"></div>
+  <p class="vl-player-note">Not signed in to Spotify? You'll hear a 30-second preview.</p>
+</div>
+
 <!-- === BACKGROUND TEMPLATES === -->
 <div class="modal-overlay" id="tpl-modal">
   <div class="modal-box tpl-box" role="dialog" aria-modal="true" aria-labelledby="tpl-title">
@@ -3953,25 +3970,105 @@ function setOverlay(on) {
     stage.style.setProperty('--t', p.toFixed(3));
   }
   fit(); tilt();
-  // The sample song keeps playing
-  const sp = stage.querySelector('.pp-sp');
-  if (sp) {
-    const len = +sp.dataset.len, bar = sp.querySelector('.pp-sp-bar i'), now = sp.querySelector('.pp-sp-time em');
-    let at = +sp.dataset.at;
-    const mmss = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
-    const paint = () => { bar.style.width = (at / len * 100).toFixed(2) + '%'; now.textContent = mmss(at); };
+  // Void Walker's radio: a mix that loops forever on a shared clock, so every visitor
+  // hears the same song at the same moment. Pressing play opens it in Spotify's player.
+  const MIX = [
+    ['6Jv7kjGkhY2fT4yuBF3aTz', "Lover, You Should've Come Over", 'Jeff Buckley', 'Grace', 404213, 'afc2d1d2c8703a10aeded0af'],
+    ['7Ewz6bJ97vUqk5HdkvguFQ', 'Heaven', 'Bryan Adams', 'Reckless', 243360, 'cf1fee2a55e98e22bf358512'],
+    ['2bcvooA6HEmVUneEGJnNZD', 'Everybody Here Wants You', 'Jeff Buckley', 'Sketches for My Sweetheart the Drunk', 286706, '488ec830a779ebab921a705c'],
+    ['0GONea6G2XdnHWjNZd6zt3', "Summer Of '69", 'Bryan Adams', 'Reckless', 216053, 'cf1fee2a55e98e22bf358512'],
+    ['3pRaLNL3b8x5uBOcsgvdqM', 'Hallelujah', 'Jeff Buckley', 'Grace', 413813, 'afc2d1d2c8703a10aeded0af'],
+    ['1Eb90nmqTrxylKFhcUzW8P', '(Everything I Do) I Do It For You', 'Bryan Adams', 'Waking Up The Neighbours', 393640, '05a41288f037a08fb45db5e2'],
+    ['64SIlhd3BaHCCMSfajXG7l', 'Grace', 'Jeff Buckley', 'Grace', 322053, 'afc2d1d2c8703a10aeded0af'],
+    ['2RWFncSWZEhSRRifqiDNVV', 'Run To You', 'Bryan Adams', 'Reckless', 233270, 'cf1fee2a55e98e22bf358512'],
+    ['0y5CnV2idm2KkQEudDjfDT', 'Last Goodbye', 'Jeff Buckley', 'Grace', 275733, 'afc2d1d2c8703a10aeded0af'],
+    ['0POfS30Fom0Tu9hbEWZXVg', 'Please Forgive Me', 'Bryan Adams', '', 312983, '8acfd0b8a5d1af55fff4149b'],
+  ].map(([id, song, artist, album, ms, img]) => ({ id, song, artist, album, ms, art: 'https://i.scdn.co/image/ab67616d00001e02' + img, url: 'https://open.spotify.com/track/' + id }));
+  const MIX_MS = MIX.reduce((s, x) => s + x.ms, 0);
+  // Where the radio is right now: which song, and how far into it
+  function onAir() {
+    let t = Date.now() % MIX_MS, i = 0;
+    while (t >= MIX[i].ms) { t -= MIX[i].ms; i++; }
+    return { i, track: MIX[i], pos: t };
+  }
+  const radio = document.getElementById('vl-radio');
+  if (radio) {
+    const $r = sel => radio.querySelector(sel);
+    const mmss = ms => { const s = Math.floor(ms / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+    let shown = -1;
+    const npFor = now => ({ song: now.track.song, artist: now.track.artist, album: now.track.album, art: now.track.art.replace('ab67616d00001e02', 'ab67616d0000b273'), url: now.track.url, playing: true, progress: now.pos, duration: now.track.ms, at: Date.now() });
+    function paint() {
+      const now = onAir();
+      if (now.i !== shown) {
+        const x = now.track;
+        $r('.pp-sp-disc').style.backgroundImage = `url("${x.art}")`;
+        $r('.pp-sp-song b').textContent = x.song;
+        $r('.pp-sp-artist').textContent = x.artist;
+        $r('.pp-sp-album').textContent = x.album;
+        $r('.pp-sp-album').hidden = !x.album;
+        $r('.pp-sp-open').href = x.url;
+        $r('.pp-sp-time em:last-child').textContent = mmss(x.ms);
+        radio.querySelectorAll('[data-sp="play"]').forEach(b => b.setAttribute('aria-label', 'Play ' + x.song + ' by ' + x.artist));
+        const bar = $r('.pp-sp-bar i');
+        bar.style.transition = 'none';
+        requestAnimationFrame(() => { bar.style.transition = ''; });
+        if (shown !== -1) player.next(x, now.pos);   // the radio moved on: so does the player
+        shown = now.i;
+      }
+      $r('.pp-sp-bar i').style.width = (now.pos / now.track.ms * 100).toFixed(2) + '%';
+      $r('.pp-sp-time em').textContent = mmss(now.pos);
+    }
+    // Lyrics follow the radio too (the viewer asks for the current song every 15 s)
+    radio._refresh = async () => npFor(onAir());
+
+    // ---- Spotify player (Spotify's own embed, loaded only when someone presses play) ----
+    const player = (() => {
+      const box = document.getElementById('vl-player');
+      let api = null, ctrl = null, playing = false, wantSeek = 0, ready = null;
+      const loadApi = () => ready || (ready = new Promise(resolve => {
+        window.onSpotifyIframeApiReady = IFrameAPI => resolve(IFrameAPI);
+        const s = document.createElement('script');
+        s.src = 'https://open.spotify.com/embed/iframe-api/v1';
+        s.async = true;
+        document.head.appendChild(s);
+      }));
+      function setPlaying(on) { playing = on; radio.classList.toggle('on-air', on); }
+      async function start(track, pos) {
+        box.hidden = false;
+        wantSeek = Math.floor(pos / 1000);
+        setPlaying(true);
+        if (ctrl) { ctrl.loadUri('spotify:track:' + track.id); ctrl.play(); return; }
+        api = api || await loadApi();
+        api.createController(document.getElementById('vl-player-host'), { uri: 'spotify:track:' + track.id, width: '100%', height: 152 }, c => {
+          ctrl = c;
+          c.addListener('ready', () => c.play());
+          c.addListener('playback_update', e => {
+            const d = e.data || {};
+            // Jump to where the radio is (works for Spotify listeners; previews start at 0)
+            if (wantSeek && !d.isPaused && d.position > 0) { const s = wantSeek; wantSeek = 0; if (s > 3) c.seek(s); }
+            radio.classList.toggle('on-air', !d.isPaused);
+          });
+        });
+      }
+      function stop() {
+        if (ctrl) ctrl.pause();
+        box.hidden = true;
+        setPlaying(false);
+      }
+      document.getElementById('vl-player-close').addEventListener('click', stop);
+      return {
+        toggle() { const now = onAir(); if (playing && !box.hidden) stop(); else start(now.track, now.pos); },
+        next(track, pos) { if (playing && ctrl) { wantSeek = Math.floor(pos / 1000); ctrl.loadUri('spotify:track:' + track.id); ctrl.play(); } },
+      };
+    })();
+
     paint();
-    setInterval(() => { at = at >= len ? 0 : at + 1; if (!at) bar.style.transition = 'none'; paint(); if (!at) requestAnimationFrame(() => { bar.style.transition = ''; }); }, 1000);
-    // Lyrics button or disc: the same karaoke lyrics viewer as on profile pages
-    sp.addEventListener('click', e => {
-      if (!e.target.closest('[data-sp="lyrics"]') || !window.LP || !LP.showLyrics) return;
-      const disc = sp.querySelector('.pp-sp-disc');
-      const art = (disc.style.backgroundImage.match(/url\("?(.*?)"?\)/) || [])[1] || '';
-      LP.showLyrics(sp, {
-        song: '500 Miles', artist: 'Peter, Paul and Mary', album: 'Peter, Paul and Mary',
-        art: art.replace('200x200bb', '600x600bb'), url: sp.querySelector('.pp-sp-song').href,
-        playing: true, progress: at * 1000, duration: len * 1000, at: Date.now(),
-      });
+    setInterval(paint, 1000);
+    radio.addEventListener('click', e => {
+      const btn = e.target.closest('[data-sp]');
+      if (!btn) return;
+      if (btn.dataset.sp === 'play') player.toggle();
+      else if (btn.dataset.sp === 'lyrics' && window.LP && LP.showLyrics) LP.showLyrics(radio, npFor(onAir()));
     });
   }
   window.addEventListener('resize', () => { fit(); tilt(); });
