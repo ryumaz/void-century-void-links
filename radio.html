@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Void Links radio</title>
+  <style>
+    html, body { margin: 0; background: transparent; overflow: hidden; }
+    #host, #host iframe { width: 100%; height: 152px; border: 0; display: block; border-radius: 12px; }
+  </style>
+</head>
+<body>
+<!--
+  Void Links radio player. The home page (voids.wtf) shows this page inside its floating
+  player and tells it which song to play and from where. It lives on go.voids.wtf, a
+  different origin, so the Spotify controller it loads (which needs eval) can never reach
+  anything on voids.wtf: no logins, no storage, no page content. It only plays music.
+-->
+<div id="host"></div>
+<script>
+(function () {
+  // Only these pages may control the player
+  const ALLOWED = ['https://voids.wtf', 'https://www.voids.wtf'];
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) ALLOWED.push(location.origin);
+  const params = new URLSearchParams(location.search);
+  const parentOrigin = ALLOWED.includes(params.get('from')) ? params.get('from') : ALLOWED[0];
+  const valid = id => /^[A-Za-z0-9]{22}$/.test(id || '');
+  let ctrl = null, wantSeek = 0;
+  const tell = msg => { try { parent.postMessage(Object.assign({ source: 'vl-radio' }, msg), parentOrigin); } catch (_) {} };
+
+  function play(id, pos) {
+    if (!ctrl || !valid(id)) return;
+    wantSeek = Math.max(0, Math.floor(pos || 0));
+    ctrl.loadUri('spotify:track:' + id);
+    ctrl.play();
+  }
+
+  window.onSpotifyIframeApiReady = IFrameAPI => {
+    const first = valid(params.get('id')) ? params.get('id') : '';
+    if (!first) return;
+    wantSeek = Math.max(0, Math.floor(+params.get('pos') || 0));
+    IFrameAPI.createController(document.getElementById('host'), { uri: 'spotify:track:' + first, width: '100%', height: 152 }, c => {
+      ctrl = c;
+      c.addListener('ready', () => { c.play(); tell({ type: 'ready' }); });
+      c.addListener('playback_update', e => {
+        const d = e.data || {};
+        // Jump to where the radio is, once the song has actually started
+        if (wantSeek && !d.isPaused && d.position > 0) { const s = wantSeek; wantSeek = 0; if (s > 3 && s * 1000 < (d.duration || Infinity)) c.seek(s); }
+        tell({ type: 'state', paused: !!d.isPaused, position: d.position || 0, duration: d.duration || 0 });
+      });
+    });
+  };
+
+  window.addEventListener('message', e => {
+    if (!ALLOWED.includes(e.origin) || !e.data || e.data.source !== 'vl-home') return;
+    if (e.data.type === 'play') play(e.data.id, e.data.pos);
+    else if (e.data.type === 'pause' && ctrl) ctrl.pause();
+    else if (e.data.type === 'resume' && ctrl) ctrl.resume();
+  });
+
+  const s = document.createElement('script');
+  s.src = 'https://open.spotify.com/embed/iframe-api/v1';
+  s.async = true;
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>

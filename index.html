@@ -570,7 +570,10 @@
     .on-air .pp-sp-play { background: #1db954; border-color: #1db954; color: #000; }
     /* Mini player for the home page radio */
     .vl-player { position: fixed; left: 16px; bottom: 16px; z-index: 600; width: min(360px, calc(100vw - 32px)); padding: 10px; border-radius: 16px; background: rgba(10,10,12,0.94); border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 20px 60px rgba(0,0,0,0.6); backdrop-filter: blur(12px); }
-    .vl-player-head { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); margin: 0 2px 8px; }
+    .vl-player-head { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); margin: 0 2px 8px; cursor: grab; touch-action: none; user-select: none; }
+    .vl-player.dragging { box-shadow: 0 30px 80px rgba(0,0,0,0.75); }
+    .vl-player.dragging .vl-player-head { cursor: grabbing; }
+    .vl-player.dragging iframe { pointer-events: none; }
     .vl-player-head button { width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.08); color: var(--text); cursor: pointer; }
     .vl-player iframe { border-radius: 12px; display: block; }
     .vl-player-note { font-size: 0.72rem; color: var(--text-dim); margin: 8px 2px 0; }
@@ -3829,7 +3832,7 @@
 <div class="vl-player" id="vl-player" hidden>
   <div class="vl-player-head"><span>Playing from Void Walker's page</span><button type="button" id="vl-player-close" aria-label="Close player">✕</button></div>
   <div id="vl-player-host"></div>
-  <p class="vl-player-note">Press play in the player. Not signed in to Spotify? You'll hear a 30-second preview.</p>
+  <p class="vl-player-note">Drag me anywhere. Not signed in to Spotify? You'll hear a 30-second preview.</p>
 </div>
 
 <!-- === BACKGROUND TEMPLATES === -->
@@ -4021,15 +4024,24 @@ function setOverlay(on) {
     // Lyrics follow the radio too (the viewer asks for the current song every 15 s)
     radio._refresh = async () => npFor(onAir());
 
-    // ---- Spotify player: Spotify's own embedded player for the song on air ----
-    // (Spotify's controllable player API needs eval(), which our security policy blocks on
-    // purpose, so this uses the plain embed: the listener presses play inside it.)
+    // ---- Spotify player ----
+    // One click plays: the controllable Spotify player runs on go.voids.wtf/radio (its own
+    // origin, so its looser script rules can't touch this site). We tell it what to play.
+    // If it can't load, Spotify's plain player is used and the listener presses play in it.
     const player = (() => {
       const box = document.getElementById('vl-player');
       const host = document.getElementById('vl-player-host');
-      let open = false, current = '';
-      function show(track) {
-        if (current === track.id) return;
+      const RADIO = (window.SUPABASE_CONFIG && SUPABASE_CONFIG.linkUrl ? SUPABASE_CONFIG.linkUrl : 'https://go.voids.wtf').replace(/\/$/, '') + '/radio';
+      const RADIO_ORIGIN = new URL(RADIO).origin;
+      let open = false, frame = null, live = false, plain = false, current = '', fallbackTimer = null;
+      const send = msg => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source: 'vl-home' }, msg), RADIO_ORIGIN); };
+      window.addEventListener('message', e => {
+        if (e.origin !== RADIO_ORIGIN || !e.data || e.data.source !== 'vl-radio') return;
+        if (e.data.type === 'ready') { live = true; clearTimeout(fallbackTimer); }
+        if (e.data.type === 'state') radio.classList.toggle('on-air', open && !e.data.paused);
+      });
+      function plainPlayer(track) {
+        plain = true;
         current = track.id;
         host.textContent = '';
         const f = document.createElement('iframe');
@@ -4039,24 +4051,83 @@ function setOverlay(on) {
         f.style.border = '0';
         f.title = 'Spotify player: ' + track.song + ' by ' + track.artist;
         host.appendChild(f);
+        box.classList.add('plain');
+      }
+      function play(now) {
+        current = now.track.id;
+        if (plain) { plainPlayer(now.track); return; }
+        if (frame && live) { send({ type: 'play', id: now.track.id, pos: now.pos / 1000 }); return; }
+        if (frame) return;   // still loading; it starts with the song it was given
+        frame = document.createElement('iframe');
+        frame.src = RADIO + '?id=' + now.track.id + '&pos=' + Math.floor(now.pos / 1000) + '&from=' + encodeURIComponent(location.origin);
+        frame.width = '100%'; frame.height = '152';
+        frame.allow = 'autoplay; encrypted-media';
+        frame.style.border = '0';
+        frame.title = 'Void Walker radio player';
+        host.textContent = '';
+        host.appendChild(frame);
+        // No word from the radio page? Use Spotify's plain player instead
+        fallbackTimer = setTimeout(() => { if (!live) { frame = null; plainPlayer(onAir().track); } }, 8000);
       }
       function stop() {
-        host.textContent = '';   // removing the player stops the sound
-        current = '';
+        if (live) send({ type: 'pause' });
+        else { host.textContent = ''; frame = null; }   // removing a player stops its sound
+        if (plain) { host.textContent = ''; current = ''; }
         box.hidden = true;
         open = false;
         radio.classList.remove('on-air');
       }
       document.getElementById('vl-player-close').addEventListener('click', stop);
+
+      // Drag the player anywhere by its top bar; each browser remembers the spot
+      const POS = 'vl-player-pos';
+      const head = box.querySelector('.vl-player-head');
+      function place(x, y) {
+        const w = box.offsetWidth || 360, hgt = box.offsetHeight || 220;
+        x = Math.min(Math.max(8, x), window.innerWidth - w - 8);
+        y = Math.min(Math.max(8, y), window.innerHeight - hgt - 8);
+        Object.assign(box.style, { left: x + 'px', top: y + 'px', right: 'auto', bottom: 'auto' });
+        return { x, y };
+      }
+      function restore() {
+        let s = null;
+        try { s = JSON.parse(localStorage.getItem(POS) || 'null'); } catch (_) {}
+        if (s) place(s.x * window.innerWidth, s.y * window.innerHeight);
+      }
+      let drag = null;
+      head.addEventListener('pointerdown', e => {
+        if (e.button !== 0 || e.target.closest('button')) return;
+        const r = box.getBoundingClientRect();
+        drag = { id: e.pointerId, dx: e.clientX - r.left, dy: e.clientY - r.top };
+        head.setPointerCapture(e.pointerId);
+        box.classList.add('dragging');
+      });
+      head.addEventListener('pointermove', e => { if (drag && e.pointerId === drag.id) place(e.clientX - drag.dx, e.clientY - drag.dy); });
+      const end = e => {
+        if (!drag || e.pointerId !== drag.id) return;
+        drag = null;
+        box.classList.remove('dragging');
+        const r = box.getBoundingClientRect();
+        try { localStorage.setItem(POS, JSON.stringify({ x: r.left / window.innerWidth, y: r.top / window.innerHeight })); } catch (_) {}
+      };
+      head.addEventListener('pointerup', end);
+      head.addEventListener('pointercancel', end);
+      window.addEventListener('resize', () => { if (!box.hidden) restore(); });
+
       return {
         toggle() {
           if (open) { stop(); return; }
           open = true;
           box.hidden = false;
+          restore();
           radio.classList.add('on-air');
-          show(onAir().track);
+          play(onAir());
         },
-        next(track) { if (open) show(track); },
+        next(track) {
+          if (!open) return;
+          const now = onAir();
+          if (now.track.id !== current) play(now);
+        },
       };
     })();
 

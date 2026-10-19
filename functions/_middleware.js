@@ -12,7 +12,7 @@ const SUPABASE_URL = 'https://agbsbbkrinewplajdwax.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_eKJmkapRV3BNWNehHcRVMw_Go_JQkdg';
 const NAME = /^\/([A-Za-z0-9_-]{2,40})\/?$/;
 const OLD_PROFILE = /^\/@([a-z0-9_.-]{2,20})\/?$/i;
-const RESERVED = new Set(['admin', 'go', 'index', 'assets', 'api', 'login', 'signup', 'dashboard', 'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify', 'functions', 'report']);
+const RESERVED = new Set(['admin', 'go', 'index', 'assets', 'api', 'login', 'signup', 'dashboard', 'settings', 'help', 'about', 'terms', 'privacy', 'supabase', 'netlify', 'functions', 'report', 'radio']);
 const headers = { 'Content-Type': 'application/json', apikey: SUPABASE_KEY };
 
 // Serve one of the site's own pages while keeping the visitor's address
@@ -58,6 +58,8 @@ export async function onRequest(context) {
 
   // ---------- go.voids.wtf: short links only ----------
   if (linksHost) {
+    // The home page's radio player lives here (its own origin, see radio.html)
+    if (path === '/radio' || path === '/radio.html') return context.next();
     const m = path.match(NAME);
     if (m && !RESERVED.has(m[1].toLowerCase())) {
       try {
