@@ -520,7 +520,6 @@
     .peek-phone.ph1 { left: 0; top: 96px; background: #000 url(assets/showcase/ryuma-bg-v2.webp) center / cover; }
     .peek-phone.ph2 { left: 118px; top: 48px; background: #000 url(assets/showcase/vagabond-bg.webp) center / cover; }
     .peek-phone.ph3 { left: 236px; top: 0; background: #000 url(assets/demo/voidwalker-bg.webp) center / cover; }
-    .ph1 .pp-np { margin: 10px 0 12px; }
     .pp-card { position: relative; width: 84%; padding: 18px 12px; border-radius: 18px; background: rgba(10,10,14,0.42); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(6px); }
     .pp-avatar { width: 58px; height: 58px; margin: 0 auto 8px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 22px; color: #000; background: #222 center / cover; box-shadow: 0 0 0 3px rgba(255,255,255,0.18); }
     .pp-name { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 17px; }
@@ -537,6 +536,19 @@
     .pp-bars { display: flex; gap: 2px; align-items: flex-end; height: 12px; }
     .pp-bars i { width: 2px; background: #8fe3a8; animation: ppBar 1s ease-in-out infinite alternate; }
     .pp-bars i:nth-child(2) { animation-delay: .3s; } .pp-bars i:nth-child(3) { animation-delay: .6s; }
+    /* Discord "Listening to" card (same look as the Pages demo) */
+    .pp-dc { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 8px; margin: 2px 0 12px; padding: 8px; border-radius: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); text-align: left; }
+    .pp-dc-av { position: relative; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,0.08); }
+    .pp-dc-av i { position: absolute; right: -2px; bottom: -2px; width: 9px; height: 9px; border-radius: 50%; background: #23a55a; border: 2px solid #0b0b0d; }
+    .pp-dc-text { min-width: 0; }
+    .pp-dc-text b { display: block; font-size: 11px; }
+    .pp-dc-text small { display: block; font-size: 9px; color: rgba(255,255,255,0.65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pp-dc-art { width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; background: rgba(255,255,255,0.1); }
+    .pp-dc-bar { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; font-size: 8px; color: rgba(255,255,255,0.5); }
+    .pp-dc-bar em { font-style: normal; font-variant-numeric: tabular-nums; }
+    .pp-dc-bar > span { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.15); overflow: hidden; }
+    .pp-dc-bar > span i { display: block; height: 100%; width: 66%; background: #fff; border-radius: 2px; animation: ppPlay 20s linear infinite; }
+    @keyframes ppPlay { from { width: 40%; } to { width: 100%; } }
     @keyframes ppSpin { to { transform: rotate(360deg); } }
     @keyframes ppBar { from { height: 3px; } to { height: 12px; } }
     .peek-note { text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.35); margin: 0; }
@@ -546,7 +558,7 @@
       .peek-dash { left: 25px; }
       .peek-phones { display: none; }
     }
-    @media (prefers-reduced-motion: reduce) { .pp-disc, .pp-bars i { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .pp-disc, .pp-bars i, .pp-dc-bar > span i { animation: none; } }
 
     /* === HOW IT WORKS === */
     #how {
@@ -3063,7 +3075,6 @@
             <div class="pp-avatar" style="background-image:url(assets/showcase/ryuma-av.webp)"></div>
             <div class="pp-name">Ryuma</div>
             <div class="pp-handle">@ryuma<span>&#9673; 3,914</span></div>
-            <div class="pp-np"><span class="pp-disc"></span><span class="pp-np-text"><b>Midnight Drive</b><small>Listening on Spotify</small></span><span class="pp-bars"><i></i><i></i><i></i></span></div>
             <div class="pp-icons"><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.8-3.6-13.8zM8.3 15.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9L1 2h7l4.8 6.4zm-1.2 18h1.9L7.1 4H5.1z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9.5c3.5-1 7-.6 10 1M7.5 12.8c3-.8 5.6-.4 8 .9M8 15.8c2.3-.5 4.3-.3 6 .7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></i></div>
           </div>
         </div>
@@ -3082,6 +3093,12 @@
             <div class="pp-name">Void Walker</div>
             <div class="pp-handle">@voidwalker<span>&#9673; 2,481</span></div>
             <div class="pp-bio">Lost somewhere past the event horizon.</div>
+            <div class="pp-dc">
+              <span class="pp-dc-av"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.8-3.6-13.8zM8.3 15.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg><i></i></span>
+              <span class="pp-dc-text"><b>voidwalker</b><small>Listening to Cornfield Chase · Hans Zimmer</small></span>
+              <span class="pp-dc-art"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+              <span class="pp-dc-bar"><em>1:24</em><span><i></i></span><em>2:06</em></span>
+            </div>
             <div class="pp-icons"><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.8-3.6-13.8zM8.3 15.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9.5c3.5-1 7-.6 10 1M7.5 12.8c3-.8 5.6-.4 8 .9M8 15.8c2.3-.5 4.3-.3 6 .7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path fill="currentColor" d="M10 9l5 3-5 3z"/></svg></i></div>
           </div>
         </div>
