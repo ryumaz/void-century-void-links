@@ -599,14 +599,23 @@
     .vl-player.mini > :not(.vl-bubble):not(#vl-player-host) { display: none; }
     /* the player stays loaded (so the sound continues), just out of sight */
     .vl-player.mini #vl-player-host { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
-    .vl-player.mini .vl-bubble { display: block; position: relative; width: 62px; height: 62px; padding: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,0.18); background: #0b0b0d; box-shadow: 0 10px 30px rgba(0,0,0,0.6); cursor: pointer; touch-action: none; }
-    .vl-bubble-art { position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center; color: #1db954; }
-    /* a soft green ring pulses while the radio plays */
-    .vl-player.mini .vl-bubble::after { content: ''; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid #1db954; animation: vlPulse 2s ease-out infinite; pointer-events: none; }
-    @keyframes vlPulse { from { transform: scale(1); opacity: .8; } to { transform: scale(1.45); opacity: 0; } }
+    .vl-player.mini .vl-bubble { display: block; position: relative; width: 62px; height: 62px; padding: 0; border-radius: 50%; border: 2px solid rgba(255,255,255,0.85); background: #0b0b0d; box-shadow: 0 0 0 1px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.6); cursor: pointer; touch-action: none; }
+    /* The bubble is a little record: the cover spins, with vinyl grooves, a rim and a centre hole */
+    .vl-bubble-art, .vl-bubble-grooves { position: absolute; inset: 3px; border-radius: 50%; }
+    .vl-bubble-art { background: #222 center / cover no-repeat; animation: ppSpin 6s linear infinite; }
+    .vl-bubble-grooves {
+      pointer-events: none;
+      background:
+        radial-gradient(circle, #0b0b0d 0 15%, rgba(225,225,225,0.9) 15.5% 18.5%, transparent 19%),
+        repeating-radial-gradient(circle, transparent 0 2.4px, rgba(0,0,0,0.13) 2.6px 3px),
+        radial-gradient(circle, transparent 58%, rgba(0,0,0,0.35) 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+    }
+    .vl-bubble-grooves::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.28), transparent 45%, transparent 60%, rgba(255,255,255,0.08)); }
+    .vl-bubble i { position: absolute; right: -1px; bottom: 2px; width: 14px; height: 14px; border-radius: 50%; background: #1db954; border: 2px solid #0b0b0d; z-index: 1; }
     .vl-player.mini.dragging .vl-bubble { cursor: grabbing; transform: scale(1.08); }
     .vl-player.snapping { transition: left .25s ease, top .25s ease; }
-    @media (prefers-reduced-motion: reduce) { .vl-player.mini .vl-bubble::after { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .vl-bubble-art { animation: none; } }
     .pp-sp-song:hover b { text-decoration: underline; }
     .pp-sp-row { display: flex; align-items: center; gap: 9px; }
     .pp-sp-disc { position: relative; width: 44px; height: 44px; flex: none; border-radius: 50%; background: #222 center / cover; box-shadow: 0 0 0 1px rgba(255,255,255,0.15); animation: ppSpin 6s linear infinite; }
@@ -3863,7 +3872,7 @@
 <!-- === RADIO PLAYER (home page preview card) === -->
 <div class="vl-player" id="vl-player" hidden>
   <div class="vl-player-head"><span>Playing from Void Walker's page</span><span class="vl-player-btns"><button type="button" id="vl-player-min" aria-label="Minimize player" title="Minimize">–</button><button type="button" id="vl-player-close" aria-label="Close player" title="Close">✕</button></span></div>
-  <button type="button" class="vl-bubble" id="vl-bubble" aria-label="Show the player" title="Tap to open · drag to move"><span class="vl-bubble-art"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21Zm4.82 15.15a.65.65 0 0 1-.9.22c-2.46-1.5-5.56-1.84-9.2-1.01a.65.65 0 1 1-.29-1.27c3.99-.91 7.4-.52 10.17 1.17.31.19.4.59.22.89Zm1.29-2.86a.82.82 0 0 1-1.12.27c-2.82-1.73-7.11-2.23-10.44-1.22a.82.82 0 1 1-.47-1.57c3.8-1.15 8.54-.59 11.77 1.4.38.24.5.74.26 1.12Zm.11-2.98C14.84 8.8 9.28 8.62 6.06 9.6a.98.98 0 1 1-.57-1.88c3.7-1.12 9.84-.9 13.72 1.4a.98.98 0 0 1-1 1.69Z"/></svg></span></button>
+  <button type="button" class="vl-bubble" id="vl-bubble" aria-label="Show the player" title="Tap to open · drag to move"><span class="vl-bubble-art"></span><span class="vl-bubble-grooves" aria-hidden="true"></span><i aria-hidden="true"></i></button>
   <div id="vl-player-host"></div>
   <p class="vl-player-note">Drag me anywhere. Not signed in to Spotify? You'll hear a 30-second preview.</p>
 </div>
@@ -4116,7 +4125,11 @@ function setOverlay(on) {
       const bubble = document.getElementById('vl-bubble');
       const BUBBLE_POS = 'vl-bubble-pos';
       let full = null;   // where the big player was, to put it back
-      function setArt() { bubble.title = 'Now playing: ' + onAir().track.song + ' · tap to open, drag to move'; }
+      function setArt() {
+        const x = onAir().track;
+        bubble.querySelector('.vl-bubble-art').style.backgroundImage = `url("${x.art}")`;
+        bubble.title = 'Now playing: ' + x.song + ' · tap to open, drag to move';
+      }
       function placeBubble(x, y) {
         const s = 62, m = 12;
         x = Math.min(Math.max(m, x), window.innerWidth - s - m);
