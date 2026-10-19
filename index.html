@@ -909,6 +909,19 @@
     .cta-box .section-title { margin-bottom: 16px; }
     .cta-box p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 40px; }
 
+    /* Shareable report (Manage panel) */
+    #lm-share { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
+    #lm-share .adv-note { margin: 0 0 10px; }
+    .share-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .share-row code { flex: 1; min-width: 0; font-family: var(--mono); font-size: 0.78rem; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 9px; padding: 9px 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .link-btn.danger { color: #f4a4a4; }
+
+    /* UTM builder */
+    .utm-opts { margin-bottom: 10px; }
+    .adv-grid.utm-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .utm-preview { display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--text-muted); }
+    .utm-preview code { font-family: var(--mono); font-size: 0.8rem; color: var(--text); background: rgba(0,0,0,0.45); border: 1px solid var(--border); border-radius: 9px; padding: 9px 11px; word-break: break-all; }
+
     /* === FAQ === */
     #faq { position: relative; z-index: 1; padding: 90px 0 30px; }
     #faq .section-title { text-align: center; margin-bottom: 36px; }
@@ -3148,7 +3161,7 @@
             <div class="step-num">1</div>
             <div class="step-content">
               <h3 data-i18n="how.s1t">Paste your long URL</h3>
-              <p data-i18n-html="how.s1p">Drop in any link — from Google Docs to YouTube videos — no signup needed to try it.</p>
+              <p data-i18n-html="how.s1p">Drop in any link, from Google Docs to YouTube videos. A free account takes a few seconds.</p>
             </div>
           </div>
           <div class="how-step" data-delay="150">
@@ -3244,8 +3257,8 @@
         <div class="feat-icon green">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </div>
-        <h3 data-i18n="feat.5t">AI Assistant</h3>
-        <p data-i18n="feat.5p">Ask questions like "Which links drove the most traffic last week?" and get instant, clear answers. No dashboard digging required.</p>
+        <h3 data-i18n="feat.5t">Vortex, your helper</h3>
+        <p data-i18n="feat.5p">Ask how anything works, right on the page. Need a person? Reach our team from the same chat.</p>
       </div>
 
       <div class="feature-card" style="transition-delay:400ms;">
@@ -3783,6 +3796,7 @@
     <div class="lm-state" id="lm-state"></div>
     <div id="lm-body"></div>
     <div class="lm-actions" id="lm-actions"></div>
+    <div id="lm-share"></div>
     <div id="lm-history"></div>
   </div>
 </div>
@@ -4943,6 +4957,7 @@ const dashPages = {
           <label for="nl-slug">Custom ending (optional)</label>
           <div class="claim-field"><span class="claim-prefix">${esc(DB.shortHost())}</span><input id="nl-slug" type="text" maxlength="40" placeholder="launch2026" autocomplete="off" spellcheck="false"></div>
         </div>
+        ${utmHtml('nl', 'nl-url')}
         ${advancedOptionsHtml('nl')}
         <p class="acct-error" id="nl-error" aria-live="polite"></p>
         <button type="submit" class="btn btn-primary">Create link →</button>
@@ -5364,7 +5379,7 @@ async function qrShare(slug) {
 async function createShortLink(e) {
   e.preventDefault();
   const err = document.getElementById('nl-error');
-  const dest = normalizeDest(document.getElementById('nl-url').value);
+  const dest = withUtm('nl', document.getElementById('nl-url').value);
   const slug = document.getElementById('nl-slug').value.trim();
   err.textContent = '';
   if (!dest) { err.textContent = 'Enter a full link, like example.com/page'; return; }
@@ -5676,6 +5691,60 @@ function linkBadges(l) {
   return out.join('');
 }
 
+// ----- UTM builder: campaign tags added to the destination (create form + Manage panel) -----
+const UTM_KEYS = [
+  ['source', 'Source', 'instagram'],
+  ['medium', 'Medium', 'social'],
+  ['campaign', 'Campaign', 'spring_launch'],
+  ['term', 'Term', 'running shoes'],
+  ['content', 'Content', 'bio_link'],
+];
+function utmHtml(prefix, destId, dest) {
+  let cur = {};
+  try { const u = new URL(dest || ''); UTM_KEYS.forEach(([k]) => { cur[k] = u.searchParams.get('utm_' + k) || ''; }); } catch (_) {}
+  const any = UTM_KEYS.some(([k]) => cur[k]);
+  return `<details class="adv-opts utm-opts" id="${prefix}-utm" data-dest="${destId}"${any ? ' open' : ''}>
+      <summary><span>UTM tags</span><span class="adv-sub">Track campaigns in Google Analytics and similar tools</span></summary>
+      <div class="adv-grid utm-grid">
+        ${UTM_KEYS.map(([k, label, ph]) => `<div class="input-group">
+          <label for="${prefix}-utm-${k}">${label}</label>
+          <input id="${prefix}-utm-${k}" type="text" maxlength="100" autocomplete="off" spellcheck="false" placeholder="${ph}" value="${esc(cur[k] || '')}">
+        </div>`).join('')}
+        <div class="utm-preview adv-wide"><span>Final link</span><code id="${prefix}-utm-preview">Type a long URL first</code></div>
+        <p class="adv-note">Optional. Filled-in tags are added to the end of your link; empty ones are left out.</p>
+      </div>
+    </details>`;
+}
+// The destination with the UTM fields applied (existing utm_ tags are replaced). '' if the URL is invalid.
+function withUtm(prefix, raw) {
+  const dest = normalizeDest(raw);
+  if (!dest) return '';
+  const box = document.getElementById(prefix + '-utm');
+  if (!box) return dest;
+  const u = new URL(dest);
+  UTM_KEYS.forEach(([k]) => {
+    const v = (document.getElementById(`${prefix}-utm-${k}`) || {}).value || '';
+    if (v.trim()) u.searchParams.set('utm_' + k, v.trim());
+    else u.searchParams.delete('utm_' + k);
+  });
+  return u.href;
+}
+function paintUtmPreview(prefix) {
+  const box = document.getElementById(prefix + '-utm');
+  const out = document.getElementById(prefix + '-utm-preview');
+  if (!box || !out) return;
+  const raw = (document.getElementById(box.dataset.dest) || {}).value || '';
+  out.textContent = withUtm(prefix, raw) || 'Type a long URL first';
+}
+// Live preview as you type, in the URL box or any tag field
+document.addEventListener('input', e => {
+  const box = e.target.closest('.utm-opts') || document.querySelector(`.utm-opts[data-dest="${e.target.id}"]`);
+  if (box) paintUtmPreview(box.id.replace(/-utm$/, ''));
+});
+document.addEventListener('toggle', e => {
+  if (e.target.classList && e.target.classList.contains('utm-opts') && e.target.open) paintUtmPreview(e.target.id.replace(/-utm$/, ''));
+}, true);
+
 // The same option fields are used when creating a link and in the Manage panel
 function advancedOptionsHtml(prefix, l) {
   const editing = !!l;
@@ -5972,6 +6041,7 @@ function paintLinkManager() {
             <label for="lm-dest">Destination</label>
             <input id="lm-dest" type="url" value="${esc(l.destination)}" autocomplete="off">
           </div>
+          ${utmHtml('lm', 'lm-dest', l.destination)}
           ${advancedOptionsHtml('lm', l)}
           <p class="acct-error" id="lm-error" aria-live="polite"></p>
           <button type="submit" class="btn btn-primary">Save changes</button>
@@ -5980,7 +6050,49 @@ function paintLinkManager() {
     ${!off && !revoked ? `<button type="button" class="btn btn-ghost" data-lm="${l.status === 'paused' ? 'resume' : 'pause'}">${l.status === 'paused' ? 'Resume link' : 'Pause link'}</button>` : ''}
     ${!off && !revoked ? `<button type="button" class="btn btn-ghost danger" data-lm="revoke">Revoke</button>` : ''}
     <button type="button" class="btn btn-ghost danger" data-lm="delete">Delete</button>`;
+  paintLinkShare();
   paintLinkHistory();
+}
+// Shareable report: a read-only stats page for this link that anyone with the address can open
+function paintLinkShare() {
+  const box = document.getElementById('lm-share');
+  if (!box || !managing) return;
+  const head = `<h3 class="lm-h">Shareable report</h3>`;
+  if (dash.shares === undefined) {
+    box.innerHTML = head + '<p class="dash-empty">Loading…</p>';
+    DB.reportShares().then(s => { dash.shares = s; }, () => { dash.shares = {}; }).then(paintLinkShare);
+    return;
+  }
+  if (dash.shares === null) {
+    box.innerHTML = head + `<p class="adv-note warn">Shareable reports need a one-time database upgrade: run <code>supabase/upgrade-reports.sql</code> in Supabase → SQL Editor.</p>`;
+    return;
+  }
+  const token = dash.shares[managing];
+  box.innerHTML = head + (token
+    ? `<p class="adv-note">Anyone with this address can see this link's click stats: totals per day, countries, devices and sources. No account needed, and no single visitors.</p>
+       <div class="share-row"><code>${esc(DB.reportUrl(token))}</code>
+         <button type="button" class="btn btn-ghost" data-lm="share-copy">Copy</button>
+         <a class="btn btn-ghost" href="${esc(DB.reportUrl(token))}" target="_blank" rel="noopener">Open</a></div>
+       <button type="button" class="link-btn danger" data-lm="unshare">Stop sharing</button>`
+    : `<p class="adv-note">Make a read-only stats page for this link to send to a client or team. Only totals are shown, never single visitors. You can turn it off any time.</p>
+       <button type="button" class="btn btn-ghost" data-lm="share">Create report link</button>`);
+}
+async function shareLinkReport(on) {
+  const slug = managing;
+  try {
+    if (on) {
+      const token = await DB.shareReport(slug);
+      dash.shares = { ...(dash.shares || {}), [slug]: token };
+      navigator.clipboard.writeText(DB.reportUrl(token)).catch(() => {});
+      showToast('Report link created and copied');
+    } else {
+      if (!confirm('Stop sharing this report? The current report address stops working.')) return;
+      await DB.unshareReport(slug);
+      delete dash.shares[slug];
+      showToast('Report no longer shared');
+    }
+  } catch (e) { showToast(e.message || "Couldn't update sharing. Try again."); }
+  if (managing === slug) paintLinkShare();
 }
 function paintLinkHistory() {
   const box = document.getElementById('lm-history');
@@ -5995,7 +6107,7 @@ async function saveLinkChanges(e) {
   const l = dash.links.find(x => x.slug === managing);
   const err = document.getElementById('lm-error');
   err.textContent = '';
-  const dest = normalizeDest(document.getElementById('lm-dest').value);
+  const dest = withUtm('lm', document.getElementById('lm-dest').value);
   if (!dest) { err.textContent = 'Enter a full link, like example.com/page'; return; }
   const { opts, error } = readLinkOptions('lm', l);
   if (error) { err.textContent = error; return; }
@@ -6039,6 +6151,9 @@ document.getElementById('link-modal').addEventListener('click', e => {
   if (act === 'resume') setLinkStatus('active');
   if (act === 'revoke') setLinkStatus('revoked');
   if (act === 'delete') { const s = managing; closeModal('link-modal'); managing = null; deleteShortLink(s); }
+  if (act === 'share') shareLinkReport(true);
+  if (act === 'unshare') shareLinkReport(false);
+  if (act === 'share-copy') navigator.clipboard.writeText(DB.reportUrl(dash.shares[managing])).then(() => showToast('Report link copied'), () => {});
 });
 
 // ----- Audit log (Discord-style: filter by link and by action, rows expand for details) -----
@@ -6293,7 +6408,7 @@ function showDashTab(tab, force) {
   }
   // Fetch your real numbers once, then re-render this tab when they arrive
   if (DATA_TABS.has(tab) && (!dash.loaded || dash.uid !== (currentUser && currentUser.id))) {
-    if (dash.uid !== (currentUser && currentUser.id)) { dash.loaded = false; dash.auditLoaded = false; auditFilter = ''; auditActionFilter = ''; }
+    if (dash.uid !== (currentUser && currentUser.id)) { dash.loaded = false; dash.auditLoaded = false; dash.shares = undefined; auditFilter = ''; auditActionFilter = ''; }
     loadDashData().then(() => {
       if (currentTab === tab && document.getElementById('dashboard-view').classList.contains('active')) showDashTab(tab);
     });

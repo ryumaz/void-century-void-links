@@ -311,6 +311,23 @@ window.siteHost = () => {
     async deleteLink(slug) {
       fail((await sb.from('short_links').delete().eq('slug', slug)).error);
     },
+    // ---------- Shareable reports (supabase/upgrade-reports.sql) ----------
+    // { slug: token } for your shared links, or null when the upgrade hasn't been run yet
+    async reportShares() {
+      const { data, error } = await sb.rpc('my_report_shares');
+      if (error) { if (/PGRST202|does not exist|Could not find/i.test(error.code + ' ' + error.message)) return null; fail(error); }
+      return Object.fromEntries((data || []).map(r => [r.slug, r.token]));
+    },
+    async shareReport(slug) {
+      const { data, error } = await sb.rpc('share_link_report', { p_slug: slug });
+      fail(error);
+      return data;
+    },
+    async unshareReport(slug) {
+      fail((await sb.rpc('unshare_link_report', { p_slug: slug })).error);
+    },
+    // The public report address; the secret is after # so it never reaches server logs
+    reportUrl(token) { return siteBase() + 'report.html#' + token; },
     // ---------- API keys (public API, supabase/upgrade-api.sql) ----------
     async apiKeys() {
       const { data, error } = await sb.from('api_keys').select('id, name, prefix, created_at, last_used_at')
