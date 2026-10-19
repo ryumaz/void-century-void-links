@@ -421,6 +421,101 @@
       max-width: 520px;
     }
 
+
+    /* === DASHBOARD PREVIEW: a tilted look at the dashboard and some pages === */
+    #peek { position: relative; padding: 30px 0 10px; overflow: hidden; }
+    .peek-head { text-align: center; }
+    .peek-head .section-sub { margin: 0 auto; }
+    .peek-stage {
+      --ps: 1; --t: 1; position: relative; height: calc(640px * var(--ps)); margin-top: 18px;
+      /* fades out at the bottom (on the full-width stage, so tilted edges aren't clipped) */
+      -webkit-mask-image: linear-gradient(180deg, #000 58%, transparent 97%);
+              mask-image: linear-gradient(180deg, #000 58%, transparent 97%);
+    }
+    .peek-scene {
+      position: absolute; left: 50%; top: 0; width: 1240px; height: 640px;
+      transform: translateX(-50%) scale(var(--ps)); transform-origin: 50% 0;
+      perspective: 2200px;
+    }
+    .peek-dash {
+      position: absolute; left: 0; top: 70px; width: 790px; height: 500px;
+      display: grid; grid-template-columns: 172px 1fr; overflow: hidden;
+      border-radius: 18px; background: #09090b; border: 1px solid rgba(255,255,255,0.13);
+      box-shadow: 0 50px 120px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.06);
+      transform: translateY(calc(var(--t) * 40px)) rotateX(calc(14deg + var(--t) * 10deg)) rotateY(calc(16deg + var(--t) * 8deg)) rotateZ(-5deg);
+      transform-origin: 60% 40%;
+      font-size: 12px; color: #f2f2f4; text-align: left;
+    }
+    .pd-side { border-right: 1px solid rgba(255,255,255,0.08); padding: 18px 12px; display: flex; flex-direction: column; background: rgba(255,255,255,0.015); }
+    .pd-logo { display: flex; align-items: center; gap: 8px; font-family: 'Michroma', 'Geist', sans-serif; font-size: 10.5px; letter-spacing: .08em; padding: 0 6px 18px; }
+    .pd-mark { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle, #000 0 28%, #fff 30% 36%, #000 38%); border: 1px solid rgba(255,255,255,.5); }
+    .pd-nav { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+    .pd-nav li { display: flex; align-items: center; gap: 9px; padding: 8px 9px; border-radius: 8px; color: rgba(255,255,255,0.55); }
+    .pd-nav li.on { background: rgba(255,255,255,0.08); color: #fff; }
+    .pd-me { margin-top: auto; display: flex; align-items: center; gap: 8px; padding: 10px 6px 0; border-top: 1px solid rgba(255,255,255,0.08); }
+    .pd-me b, .pd-page b { display: block; font-weight: 600; }
+    .pd-me small, .pd-page small, .pd-kpis small, .pd-chart small, .pd-top small { display: block; color: rgba(255,255,255,0.45); font-size: 10px; }
+    .pd-av { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, #fff, #8a8f9e); color: #000; font-weight: 700; }
+    .pd-main { padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .pd-hello { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.02em; }
+    .pd-sub { color: rgba(255,255,255,0.5); margin-top: -8px; }
+    .pd-page, .pd-kpis > div, .pd-chart, .pd-top { border: 1px solid rgba(255,255,255,0.09); background: rgba(255,255,255,0.03); border-radius: 12px; }
+    .pd-page { display: flex; align-items: center; gap: 8px; padding: 12px 14px; }
+    .pd-page > div { margin-right: auto; }
+    .pd-btn { padding: 6px 11px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.14); font-size: 11px; }
+    .pd-btn.solid { background: #fff; color: #000; border-color: #fff; font-weight: 600; }
+    .pd-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .pd-kpis > div { padding: 11px 12px; }
+    .pd-kpis b { display: block; font-size: 20px; font-weight: 700; margin: 4px 0 2px; letter-spacing: -0.02em; }
+    .pd-kpis em { font-style: normal; font-size: 10px; color: rgba(255,255,255,0.6); }
+    .pd-row { display: grid; grid-template-columns: 1.45fr 1fr; gap: 10px; flex: 1; min-height: 0; }
+    .pd-chart, .pd-top { padding: 12px 14px; display: flex; flex-direction: column; }
+    .pd-chart svg { width: 100%; flex: 1; min-height: 0; margin-top: 8px; }
+    .pd-days { display: flex; justify-content: space-between; color: rgba(255,255,255,0.35); font-size: 9px; margin-top: 6px; }
+    .pd-top p { display: grid; grid-template-columns: 62px 1fr 22px; align-items: center; gap: 8px; margin: 9px 0 0; font-size: 11px; }
+    .pd-top span { color: rgba(255,255,255,0.75); font-family: var(--mono); font-size: 10px; }
+    .pd-top i { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); position: relative; overflow: hidden; }
+    .pd-top i::after { content: ''; position: absolute; inset: 0; width: var(--w); border-radius: 3px; background: linear-gradient(90deg, rgba(255,255,255,.45), #fff); }
+    .pd-top b { text-align: right; font-weight: 600; }
+
+    .peek-phones { position: absolute; right: 0; top: 30px; width: 470px; height: 560px; perspective: 2200px; perspective-origin: 0 40%; }   /* later phones sit in front */
+    .peek-phone {
+      position: absolute; width: 236px; height: 470px; border-radius: 30px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.16); box-shadow: 0 40px 90px rgba(0,0,0,0.7);
+      transform: translateY(calc(var(--t) * 30px)) rotateX(calc(8deg + var(--t) * 8deg)) rotateY(calc(-14deg - var(--t) * 8deg)) rotateZ(4deg);
+      display: flex; align-items: center; justify-content: center; text-align: center; color: #fff;
+    }
+    .peek-phone::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.28); }
+    .peek-phone.ph1 { left: 0; top: 96px; background: radial-gradient(120% 70% at 30% 20%, #6b2318, transparent 60%), linear-gradient(160deg, #2a0e0b, #120606 60%, #000); }
+    .peek-phone.ph2 { left: 118px; top: 48px; background: radial-gradient(90% 60% at 70% 15%, #3c3f8f, transparent 65%), radial-gradient(70% 50% at 20% 90%, #6a2b6e, transparent 70%), linear-gradient(180deg, #0d0f2a, #05050c); }
+    .peek-phone.ph3 { left: 236px; top: 0; background: radial-gradient(100% 60% at 50% 0%, #2c3440, transparent 70%), linear-gradient(180deg, #11151b, #040506); }
+    .pp-card { position: relative; width: 84%; padding: 18px 12px; border-radius: 18px; background: rgba(10,10,14,0.42); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(6px); }
+    .pp-avatar { width: 58px; height: 58px; margin: 0 auto 8px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 22px; color: #000; background: linear-gradient(135deg, #fff, #9aa0ad); box-shadow: 0 0 0 3px rgba(255,255,255,0.18); }
+    .pp-name { font-family: 'Geist', sans-serif; font-weight: 700; font-size: 17px; }
+    .pp-handle { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .pp-handle span { margin-left: 6px; }
+    .pp-bio { font-size: 11px; color: rgba(255,255,255,0.8); margin: 8px 0 10px; }
+    .pp-icons { display: flex; justify-content: center; gap: 10px; }
+    .pp-icons i { display: grid; place-items: center; filter: drop-shadow(0 0 6px rgba(255,255,255,0.5)); }
+    .pp-np { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 8px; border-radius: 12px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); text-align: left; }
+    .pp-disc { width: 30px; height: 30px; flex: none; border-radius: 50%; background: radial-gradient(circle, #ddd 0 12%, #111 14% 30%, #333 31% 33%, #111 34% 60%, #2a2a2a 61% 63%, #111 64%); animation: ppSpin 4s linear infinite; }
+    .pp-np-text { min-width: 0; flex: 1; font-size: 10px; }
+    .pp-np-text b { display: block; font-size: 11px; }
+    .pp-np-text small { color: #8fe3a8; font-size: 9px; }
+    .pp-bars { display: flex; gap: 2px; align-items: flex-end; height: 12px; }
+    .pp-bars i { width: 2px; background: #8fe3a8; animation: ppBar 1s ease-in-out infinite alternate; }
+    .pp-bars i:nth-child(2) { animation-delay: .3s; } .pp-bars i:nth-child(3) { animation-delay: .6s; }
+    @keyframes ppSpin { to { transform: rotate(360deg); } }
+    @keyframes ppBar { from { height: 3px; } to { height: 12px; } }
+    .peek-note { text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.35); margin: 0; }
+    /* Phones and small tablets: just the dashboard, a bit larger */
+    @media (max-width: 760px) {
+      .peek-scene { width: 840px; }
+      .peek-dash { left: 25px; }
+      .peek-phones { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { .pp-disc, .pp-bars i { animation: none; } }
+
     /* === HOW IT WORKS === */
     #how {
       padding: 120px 0;
@@ -2891,6 +2986,80 @@
   </div>
 </section>
 
+<!-- === DASHBOARD PREVIEW === -->
+<section id="peek" aria-labelledby="peek-title">
+  <div class="container peek-head">
+    <span class="section-eyebrow reveal" data-i18n="peek.eyebrow">Inside Void Links</span>
+    <h2 class="section-title reveal" id="peek-title" data-i18n-html="peek.title">One dashboard.<br>Every link, every click.</h2>
+    <p class="section-sub reveal" data-i18n="peek.sub">Shorten links, build your page and watch the clicks come in, all from one place.</p>
+  </div>
+  <div class="peek-stage" aria-hidden="true">
+    <div class="peek-scene">
+      <div class="peek-dash">
+        <aside class="pd-side">
+          <div class="pd-logo"><span class="pd-mark"></span>VOID LINKS</div>
+          <ul class="pd-nav"><li class=on><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Overview</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>My Page</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><span>My Links</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 12 7 12 10 4 14 20 17 12 21 12"/></svg><span>Analytics</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 20h1M17 20h1M20 17h1"/></svg><span>QR Codes</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg><span>API</span></li><li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span>Settings</span></li></ul>
+          <div class="pd-me"><span class="pd-av">Y</span><span><b>You</b><small>voids.wtf/yourname</small></span></div>
+        </aside>
+        <div class="pd-main">
+          <div class="pd-hello">Good to see you</div>
+          <div class="pd-sub">Here's how your links and page are doing.</div>
+          <div class="pd-page"><div><b>voids.wtf/yourname</b><small>Your page &middot; 6 links</small></div><span class="pd-btn">Copy link</span><span class="pd-btn">Edit</span><span class="pd-btn solid">View page</span></div>
+          <div class="pd-kpis">
+            <div><small>Clicks, 7 days</small><b>249</b><em>&#8599; 18%</em></div>
+            <div><small>Short links</small><b>12</b><em>3 locked</em></div>
+            <div><small>Page views</small><b>1,032</b><em>&#8599; 9%</em></div>
+            <div><small>Top link</small><b>/yt</b><em>96 clicks</em></div>
+          </div>
+          <div class="pd-row">
+            <div class="pd-chart"><small>Clicks, last 7 days</small>
+              <svg viewBox="0 0 400 120" preserveAspectRatio="none"><defs><linearGradient id="pdg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><path d="M0.0,86.2 66.7,71.2 133.3,78.8 200.0,43.1 266.7,54.4 333.3,11.2 400.0,28.1 L400,120 L0,120 Z" fill="url(#pdg)"/><path d="M0.0,86.2 66.7,71.2 133.3,78.8 200.0,43.1 266.7,54.4 333.3,11.2 400.0,28.1" fill="none" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
+              <div class="pd-days"><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span><span>Mon</span></div>
+            </div>
+            <div class="pd-top"><small>Top links</small>
+              <p><span>/yt</span><i style="--w:100%"></i><b>96</b></p>
+              <p><span>/discord</span><i style="--w:64%"></i><b>61</b></p>
+              <p><span>/merch</span><i style="--w:42%"></i><b>40</b></p>
+              <p><span>/portfolio</span><i style="--w:27%"></i><b>26</b></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="peek-phones">
+        <div class="peek-phone ph1">
+          <div class="pp-card">
+            <div class="pp-avatar">K</div>
+            <div class="pp-name">Kai</div>
+            <div class="pp-handle">@kai<span>&#9673; 2,481</span></div>
+            <div class="pp-bio">drifting since 2019</div>
+            <div class="pp-icons"><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.8-3.6-13.8zM8.3 15.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path fill="currentColor" d="M10 9l5 3-5 3z"/></svg></i></div>
+          </div>
+        </div>
+        <div class="peek-phone ph2">
+          <div class="pp-card">
+            <div class="pp-avatar">L</div>
+            <div class="pp-name">Luna</div>
+            <div class="pp-handle">@luna<span>&#9673; 5,307</span></div>
+            <div class="pp-bio">art, music &amp; late nights</div>
+            <div class="pp-icons"><i><svg width="15" height="15" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9L1 2h7l4.8 6.4zm-1.2 18h1.9L7.1 4H5.1z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9.5c3.5-1 7-.6 10 1M7.5 12.8c3-.8 5.6-.4 8 .9M8 15.8c2.3-.5 4.3-.3 6 .7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.8-3.6-13.8zM8.3 15.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg></i></div>
+          </div>
+        </div>
+        <div class="peek-phone ph3">
+          <div class="pp-card">
+            <div class="pp-avatar">N</div>
+            <div class="pp-name">Nova</div>
+            <div class="pp-handle">@nova<span>&#9673; 3,914</span></div>
+            <div class="pp-bio">welcome to my corner</div>
+            <div class="pp-icons"><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.8-3.6-13.8zM8.3 15.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M18.2 2h3.4l-7.4 8.5L23 22h-6.8l-5.3-7-6.1 7H1.4l7.9-9L1 2h7l4.8 6.4zm-1.2 18h1.9L7.1 4H5.1z"/></svg></i><i><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9.5c3.5-1 7-.6 10 1M7.5 12.8c3-.8 5.6-.4 8 .9M8 15.8c2.3-.5 4.3-.3 6 .7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></i></div>
+            <div class="pp-np"><span class="pp-disc"></span><span class="pp-np-text"><b>Midnight Drive</b><small>Listening on Spotify</small></span><span class="pp-bars"><i></i><i></i><i></i></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="peek-note" data-i18n="peek.note">Preview with sample data</p>
+</section>
+
 <!-- === HOW IT WORKS === -->
 <section id="how">
   <div class="container">
@@ -3639,11 +3808,41 @@ function setOverlay(on) {
   document.body.classList.toggle('bg-paused', lock && !document.querySelector('#profile-view.active.show-void'));
 }
 
+// ===== DASHBOARD PREVIEW: fit to the screen, straighten a little as it scrolls in =====
+(function () {
+  const stage = document.querySelector('.peek-stage');
+  if (!stage) return;
+  const scene = stage.querySelector('.peek-scene');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function fit() {
+    const w = scene.offsetWidth;   // its own width, before scaling
+    stage.style.setProperty('--ps', Math.min(1, stage.clientWidth / w).toFixed(3));
+  }
+  function tilt() {
+    if (still) { stage.style.setProperty('--t', '0.4'); return; }
+    const r = stage.getBoundingClientRect(), vh = window.innerHeight;
+    // 1 while it's below the screen, 0 once its top reaches a quarter of the way down
+    const p = Math.min(1, Math.max(0, (r.top - vh * 0.25) / (vh * 0.75)));
+    stage.style.setProperty('--t', p.toFixed(3));
+  }
+  fit(); tilt();
+  window.addEventListener('resize', () => { fit(); tilt(); });
+  window.addEventListener('scroll', tilt, { passive: true });
+})();
+
 // ===== NAV SCROLL + PROGRESS =====
 const nav = document.getElementById('nav');
 const progressBar = document.getElementById('scroll-progress');
+const bhCanvas = document.getElementById('bg');
+const heroEl = document.getElementById('hero');
 function onScroll() {
   nav.classList.toggle('scrolled', window.scrollY > 40);
+  // Black hole: full strength in the hero, dimmed (not gone) below it
+  if (bhCanvas && heroEl) {
+    const hh = heroEl.offsetHeight || window.innerHeight;
+    const f = Math.min(1, Math.max(0, (window.scrollY - hh * 0.3) / (hh * 0.6)));
+    bhCanvas.style.opacity = (1 - f * 0.72).toFixed(3);
+  }
   const max = document.documentElement.scrollHeight - window.innerHeight;
   progressBar.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
 }
