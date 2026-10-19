@@ -7,6 +7,7 @@ Made by **Team Void Century**.
 > **This code is shown for viewing and judging only.** It is not licensed for reuse: see [LICENSE](LICENSE).
 
 **Live site:** https://voids.wtf
+**Repository:** https://github.com/ryumaz/void-century-void-links
 **Short links:** https://go.voids.wtf/&lt;name&gt; · **Profile pages:** https://voids.wtf/&lt;username&gt;
 
 ![Void Links home page](docs/screenshots/hero.jpg)
