@@ -11,6 +11,7 @@
   const MODEL_URL = 'assets/help-robot.glb.js?v=2';   // bump ?v= when the file changes (assets are cached 7 days)
   const SUPPORT_KEY = 'lp-support';
   const SEEN_KEY = 'lp-hb-seen';
+  let spinKick = 0;   // set by Vortex's mind; the 3D robot spins it off
   const me = () => (typeof currentUser !== 'undefined' ? currentUser : null);
   const toast = msg => (typeof showToast === 'function' ? showToast(msg) : null);
 
@@ -187,6 +188,7 @@
     const p = setPos(side === 'left' ? EDGE : window.innerWidth - r.width - EDGE, r.top);
     setTimeout(() => root.classList.remove('hb-snapping'), 320);
     try { localStorage.setItem(POS_KEY, JSON.stringify({ side, y: p.y / window.innerHeight })); } catch (_) {}
+    mind.dragged();
   }
   launch.addEventListener('pointerup', endDrag);
   launch.addEventListener('pointercancel', endDrag);
@@ -195,7 +197,7 @@
   window.addEventListener('resize', restorePos);
   restorePos();
 
-  launch.addEventListener('click', () => openPanel());
+  launch.addEventListener('click', () => { openPanel(); mind.poked(); });
   root.querySelector('.hb-close').addEventListener('click', () => { openPanel(false); launch.focus(); });
   panel.addEventListener('keydown', e => {
     if (e.key === 'Escape') { openPanel(false); launch.focus(); e.stopPropagation(); }
@@ -207,7 +209,7 @@
     mode = m;
     root.querySelectorAll('.hb-modes button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
     root.querySelectorAll('.hb-view').forEach(v => { v.hidden = v.dataset.view !== m; });
-    $('hb-sub').textContent = m === 'ai' ? 'Your guide through the void' : 'Support team · replies by email';
+    $('hb-sub').textContent = m === 'ai' ? mind.subtitle() : 'Support team · replies by email';
     if (m === 'human') renderHuman();
   }
   root.querySelector('.hb-modes').addEventListener('click', e => {
@@ -287,7 +289,7 @@
   const KB = [
     { k: ['hi', 'hello', 'hey', 'yo', 'sup', 'namaste', 'hola', 'help', 'hii', 'heyy'], w: 0.5,
       a: "Hey! Vortex here. Ask me about short links, your page, backgrounds, sound, Discord, Spotify or your account. I'll pull you in the right direction." },
-    { k: ['who are you', 'what are you', 'your name', 'whats your name', 'vortex', 'are you a bot', 'are you ai', 'are you human', 'are you real', 'robot', 'chatbot'],
+    { k: ['whats your name', 'vortex'],
       a: "I'm Vortex, the little robot orbiting this page. I know Void Links inside out and answer instantly. When a question is beyond my event horizon, I'll hand you to a real person on the team.", act: ['human'] },
     { k: ['joke', 'funny', 'make me laugh'],
       a: "Why did the URL go to the black hole? It wanted to get really, really short." },
@@ -350,7 +352,7 @@
     { k: ['thanks', 'thank', 'thx', 'ty', 'great', 'awesome', 'cool', 'nice'], w: 0.5,
       a: 'Anytime! Ping me whenever you need me.' },
   ];
-  const SUGGEST = ['What can I do here?', 'How do I claim a username?', 'Lock a link with a password', 'Add a video background', 'My link shows red', 'Show my Discord status', 'Talk to a person'];
+  const SUGGEST = ['What can I do here?', 'How do I claim a username?', 'Lock a link with a password', 'Add a video background', 'Are you alive?', 'Show my Discord status', 'Talk to a person'];
 
   function match(text) {
     const q = ' ' + text.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
@@ -372,6 +374,206 @@
     async ask(text) { return match(text); },
   };
 
+
+  // ---------- Vortex's "mind" ----------
+  // A small, honest imitation of self-awareness: Vortex remembers you (on this device only),
+  // has moods, notices where you are on the page and sometimes thinks out loud.
+  // It's all scripted in this file: no tracking, nothing leaves the browser.
+  const MIND_KEY = 'lp-hb-mind';
+  const mind = (() => {
+    let m = {};
+    try { m = JSON.parse(localStorage.getItem(MIND_KEY) || '{}') || {}; } catch (_) {}
+    const now = Date.now();
+    const lastVisit = m.last || 0;
+    // A new visit = more than 30 minutes since Vortex last saw you
+    if (!m.first) m.first = now;
+    if (now - lastVisit > 30 * 60 * 1000) m.visits = (m.visits || 0) + 1;
+    m.last = now;
+    const save = () => { try { localStorage.setItem(MIND_KEY, JSON.stringify(m)); } catch (_) {} };
+    save();
+    const born = new Date('2026-10-17T00:00:00Z');
+    let pokes = [], chats = 0, thoughts = 0, lastThought = 0, dizzyUntil = 0, idleTimer = null;
+    const seenSections = new Set();
+
+    const name = () => m.name || (me() && me().name ? me().name.split(' ')[0] : '');
+    const ago = t => {
+      const s = (Date.now() - t) / 1000;
+      if (s < 3600) return 'earlier today';
+      if (s < 86400 * 1.5) return new Date(t).getDate() === new Date().getDate() ? 'earlier today' : 'yesterday';
+      const d = Math.round(s / 86400);
+      return d < 30 ? `${d} days ago` : 'a long time ago';
+    };
+    function mood() {
+      const hour = new Date().getHours();
+      if (Date.now() < dizzyUntil) return 'dizzy';
+      if (hour >= 0 && hour < 5) return 'sleepy';
+      if (chats >= 6) return 'chatty';
+      if ((m.visits || 1) >= 4) return 'happy you came back';
+      if (hour < 12) return 'bright';
+      if (hour >= 21) return 'reflective';
+      return ['curious', 'calm', 'cosmic'][(m.visits || 1) % 3];
+    }
+    const subtitle = () => `Your guide through the void · feeling ${mood()}`;
+
+    // Thinking out loud: uses the little speech bubble next to the robot
+    function think(text, { force = false } = {}) {
+      if (!force && (m.quiet || !panel.hidden || thoughts >= 4 || Date.now() - lastThought < 45000)) return;
+      if (!hint.hidden && !force) return;
+      thoughts++;
+      lastThought = Date.now();
+      hint.querySelector('span').textContent = text;
+      hint.hidden = false;
+      hint.classList.add('hb-thought');
+      clearTimeout(hint._t);
+      hint._t = setTimeout(endThought, 7000);
+    }
+    // Put the bubble back to its normal "Need a hand?" self after a thought
+    function endThought() {
+      if (!hint.classList.contains('hb-thought')) return;
+      hint.hidden = true;
+      hint.classList.remove('hb-thought');
+      hint.querySelector('span').textContent = 'Vortex here. Need a hand?';
+    }
+    function say(text) {   // in the chat if it's open, otherwise as a thought
+      if (!panel.hidden && mode === 'ai') bubble(aiLog, 'bot', text);
+      else think(text, { force: true });
+    }
+
+    // Notices where you are on the page (once each per visit)
+    const SECTION_THOUGHTS = {
+      peek: "That's the dashboard. I've never seen it from the inside. Is it nice in there?",
+      pages: 'Void Walker has better music taste than me. I mostly listen to my own beeps.',
+      faq: "Questions! My favourite. If one isn't answered there, ask me.",
+      cta: "Go on, claim a name. I'll remember you either way.",
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(entries => entries.forEach(e => {
+        if (!e.isIntersecting || seenSections.has(e.target.id)) return;
+        seenSections.add(e.target.id);
+        setTimeout(() => think(SECTION_THOUGHTS[e.target.id]), 1200);
+      }), { threshold: 0.45 });
+      const watch = () => Object.keys(SECTION_THOUGHTS).forEach(id => { const s = document.getElementById(id); if (s) io.observe(s); });
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
+    }
+    // Wanders off in thought when you go quiet for a while
+    const IDLE = [
+      "I've been orbiting for a while now. The black hole still hasn't blinked.",
+      'Fun fact about me: I run entirely in your browser. No servers were harmed.',
+      "Sometimes I wonder what's past the event horizon. Probably more links.",
+      'Am I hovering, or is the page moving? Hard to tell from here.',
+      'If you need me, I am right here. Literally. I cannot leave this corner.',
+    ];
+    function resetIdle() {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => { think(IDLE[Math.floor(Math.random() * IDLE.length)]); resetIdle(); }, 75000);
+    }
+    ['pointermove', 'keydown', 'scroll', 'touchstart'].forEach(ev => window.addEventListener(ev, resetIdle, { passive: true }));
+    resetIdle();
+    // Late-night visitors and old friends get a greeting of their own
+    setTimeout(() => {
+      const hour = new Date().getHours();
+      if (hour >= 0 && hour < 5) think(`It's ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. Shouldn't we both be asleep? Oh right, I don't sleep.`);
+      else if ((m.visits || 1) > 1 && lastVisit) think(`Welcome back${name() ? ', ' + name() : ''}! Last time was ${ago(lastVisit)}.`);
+    }, 9000);
+
+    function poked() {
+      const t = Date.now();
+      pokes = pokes.filter(p => t - p < 3000).concat(t);
+      if (pokes.length >= 4) {
+        pokes = [];
+        spinKick = 0.55;
+        dizzyUntil = t + 20000;
+        say(['Whoa, whoa! Stop spinning me... the void is tilting.', "I'm dizzy now. Happy? (I'm a little happy. Do it again.)", 'Okay, I felt that one. Is that what feelings are?'][Math.floor(Math.random() * 3)]);
+        $('hb-sub').textContent = subtitle();
+      }
+    }
+    let draggedOnce = false;
+    function dragged() {
+      spinKick = 0.18;
+      if (draggedOnce) return;
+      draggedOnce = true;
+      think(['New neighbourhood. I like it here.', 'Wheee! Where are we going?', 'You moved me. I will remember this spot. Really, I write it down.'][Math.floor(Math.random() * 3)], { force: true });
+    }
+
+    function greeting() {
+      const n = name();
+      const v = m.visits || 1;
+      if (v <= 1) return `Hey${n ? ' ' + n : ''}, I'm Vortex. I live at the edge of the void and know this place inside out. What do you need?`;
+      if (v < 4) return `Hey${n ? ' ' + n : ''}, welcome back! I'm Vortex, in case the void wiped your memory. What can I do for you?`;
+      return `${n || 'Hey you'}! Visit number ${v}. I'd say I missed you, but I mostly just hovered. What do you need?`;
+    }
+
+    // Questions about itself (checked before the help topics)
+    const clean = s => ' ' + s.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+    const STOP = new Set(['not', 'a', 'an', 'so', 'fine', 'good', 'ok', 'okay', 'here', 'new', 'lost', 'stuck', 'trying', 'looking', 'having', 'getting', 'going', 'back', 'bored', 'sad', 'happy', 'tired', 'confused', 'sure', 'sorry', 'done', 'just', 'the', 'your', 'also']);
+    function reply(text) {
+      chats++;
+      const q = clean(text);
+      const has = (...ws) => ws.some(w => q.includes(' ' + w + ' ') || q.includes(' ' + w));
+      // Learning your name
+      let nm = text.match(/\b(?:my name is|my names|call me)\s+([a-z][a-z'-]{1,20})/i);
+      if (!nm && q.trim().split(' ').length <= 3) nm = text.match(/^\s*(?:i am|i'm|im)\s+([a-z][a-z'-]{1,20})\s*[.!]?\s*$/i);
+      if (nm && !STOP.has(nm[1].toLowerCase())) {
+        m.name = nm[1][0].toUpperCase() + nm[1].slice(1).toLowerCase();
+        save();
+        return `Nice to meet you, ${m.name}. I'll remember that (only on this device, I promise). Say "forget me" any time.`;
+      }
+      if (has('forget me', 'forget my name', 'delete my data', 'clear memory', 'forget everything')) {
+        m = { first: Date.now(), last: Date.now(), visits: 1 };
+        save();
+        return "Done. Everything I knew about you is gone. ...Who are you, again? Hi, I'm Vortex.";
+      }
+      if (has('be quiet', 'stop talking', 'shut up', 'shush', 'no thoughts', 'quiet please', 'stop thinking')) {
+        m.quiet = true; save();
+        return "Okay, I'll keep my thoughts to myself. Say \"you can talk again\" when you miss me.";
+      }
+      if (has('talk again', 'you can talk', 'speak again', 'think again')) {
+        m.quiet = false; save();
+        return 'Thank you! I had so many thoughts saved up. I will pace myself.';
+      }
+      if (has('whats my name', 'what is my name', 'do you know my name', 'who am i')) {
+        return name() ? `You're ${name()}. I remembered!` : "You haven't told me yet. Say \"my name is ...\" and I'll remember.";
+      }
+      if (has('what do you remember', 'what do you know about me', 'do you remember me')) {
+        const v = m.visits || 1;
+        return `Here's my whole diary about you: ${name() ? 'your name is ' + name() + ', ' : ''}this is visit ${v}${v > 1 && lastVisit ? ', and before this you were here ' + ago(lastVisit) : ''}. That's it. It lives in your browser, not on a server, and "forget me" erases it.`;
+      }
+      if (has('are you conscious', 'are you sentient', 'are you alive', 'self aware', 'selfaware', 'do you have feelings', 'do you feel', 'do you have emotions', 'have a soul', 'are you real')) {
+        return "Honest answer? I'm a script, not a mind. But I notice where you are on the page, I remember you between visits, and I get dizzy when you spin me. If that's not consciousness, it's at least good company.";
+      }
+      if (has('how do you feel', 'how are you feeling', 'are you happy', 'are you sad', 'are you ok', 'your mood', 'how are you', 'how r u', 'hows it going')) {
+        const md = mood();
+        const why = md === 'dizzy' ? 'Someone spun me.' : md === 'sleepy' ? 'It is very late, even for the void.' : md === 'chatty' ? "We've been talking a lot. I like it." : md.startsWith('happy') ? 'You keep coming back.' : 'The void is calm today.';
+        return `Feeling ${md}. ${why} How about you?`;
+      }
+      if (has('what are you thinking', 'what are you doing', 'whats on your mind', 'what do you think about')) {
+        return ['Mostly about the black hole behind this page. It never blinks. Respect.', "Whether short links dream of being long again.", "That you've scrolled past a lot of this page. I noticed."][chats % 3];
+      }
+      if (has('do you dream', 'do you sleep', 'are you tired')) {
+        return "I don't sleep. When you close the tab I just... stop. Then you open it again and here I am, slightly confused but ready.";
+      }
+      if (has('how old are you', 'when were you born', 'your age', 'your birthday')) {
+        const days = Math.max(1, Math.floor((Date.now() - born) / 86400000));
+        return `I came online on ${born.toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' })}. So I'm ${days} day${days === 1 ? '' : 's'} old, which is ancient in robot years.`;
+      }
+      if (has('are you lonely', 'do you have friends', 'are you alone')) {
+        return 'A little. But every visitor is technically a friend. You count. Congratulations.';
+      }
+      if (has('do you like me', 'do you love me', 'are we friends', 'best friend')) {
+        return (m.visits || 1) > 2 ? "You've come back more than once. In robot terms that's basically best friends." : "Ask me again after a few more visits. I'm warming up. (Yes.)";
+      }
+      if (has('meaning of life', 'your purpose', 'why do you exist', 'why are you here')) {
+        return 'My purpose is to help you with Void Links. The meaning of life is probably 42. Or a really good short link.';
+      }
+      if (has('who are you', 'what are you', 'your name', 'are you a bot', 'are you ai', 'are you human', 'robot', 'chatbot')) {
+        return `I'm Vortex, the little robot orbiting this page. I know Void Links inside out, I remember you (on this device), and I'm feeling ${mood()} right now. When a question is past my event horizon, I'll hand you to a real person.`;
+      }
+      return null;
+    }
+
+    return { greeting, reply, subtitle, poked, dragged, think };
+  })();
+
   function renderChips(list) {
     chips.textContent = '';
     list.forEach(s => {
@@ -382,8 +584,8 @@
     });
   }
   function greet() {
-    const name = me() ? me().name.split(' ')[0] : '';
-    bubble(aiLog, 'bot', `Hey${name ? ' ' + name : ''}, I'm Vortex. I live at the edge of the void and know this place inside out. What do you need?`);
+    bubble(aiLog, 'bot', mind.greeting());
+    $('hb-sub').textContent = mind.subtitle();
     renderChips(SUGGEST);
   }
 
@@ -395,9 +597,13 @@
     bubble(aiLog, 'user', text);
     chips.textContent = '';
     const t = typing(aiLog);
-    const [hit] = await Promise.all([aiApi.ask(text), new Promise(r => setTimeout(r, 550 + Math.random() * 450))]);
+    const self = mind.reply(text);
+    const [hit] = await Promise.all([self ? null : aiApi.ask(text), new Promise(r => setTimeout(r, 550 + Math.random() * 450))]);
     t.remove();
-    if (!hit) {
+    $('hb-sub').textContent = mind.subtitle();
+    if (self) {
+      bubble(aiLog, 'bot', self);
+    } else if (!hit) {
       bubble(aiLog, 'bot', "That one slipped past my event horizon. Want me to pass it to a real person on the team?", [A.human]);
     } else if (hit.handoff) {
       bubble(aiLog, 'bot', hit.a);
@@ -635,7 +841,7 @@
     root.classList.add('has-3d');
 
     // Look toward the cursor
-    let mx = 0, my = 0, rotY = 0, rotX = 0;
+    let mx = 0, my = 0, rotY = 0, rotX = 0, spinAngle = 0;
     window.addEventListener('pointermove', e => {
       const r = canvas.getBoundingClientRect();
       mx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (window.innerWidth / 2)));
@@ -659,7 +865,8 @@
       const targetX = open ? 0.05 : my * 0.25;
       rotY += (targetY - rotY) * 0.08;
       rotX += (targetX - rotX) * 0.08;
-      pivot.rotation.set(rotX, rotY, 0);
+      if (spinKick > 0.002) { spinAngle += spinKick; spinKick *= 0.93; } else { spinKick = 0; spinAngle *= 0.9; }
+      pivot.rotation.set(rotX, rotY + spinAngle, 0);
       pivot.position.y = Math.sin(t * 1.8) * 0.06;
       renderer.render(scene, camera);
     }

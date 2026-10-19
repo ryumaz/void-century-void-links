@@ -295,3 +295,11 @@
 #help-bot.hb-left .hb-hint { right: auto; left: 112px; border-radius: 14px 14px 14px 4px; }
 #help-bot.hb-below .hb-hint { bottom: auto; top: 40px; }
 @media (prefers-reduced-motion: reduce) { #help-bot.hb-snapping { transition: none; } }
+
+/* Vortex thinking out loud: same bubble, a little dreamier */
+.hb-hint.hb-thought { font-style: italic; width: max-content; max-width: min(280px, calc(100vw - 150px)); white-space: normal; line-height: 1.4; animation: hbThought .35s ease-out; }
+.hb-hint.hb-thought span::before { content: '\201C'; opacity: .6; margin-right: 1px; }
+.hb-hint.hb-thought span::after { content: '\201D'; opacity: .6; margin-left: 1px; }
+@keyframes hbThought { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .hb-hint.hb-thought { animation: none; } }
+.hb-hint.hb-thought span { white-space: normal; }
