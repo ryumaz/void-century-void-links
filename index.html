@@ -5589,104 +5589,8 @@ const dashPages = {
       </div>
     </div>
   `,
-  ai: () => `
-    <div class="dash-page-title">AI Assistant</div>
-    <div class="dash-page-sub">Ask anything about your links and analytics.</div>
-    <div class="dash-panel" style="margin-bottom:16px;">
-      <div class="dash-panel-title">Quick Insights</div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        ${['Which link drove the most traffic this week?','What time of day gets the most clicks?','Which country should I target more?'].map(q=>`
-        <button class="btn btn-ghost" style="justify-content:flex-start;text-align:left;" onclick="askAI('${q}')">${q}</button>`).join('')}
-      </div>
-    </div>
-    <div class="dash-panel">
-      <div id="ai-chat" style="min-height:200px;display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
-        <div style="background:var(--accent-dim);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px 16px;font-size:0.9rem;">
-          <strong style="color:var(--accent);">Void Links AI</strong><br>
-          <span style="color:var(--text-muted);">Ask me about your links. I answer from your real clicks: your top link, best time to post, where clicks come from and more.</span>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <input type="text" id="ai-input" aria-label="Ask the AI assistant about your links" placeholder="Ask me anything about your links..." style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-size:0.9rem;outline:none;" onkeydown="if(event.key==='Enter')askAI(this.value)">
-        <button class="btn btn-primary" onclick="askAI(document.getElementById('ai-input').value)">Ask →</button>
-      </div>
-    </div>
-  `
 };
 
-// Answers built from your real links and clicks (swap for an LLM later if you like)
-function aiAnswer(q) {
-  if (!dash.loaded) return "I'm still loading your data. Ask me again in a moment.";
-  const ql = q.toLowerCase();
-  const c = dash.clicks;
-  const page = window.LP && LP.myPage();
-  const week = c.filter(x => Date.now() - new Date(x.at).getTime() < 7 * DAY);
-  const host = esc(DB.shortHost());
-  if (!dash.links.length && !page) return "You don't have short links or a page yet. Create a link in My Links (or claim your page), share it, and I'll have numbers for you.";
-  if (/(most|top|best|popular).*(link|traffic|click)|which link|traffic/.test(ql)) {
-    const top = countBy(week, x => x.slug)[0];
-    if (!top) return 'No clicks in the last 7 days yet. Share one of your links and check back.';
-    return `**${host}${esc(top[0])}** got the most clicks this week: **${fmt(top[1])}** of ${fmt(week.length)}.`;
-  }
-  if (/time|hour|when|day of/.test(ql)) {
-    if (!c.length) return "There are no clicks yet, so I can't tell your best time. Share a link and ask again.";
-    const hours = countBy(c, x => String(new Date(x.at).getHours()));
-    const h = Number(hours[0][0]);
-    const label = n => new Date(2000, 0, 1, n % 24).toLocaleTimeString([], { hour: 'numeric' });
-    return `Your clicks peak around **${label(h)}–${label(h + 1)}** (your local time), based on ${fmt(c.length)} clicks in the last 30 days. Post new links a little before then.`;
-  }
-  if (/country|countries|where|audience|target|location/.test(ql)) {
-    const countries = countBy(c, x => x.country);
-    if (!countries.length) {
-      const src = countBy(c, x => x.referrer || 'Direct')[0];
-      return `I don't have country data yet (it's recorded for clicks through your live site).${src ? ` Your top source is **${esc(src[0])}**.` : ''}`;
-    }
-    return 'Your top countries: ' + countries.slice(0, 3).map(([k, n]) => `**${esc(countryName(k))}** (${fmt(n)})`).join(', ') + '.';
-  }
-  if (/device|mobile|phone|desktop/.test(ql)) {
-    if (!c.length) return 'No clicks yet, so no device data.';
-    const m = c.filter(x => x.device === 'mobile').length;
-    return `**${Math.round(m / c.length * 100)}%** of your clicks come from phones (${fmt(m)} of ${fmt(c.length)}).`;
-  }
-  if (/source|referr|from/.test(ql)) {
-    const src = countBy(c, x => x.referrer || 'Direct');
-    if (!src.length) return 'No clicks yet, so no sources to show.';
-    return 'Your top sources: ' + src.slice(0, 3).map(([k, n]) => `**${esc(k)}** (${fmt(n)})`).join(', ') + '.';
-  }
-  if (/view|page|profile/.test(ql)) {
-    return page ? `Your page **${host}@${esc(page.username)}** has **${fmt(page.views)}** views.` : "You haven't published a page yet. Open My Page to create one.";
-  }
-  return `In the last 30 days: **${fmt(c.length)}** clicks across **${fmt(dash.links.length)}** links${page ? `, and your page has **${fmt(page.views)}** views` : ''}. Ask me about your top link, best time, sources, countries or devices.`;
-}
-
-function askAI(question) {
-  if (!question.trim()) return;
-  const chat = document.getElementById('ai-chat');
-  const input = document.getElementById('ai-input');
-  if (!chat) return;
-  // User bubble
-  const userBubble = document.createElement('div');
-  userBubble.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:0.9rem;align-self:flex-end;max-width:80%;';
-  userBubble.innerHTML = `<strong style="color:var(--text);">You</strong><br><span style="color:var(--text-muted);"></span>`;
-  userBubble.querySelector('span').textContent = question; // never inject user text as HTML
-  chat.appendChild(userBubble);
-  // AI bubble
-  setTimeout(() => {
-    const aiBubble = document.createElement('div');
-    aiBubble.style.cssText = 'background:var(--accent-dim);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px 16px;font-size:0.9rem;';
-    const resp = aiAnswer(question);
-    aiBubble.innerHTML = `<strong style="color:var(--accent);">Void Links AI</strong><br><span style="color:var(--text-muted);">${resp.replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--text);">$1</strong>')}</span>`;
-    chat.appendChild(aiBubble);
-    chat.scrollTop = chat.scrollHeight;
-  }, 700);
-  if (input) { input.value = ''; }
-  chat.scrollTop = chat.scrollHeight;
-}
-
-// ===== QR CODES =====
-// Real QR codes (qrcode-generator, shipped in assets/vendor). They point at the
-// site's own address (DB.shortUrl): "abc" → short link, "@name" → profile page.
-const QR_LIB = 'assets/vendor/qrcode.min.js?v=2';   // bump ?v= when the file changes (assets are cached 7 days)
 let qrLib = null;
 function loadQrLib() {
   if (!qrLib) {
@@ -6802,7 +6706,7 @@ dashPages.audit = () => {
 
 
 let currentTab = 'overview';
-const DATA_TABS = new Set(['overview', 'links', 'audit', 'analytics', 'qr', 'ai']);
+const DATA_TABS = new Set(['overview', 'links', 'audit', 'analytics', 'qr']);
 function showDashTab(tab, force) {
   const content = document.getElementById('dash-content');
   if (!content) return;
