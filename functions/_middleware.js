@@ -45,7 +45,7 @@ async function openLink(context, name) {
 
 // The profile with this name (only what a link preview needs), or null
 async function findProfile(name) {
-  const p = await fetch(`${SUPABASE_URL}/rest/v1/pages?select=username,name,bio,avatar_path&username=eq.${encodeURIComponent(name.toLowerCase())}`, { headers });
+  const p = await fetch(`${SUPABASE_URL}/rest/v1/pages?select=*&username=eq.${encodeURIComponent(name.toLowerCase())}`, { headers });
   const rows = p.ok ? await p.json() : [];
   return Array.isArray(rows) && rows.length ? rows[0] : null;
 }
@@ -61,7 +61,11 @@ async function profilePage(context, profile, url) {
     ? (profile.avatar_path.startsWith('site:') ? `${url.origin}/${profile.avatar_path.slice(5)}` : `${SUPABASE_URL}/storage/v1/object/public/media/${profile.avatar_path}`)
     : `${url.origin}/assets/brand/og-image-v2.jpg`;
   const set = (value) => ({ element(el) { el.setAttribute('content', value); } });
+  // The page data goes along with the HTML, so the browser can show it without asking again.
+  // (Pages are public anyway.) Escaped so nothing in it can close the script tag.
+  const data = JSON.stringify(profile).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
   return new HTMLRewriter()
+    .on('head', { element(el) { el.append(`<script>window.__VL_PAGE=${data};</script>`, { html: true }); } })
     .on('title', { element(el) { el.setInnerContent(title); } })
     .on('meta[name="description"]', set(desc))
     .on('meta[property="og:type"]', set('profile'))

@@ -1664,7 +1664,13 @@
     closeMedia();
     view.dataset.user = user;
     let page = null;
-    try { page = window.DB ? await DB.getPage(user) : null; } catch (_) { page = null; }
+    const pre = window.__VL_PAGE;   // sent along with the HTML on voids.wtf/name
+    if (pre && pre.username === user && window.DB && DB.pageFromRow) {
+      window.__VL_PAGE = null;
+      page = DB.pageFromRow(pre);
+    } else {
+      try { page = window.DB ? await DB.getPage(user) : null; } catch (_) { page = null; }
+    }
     if (routeUser() !== user) return;   // visitor moved on while it loaded
     viewPage = page;
     if (!page) {
@@ -1678,17 +1684,23 @@
         viewAudio = new Audio(page.audioUrl);
         viewAudio.loop = true;
       }
-      // Count the visit once a day per visitor (not refreshes, and not the owner's own looks)
-      const own = (myPageCache && myPageCache.username === user) || (me() && page.owner && me().id === page.owner);
-      const seenKey = 'vl_seen_' + user;
-      let fresh = !own;
-      try {
-        if (fresh && Date.now() - Number(localStorage.getItem(seenKey) || 0) < 864e5) fresh = false;
-        if (fresh) localStorage.setItem(seenKey, String(Date.now()));
-      } catch (_) {}
-      if (fresh) page.views += 1;
       renderProfile(view, page, media);
-      if (fresh) DB.countView(user).then(v => { if (v != null && viewPage === page) { page.views = v; renderProfile(view, page, media); } });
+      // Count the visit once a day per visitor (not refreshes, and not the owner's own looks).
+      // This waits for the sign-in check so we know whether it's the owner; the page doesn't.
+      ready.then(() => {
+        if (viewPage !== page) return;
+        const own = (myPageCache && myPageCache.username === user) || (me() && page.owner && me().id === page.owner);
+        const seenKey = 'vl_seen_' + user;
+        let fresh = !own;
+        try {
+          if (fresh && Date.now() - Number(localStorage.getItem(seenKey) || 0) < 864e5) fresh = false;
+          if (fresh) localStorage.setItem(seenKey, String(Date.now()));
+        } catch (_) {}
+        if (!fresh) return;
+        page.views += 1;
+        renderProfile(view, page, media);
+        DB.countView(user).then(v => { if (v != null && viewPage === page) { page.views = v; renderProfile(view, page, media); } });
+      });
       if (/^\d{17,20}$/.test(page.discordId || '') || page.nowPlaying) {
         discordTimer = setInterval(() => renderProfile(view, page, media), 15000);
       }
@@ -1698,6 +1710,7 @@
     soundBtn.hidden = !sound;
     splash.hidden = !sound;
     view.classList.add('active');
+    document.documentElement.classList.remove('vl-profile-boot');
     setOverlay(true);
     applySound(false);
     if (sound) splash.focus({ preventScroll: true });
@@ -1715,6 +1728,7 @@
   }
 
   function closeProfile() {
+    document.documentElement.classList.remove('vl-profile-boot');
     if (!view.classList.contains('active')) return;
     view.classList.remove('active');
     reportPanel.hidden = true;
@@ -1916,5 +1930,7 @@
     }
   })();
   renderDemo();
-  ready.then(route);
+  // Profile links open straight away; everything else routes once sign-in is known
+  if (routeUser()) route();
+  else ready.then(route);
 })();

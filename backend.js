@@ -190,6 +190,8 @@ window.siteHost = () => {
       fail(error);
       return fromRow(data);
     },
+    // A page row the server put in the HTML (profile links), so no second lookup is needed
+    pageFromRow(row) { return row ? fromRow(row) : null; },
     async getPage(username) {
       const { data, error } = await sb.from('pages').select('*').eq('username', username).maybeSingle();
       fail(error);
